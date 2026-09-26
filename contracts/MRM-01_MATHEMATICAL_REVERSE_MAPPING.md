@@ -142,3 +142,8 @@ Current conclusion: runtime trust-boundary evidence is stronger than the current
 ### Stage-7 K0/Ψ boundary result
 
 Reverse-analysis found an important type-boundary correction: canonical K0 is a kernel authority, not a predicate over Ψ. The formal model therefore keeps `Ψ` transition and K0 kernel preservation as separate components of `Sigma`; a certified transition must carry an explicit root-preservation certificate. This avoids collapsing the two state domains into a second authority model. CI at HEAD `0b6e4f95a517761c0c67c913359a177aac27023a`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+### Stage-7 Ψ/K0 runtime separation evidence
+
+Adversarial tests now establish that `PsiTransition` can change only the canonical `Ψ=(X,R)` projection and cannot self-authorize a kernel/K0 change. A valid K0 before/after pair requires the explicit canonical invariant and `preserve_root`; a forged `sealed=False` kernel remains outside authority regardless of a successful Ψ transition. CI at HEAD `b0cb6320a2a6914d661b3db84c700f984cf2cf94`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
