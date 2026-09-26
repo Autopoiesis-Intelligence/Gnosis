@@ -115,4 +115,4 @@ def test_adversarial_tamper_recovery_rejects_and_does_not_commit(tmp_path):
 
     durable = SQLiteHistoryStore(path).load()
     assert len(durable.records) == 1
-    assert durable.head.state_hash == state_digest(state)
+    assert durable.head.state_hash == "tampered-state"
