@@ -55,3 +55,29 @@ def test_task_processing_can_use_durable_audited_store(tmp_path):
     assert len(store.load().records)==1
     assert len(store.load_provenance())==1
     assert len(store.load_audit())==1
+
+
+def test_durable_task_result_survives_recovery(tmp_path):
+    from core.recovery import recover_psi
+    from core.state import Psi
+    genesis=Psi(x=("start",),relations=())
+    task=Task.create("task-recovery","append-result")
+    info=Information("info-recovery","task",task.task_id,"test",
+        Authorization("task","process","transform","core",AuthorizationStatus.ALLOWED),
+        payload=task.content)
+    request=ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation(name="transform"),
+        content_digest=task.content_digest, purpose="task-processing")
+    execution_input=execution_input_from_psi(
+        genesis,input_type="task",content_digest=task.content_digest)
+    transition=PsiTransition(lambda s: Psi(x=s.x+("done",),relations=s.relations))
+    store=SQLiteHistoryStore(tmp_path/"recovery.db")
+    executor=CanonicalExecutor(
+        history=__import__("core.history",fromlist=["AppendOnlyHistory"]).AppendOnlyHistory(),
+        kernel_version="task-kernel", durable_store=store)
+    result=TaskProcessor(AuthorizedExecution(executor)).process(
+        task,info,genesis,transition,execution_input,request)
+    recovered=recover_psi(
+        genesis, SQLiteHistoryStore(tmp_path/"recovery.db"),
+        lambda state, record: Psi(x=state.x+("done",),relations=state.relations))
+    assert recovered.psi == result.execution.psi
