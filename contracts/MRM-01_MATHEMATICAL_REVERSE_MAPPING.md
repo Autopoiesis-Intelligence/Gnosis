@@ -122,3 +122,8 @@ After MRM-01 reaches VERIFIED status, optimize the existing contract registry ag
 A row may move to VERIFIED only when the same semantic proposition is represented in the formal layer and connected to executable evidence. Existing Lean files are therefore treated as proof targets, not as evidence that the full architecture has already been formally verified.
 
 Current conclusion: runtime trust-boundary evidence is stronger than the current formal correspondence. The remaining Stage-7 work is to close that correspondence without introducing a second authority or state model.
+
+
+### Stage-7 formal bridge update
+
+`formal/RootInvariant.lean` now contains an explicit `Kernel`/`canonicalK0` target corresponding to the runtime sealed-kernel condition, plus a preservation theorem. This is a formal proof target and correspondence anchor; it is not yet a proof that arbitrary Python runtime states are represented by this Lean `Kernel`. That runtime representation theorem remains pending.
