@@ -28,6 +28,9 @@ class SQLiteHistoryStore:
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
                 event TEXT NOT NULL, audit_hash TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS authorization_consumption (
+                authorization_digest TEXT PRIMARY KEY, sequence INTEGER NOT NULL,
+                consumed_event TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
                 sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
                 evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
@@ -76,7 +79,7 @@ class SQLiteHistoryStore:
 
     def commit_once_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
-        current, next_value,
+        current, next_value, authorization_digest: str | None = None,
     ) -> CommitResult:
         """Atomically commit History + canonical Audit or commit neither."""
         existing = self.load()
@@ -122,6 +125,17 @@ class SQLiteHistoryStore:
                      provenance.evidence_hash, provenance.kernel_version,
                      "\x1f".join(provenance.source_ids)))
                 self._fail("after_provenance_before_audit")
+                if authorization_digest is not None:
+                    if not authorization_digest.strip():
+                        raise ValueError("authorization_digest is required when supplied")
+                    try:
+                        conn.execute("""INSERT INTO authorization_consumption
+                            (authorization_digest, sequence, consumed_event)
+                            VALUES (?, ?, ?)""",
+                            (authorization_digest, record.sequence, "execution-authorized-commit"))
+                    except sqlite3.IntegrityError as exc:
+                        raise ValueError("authorization has already been consumed") from exc
+                self._fail("after_authorization_before_audit")
                 conn.execute("""INSERT INTO audit_history
                     (sequence, transition_hash, previous_audit_hash,
                      provenance_hash, event, audit_hash)
