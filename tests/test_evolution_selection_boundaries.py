@@ -1,3 +1,5 @@
+import pytest
+
 from core import State
 from core.evolution import evolutionary_psi_transition, select_next_state
 
@@ -59,7 +61,10 @@ def test_evolution_selector_cannot_use_external_candidate_authority():
     def accept(_state):
         return True
 
-    transition = evolutionary_psi_transition(generate, accept)
+    def generate_with_continuation(_state):
+        return [candidate, State(values={"x": 2, "relations": ("accepted",)})]
+
+    transition = evolutionary_psi_transition(generate_with_continuation, accept)
     result = transition(initial.to_psi())
 
     assert result.x == 1
