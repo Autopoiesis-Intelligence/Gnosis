@@ -27,6 +27,12 @@ def preserve_root(root: RootInvariant[T], before: T, after: T) -> bool:
     return root.holds(before) and root.holds(after)
 
 
+CANONICAL_ROOT_INVARIANT = RootInvariant(
+    lambda kernel: kernel.get("sealed") is True,
+    name="K0",
+)
+
+
 def canonical_root_invariant() -> RootInvariant[dict]:
-    """Return the canonical K0 contract; callers cannot supply a replacement."""
-    return RootInvariant(lambda kernel: kernel.get("sealed") is True, name="K0")
+    """Return the singleton canonical K0 contract; callers cannot replace it."""
+    return CANONICAL_ROOT_INVARIANT
