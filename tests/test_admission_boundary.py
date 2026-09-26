@@ -53,3 +53,42 @@ def test_canonical_evolution_uses_admission_before_selection():
     )
     result = transition(State(values={"x": "current", "relations": ()}).to_psi())
     assert result.x in {"a", "b"}
+
+
+def test_evidence_cannot_upgrade_rejected_admission():
+    candidate = State(values={"x": "forged", "relations": ()})
+    proof = ProofObligation(
+        passed=False,
+        invariant=False,
+        viable=False,
+        evidence={
+            "regime": "fundamental",
+            "source_ids": ("trusted-source",),
+            "evidence_hash": "valid-looking",
+            "attestation": True,
+        },
+    )
+    result = admit(candidate, proof)
+    assert result.accepted is False
+    with pytest.raises(ValueError, match="not admitted"):
+        require_admitted(result)
+
+
+def test_provenance_attachment_does_not_create_admission_authority():
+    from core.provenance import Provenance, attach_provenance
+
+    record = __import__("core.history", fromlist=["TransitionRecord"]).TransitionRecord(
+        0, "", "s0", "k1", "c0", True, "e0"
+    )
+    attached = attach_provenance(
+        record, Provenance("c0", "e0", "k1", ("trusted-source",))
+    )
+    assert attached == record
+    proof = ProofObligation(
+        passed=False,
+        invariant=False,
+        viable=False,
+        evidence={"provenance": attached, "source_ids": ("trusted-source",)},
+    )
+    admission = admit(candidate, proof)
+    assert admission.accepted is False
