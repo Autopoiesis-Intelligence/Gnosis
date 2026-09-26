@@ -2,6 +2,9 @@
 from __future__ import annotations
 import argparse, json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
 from core.execution_contract import execution_input_from_psi, state_digest
