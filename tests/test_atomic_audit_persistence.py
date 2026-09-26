@@ -88,3 +88,39 @@ def test_cross_table_tamper_fails_closed(tmp_path, table, column, value, message
         conn.commit()
     with pytest.raises(ValueError):
         SQLiteHistoryStore(path).verify_cross_table_consistency()
+
+
+@pytest.mark.parametrize("mutation", ["delete_first", "delete_middle", "duplicate_sequence", "rewrite_previous_hash"])
+def test_chain_continuity_mutation_fails_closed(tmp_path, mutation):
+    path = tmp_path / "chain-mutation.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(rec(), prov(), None, "state")
+    second = TransitionRecord(1, "s0", "s1", "k1", "s1", True, "e1")
+    store.commit_once_with_audit(
+        second,
+        Provenance("s1", "e1", "k1"),
+        "state",
+        "state-1",
+    )
+
+    with sqlite3.connect(path) as conn:
+        if mutation == "delete_first":
+            conn.execute("DELETE FROM transition_history WHERE sequence=0")
+            conn.execute("DELETE FROM provenance_history WHERE sequence=0")
+            conn.execute("DELETE FROM audit_history WHERE sequence=0")
+        elif mutation == "delete_middle":
+            conn.execute("DELETE FROM transition_history WHERE sequence=1")
+            conn.execute("DELETE FROM provenance_history WHERE sequence=1")
+            conn.execute("DELETE FROM audit_history WHERE sequence=1")
+        elif mutation == "duplicate_sequence":
+            conn.execute(
+                "INSERT INTO transition_history VALUES (2, 's1', 's2', 'k1', 's2', 1, 'e2')"
+            )
+        elif mutation == "rewrite_previous_hash":
+            conn.execute(
+                "UPDATE transition_history SET previous_hash='forged' WHERE sequence=1"
+            )
+        conn.commit()
+
+    with pytest.raises(ValueError):
+        store.verify_cross_table_consistency()
