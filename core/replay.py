@@ -34,7 +34,10 @@ def replay(
         if record.sequence != index:
             raise ValueError("replay sequence is not contiguous.")
 
-        if index > 0:
+        if index == 0:
+            if record.previous_hash != "genesis":
+                raise ValueError("replay genesis record has invalid previous_hash.")
+        else:
             actual_previous = state_digest(state)
             if actual_previous != record.previous_hash:
                 raise ValueError("replay state does not match record.previous_hash.")
