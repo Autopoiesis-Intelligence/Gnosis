@@ -91,3 +91,12 @@ CI evidence: Architecture Gate and Gnozis Port CI are GREEN on HEAD 6b96c113bf8c
 Audit persistence is now adversarially checked for previous-audit-hash mutation and sequence gaps after restart. Because `load_audit()` verifies each stored digest and contiguous sequence, and recovery additionally verifies the causal chain against history/provenance, reordered or gapped audit evidence fails closed before replay.
 
 CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN at HEAD e2de525eb52e0eb5f438a843ba7521457a2144a6.
+
+
+## Durable recovery equivalence gate
+
+The end-to-end restart replay scenario is now covered by the existing authorization restart test: a real canonical execution is durably committed, the process is recreated, `recover_psi()` reconstructs the committed state, and the recovered state is asserted equal to the original committed `Psi`. The same durable authorization is then rejected after restart, and the database remains at exactly one transition and one authorization-consumption record.
+
+This establishes the required distinction: recovery restores the committed causal state, while it does not restore authorization as an executable permission.
+
+CI evidence at HEAD `5abec429b3f655c4b0f964b9e0d80dc1957c6e2b`: Tests, Architecture Gate, and Gnozis Port CI all SUCCESS.
