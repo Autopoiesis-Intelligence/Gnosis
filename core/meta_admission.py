@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from .meta_transition import MetaTransition, RefinementProof
-from .root_invariant import RootInvariant
+from .root_invariant import RootInvariant, canonical_root_invariant
 from .state import Psi
 from .dynamics import ClosureObligation
 
@@ -21,6 +21,7 @@ class MetaAdmission(Generic[T]):
     def admissible(self) -> bool:
         return (
             self.transition.admissible()
+            and self.root == canonical_root_invariant()
             and self.root.holds(self.transition.before)
             and self.root.holds(self.transition.after)
             and self.closure.holds()
