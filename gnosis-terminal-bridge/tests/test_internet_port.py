@@ -13,8 +13,8 @@ def test_handshake_and_exchange():
         "protocol": PROTOCOL,
         "client_id": "test-agent",
         "provenance": {"provider": "test"},
-            "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
-        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+            "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
+        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
     })
     response = port.exchange({
         "protocol": PROTOCOL,
@@ -23,7 +23,7 @@ def test_handshake_and_exchange():
         "type": "hypothesis",
         "payload": {"x": 1},
         "provenance": {"provider": "test"},
-        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
     })
     assert response["status"] == "accepted"
     assert response["message_id"] == "m1"
@@ -45,7 +45,7 @@ def test_unknown_session_fails():
 def test_replay_fails():
     port = make_port()
     hs = port.handshake({"protocol": PROTOCOL, "client_id": "x", "provenance": {}})
-    msg = {"protocol": PROTOCOL, "session_id": hs["session_id"], "message_id": "same", "type": "request", "payload": {}, "provenance": {}, "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"}}
+    msg = {"protocol": PROTOCOL, "session_id": hs["session_id"], "message_id": "same", "type": "request", "payload": {}, "provenance": {}, "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"}}
     port.exchange(msg)
     with pytest.raises(PortError, match="replayed"):
         port.exchange(msg)
