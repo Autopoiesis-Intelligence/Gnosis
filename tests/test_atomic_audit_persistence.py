@@ -196,3 +196,38 @@ def test_persisted_evidence_does_not_create_admission_after_restart(tmp_path):
         proof,
     )
     assert admission.accepted is False
+
+
+def test_full_authority_path_closes_after_restart(tmp_path):
+    path = tmp_path / "authority-closure.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(
+        rec(), prov(), None, "state",
+        authorization_digest="auth-closure",
+        authorization_state_digest="state-0",
+    )
+
+    reopened = SQLiteHistoryStore(path)
+    reopened.verify_cross_table_consistency()
+    persisted = reopened.load_provenance()[0]
+
+    from core.admission import admit, require_admitted
+    from core.proof import ProofObligation
+    from core.state import State
+
+    candidate = State(values={"x": "recovered-evidence", "relations": ()})
+    proof = ProofObligation(
+        passed=False,
+        invariant=False,
+        viable=False,
+        evidence={"persisted_provenance": persisted, "source_ids": persisted.source_ids},
+    )
+    admission = admit(candidate, proof)
+    assert admission.accepted is False
+    with pytest.raises(ValueError, match="not admitted"):
+        require_admitted(admission)
+
+    assert reopened.load().records == store.load().records
+    assert reopened.load_audit() == store.load_audit()
+    assert reopened.load_provenance() == store.load_provenance()
+    assert reopened.load_authorization_consumption() == store.load_authorization_consumption()
