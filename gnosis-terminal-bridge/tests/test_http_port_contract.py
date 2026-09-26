@@ -81,6 +81,7 @@ def test_replay_is_rejected():
             "protocol": "gnozis-port/1", "session_id": handshake["session_id"],
             "message_id": "same-message", "type": "hypothesis",
             "payload": {"text": "test"}, "provenance": {"source": "test-client"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "ALLOWED"},
         }
         assert _request(server, "/v1/exchange", payload)[0] == 200
         assert _request(server, "/v1/exchange", payload)[0] == 401
