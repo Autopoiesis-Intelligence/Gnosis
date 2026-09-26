@@ -1,0 +1,24 @@
+id: R3-FIRST-TASK-2026-09-26
+title: First Independent Task Processing Boundary
+status: IMPLEMENTED_PENDING_RUNTIME_VERIFICATION
+product_milestone:
+  criterion: "A task is accepted, authorization is checked, execution identity is bound, canonical transition executes, and a result is returned with causal history."
+flow:
+  - Task
+  - Information
+  - Authorization
+  - ExecutionInput
+  - CanonicalExecution
+  - Commit
+  - TaskResult
+evidence:
+  implementation: core/task_processing.py
+  test: tests/test_task_processing.py
+limitations:
+  - "Current milestone uses an explicit deterministic PsiTransition supplied to the processor."
+  - "Durable audited persistence is not yet wired into CanonicalExecutor."
+  - "This is the first executable task-processing path, not yet the autonomous/self-generated task milestone."
+next:
+  - "Wire durable audited commit into CanonicalExecutor."
+  - "Execute task path against SQLite History+Provenance+Audit."
+  - "Verify restart/recovery of the task result."
