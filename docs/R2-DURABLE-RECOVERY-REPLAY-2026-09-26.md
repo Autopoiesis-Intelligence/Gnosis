@@ -66,3 +66,12 @@ The durable commit boundary now has adversarial evidence for the complete Histor
 A second test mutates persisted authorization candidate binding after a successful commit. Verification fails closed and refuses to treat the tampered authorization evidence as valid.
 
 CI evidence: Tests, Architecture Gate and Gnozis Port CI are GREEN at HEAD e68621b9d5b6e6bf93dba5a64d1b06c2a58d858b.
+
+
+## Cross-table consistency gate
+
+Recovery now verifies the complete durable evidence graph across transition history, provenance, audit chain, and authorization consumption. Independent tampering of candidate, evidence, provenance, or transition bindings is detected fail-closed; audit digest verification remains an earlier integrity barrier.
+
+Adversarial coverage includes independent mutation of each cross-table binding and CI confirmation after the initial assertion was corrected to test the invariant (fail-closed), rather than a particular detection ordering.
+
+CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN at HEAD 3ea6ec07a33eadcbd4eac1cb94dcf6c46d1eed72.
