@@ -40,7 +40,7 @@ def select_next_state(state: State, generate: Generator, test: Tester) -> State:
         raise ValueError("Generator must produce at least one candidate state")
     valid = [candidate for candidate in candidates if _test_candidate(test, candidate)]
     if not valid:
-        return state
+        raise ValueError("No valid candidate state passed the test")
     return min(valid, key=_generic_score)
 
 
