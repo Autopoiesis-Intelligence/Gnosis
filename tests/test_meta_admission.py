@@ -4,6 +4,7 @@ from core.meta_admission import MetaAdmission
 from core.meta_transition import MetaTransition, RefinementProof
 from core.psi_transition import make_psi_transition
 from core.root_invariant import RootInvariant
+from core.state import Psi
 
 
 def test_unified_meta_admission_requires_k0_refinement_and_closure():
