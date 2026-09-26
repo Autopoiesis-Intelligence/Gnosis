@@ -26,3 +26,16 @@ The integration tests cover:
 ## Boundary
 
 This proves the Core persistence/replay contract at the application level. It does not prove physical power-loss durability, filesystem hardware behavior, or OS-level storage guarantees.
+
+
+## Authorization replay-after-restart gate
+
+An authorization-bearing external execution request is now bound to a stable request digest and consumed atomically in the same SQLite transaction as History + Provenance + Audit.
+
+The adversarial test performs:
+
+`authorized request -> durable commit -> simulated restart -> durable recovery/replay -> reuse of the same request against the recovered state -> reject`
+
+The rejected replay leaves the durable transition count unchanged and preserves exactly one authorization-consumption record. A conflicting replay cannot become a new committed transition merely because the original authorization survived process restart.
+
+This closes the persistence/restart authorization-replay gate at the application level. It does not claim protection against physical storage rollback, filesystem snapshots restored to an earlier point, or external authorization systems that are themselves mutable outside Core.
