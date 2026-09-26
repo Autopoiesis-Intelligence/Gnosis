@@ -25,3 +25,8 @@ class RootInvariant(Generic[T]):
 def preserve_root(root: RootInvariant[T], before: T, after: T) -> bool:
     """K0 preservation requires the invariant to hold before and after."""
     return root.holds(before) and root.holds(after)
+
+
+def canonical_root_invariant() -> RootInvariant[dict]:
+    """Return the canonical K0 contract; callers cannot supply a replacement."""
+    return RootInvariant(lambda kernel: kernel.get("sealed") is True, name="K0")
