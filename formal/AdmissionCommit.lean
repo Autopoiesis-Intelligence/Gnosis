@@ -65,3 +65,24 @@ theorem runtime_commit_cannot_bypass_admission
     (h : SemanticCommit I previous candidate proof) :
     proof.passed = true ∧ I candidate ∧ proof.viable := by
   exact ⟨h.2.1, h.2.2.2, h.2.2.2⟩
+
+
+/-- Fundamental admission is intentionally weaker than evolutionary admission:
+    viability is not an input to the fundamental regime. -/
+theorem fundamental_does_not_require_viability
+    (I : Psi → Prop)
+    (candidate : Psi)
+    (proof : ProofObligation I candidate)
+    (hPassed : proof.passed = true)
+    (hInvariant : proof.invariant_ok) :
+    FundamentalAdmission I candidate proof := by
+  exact ⟨hPassed, hInvariant⟩
+
+/-- Evolutionary admission retains the stronger continuation requirement. -/
+theorem evolutionary_requires_viability
+    (I : Psi → Prop)
+    (candidate : Psi)
+    (proof : ProofObligation I candidate)
+    (h : EvolutionaryAdmission I candidate proof) :
+    proof.viable := by
+  exact h.2.2
