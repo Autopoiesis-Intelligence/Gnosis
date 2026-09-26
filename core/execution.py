@@ -8,6 +8,7 @@ from .admission import admit
 from .commit import commit
 from .execution_contract import ExecutionInput, verify_execution_input
 from .history import AppendOnlyHistory
+from .sqlite_persistence import SQLiteHistoryStore
 from .proof import prove_fundamental_transition, prove_transition
 from .psi_transition import PsiTransition
 from .state import Psi, State
@@ -26,6 +27,7 @@ class ExecutionResult:
 class CanonicalExecutor:
     history: AppendOnlyHistory
     kernel_version: str
+    durable_store: SQLiteHistoryStore | None = None
 
     def step(
         self,
@@ -65,13 +67,14 @@ class CanonicalExecutor:
         if not admission.accepted:
             return ExecutionResult(psi=psi, history=self.history)
 
-        committed, history = commit(
-            previous=psi,
-            admission=admission,
+        from .canonical_chain import commit_admitted_psi
+        committed = commit_admitted_psi(
+            self.history, psi, admission,
             kernel_version=self.kernel_version,
-        ).apply(self.history)
-        self.history = history
-        return ExecutionResult(psi=committed, history=history)
+            durable_store=self.durable_store,
+        )
+        self.history = committed.history
+        return ExecutionResult(psi=committed.value, history=committed.history)
 
     def evolve(
         self,
@@ -116,11 +119,11 @@ class CanonicalExecutor:
             proof=selected.proof,
         )
 
-        committed, history = commit(
-            previous=psi,
-            admission=selected,
+        from .canonical_chain import commit_admitted_psi
+        committed = commit_admitted_psi(
+            self.history, psi, selected,
             kernel_version=self.kernel_version,
-        ).apply(self.history)
-
-        self.history = history
-        return ExecutionResult(psi=committed, history=history)
+            durable_store=self.durable_store,
+        )
+        self.history = committed.history
+        return ExecutionResult(psi=committed.value, history=committed.history)
