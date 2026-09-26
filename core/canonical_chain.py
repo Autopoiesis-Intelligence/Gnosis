@@ -36,6 +36,10 @@ def admit_transition(
     guard_transition(record, provenance, operation_count=operation_count,
                      gas_costs=gas_costs, gate=gate, gas_limit=gas_limit)
     if durable_store is not None:
+        if authorization_digest is None:
+            return durable_store.commit_once_with_audit(
+                record, provenance, current_state, next_state
+            )
         return durable_store.commit_once_with_audit(
             record, provenance, current_state, next_state,
             authorization_digest=authorization_digest,
