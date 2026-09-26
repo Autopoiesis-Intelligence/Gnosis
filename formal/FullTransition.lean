@@ -17,25 +17,40 @@ structure ProofObligation (I : Psi → Prop) (candidate : Psi) where
   invariant_ok : I candidate
   viable : Prop
 
-def Admission (I : Psi → Prop) (candidate : Psi)
+def FundamentalAdmission (I : Psi → Prop) (candidate : Psi)
+    (proof : ProofObligation I candidate) : Prop :=
+  proof.passed = true ∧ proof.invariant_ok
+
+def EvolutionaryAdmission (I : Psi → Prop) (candidate : Psi)
     (proof : ProofObligation I candidate) : Prop :=
   proof.passed = true ∧ proof.invariant_ok ∧ proof.viable
 
+inductive AdmissionRegime
+  | fundamental
+  | evolutionary
+
+def Admission (regime : AdmissionRegime) (I : Psi → Prop) (candidate : Psi)
+    (proof : ProofObligation I candidate) : Prop :=
+  match regime with
+  | .fundamental => FundamentalAdmission I candidate proof
+  | .evolutionary => EvolutionaryAdmission I candidate proof
+
 structure CertifiedTransition
+    (regime : AdmissionRegime)
     (I : Psi → Prop) (root : K → Prop)
     (s : Sigma) where
   candidate : Psi
   next : Sigma
   nextK : K
   proof : ProofObligation I candidate
-  admission : Admission I candidate proof
+  admission : Admission regime I candidate proof
   commit_psi : next.psi = candidate
   preserves_root : root s.K → root nextK
 
 theorem full_transition_preserves
     (I : Psi → Prop) (root : K → Prop)
     (s : Sigma)
-    (t : CertifiedTransition I root s)
+    (t : CertifiedTransition regime I root s)
     (hI : I s.psi)
     (hRoot : root s.K) :
     J I root t.next t.nextK := by
@@ -78,3 +93,17 @@ theorem evidence_does_not_imply_certified_transition
   intro hNoAdmission hExists
   rcases hExists with ⟨t, hCandidate⟩
   exact hNoAdmission t.admission
+
+
+theorem certified_transition_supports_fundamental_or_evolutionary
+    (regime : AdmissionRegime)
+    (I : Psi → Prop) (root : K → Prop)
+    (s : Sigma)
+    (t : CertifiedTransition regime I root s)
+    (hRoot : root s.K) :
+    J I root t.next t.nextK := by
+  constructor
+  · rw [t.commit_psi]
+    exact t.proof.invariant_ok
+  · exact t.preserves_root hRoot
+
