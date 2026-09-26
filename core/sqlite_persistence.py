@@ -113,6 +113,7 @@ class SQLiteHistoryStore:
                     (record.sequence, record.previous_hash, record.state_hash,
                      record.kernel_version, record.candidate_hash,
                      int(record.admitted), record.evidence_hash))
+                self._fail("after_history_before_audit")
                 self._fail("after_history_before_provenance")
                 conn.execute("""INSERT INTO provenance_history
                     (sequence, candidate_hash, evidence_hash, kernel_version, source_ids)
