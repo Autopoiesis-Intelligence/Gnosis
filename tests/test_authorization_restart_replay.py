@@ -64,7 +64,7 @@ def test_authorized_request_cannot_be_replayed_after_restart(tmp_path):
         kernel_version="restart-test-v1",
         durable_store=first_store,
     )
-    first = TaskExecution = AuthorizedExecution(first_executor).step(
+    first = AuthorizedExecution(first_executor).step(
         info,
         genesis,
         PsiTransition(lambda p: Psi(x=p.x + ("first-commit",), relations=p.relations)),
