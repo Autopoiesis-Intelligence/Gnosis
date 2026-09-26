@@ -113,7 +113,7 @@ def test_authorized_request_cannot_be_replayed_after_restart(tmp_path):
     with __import__("sqlite3").connect(database) as conn:
         row = conn.execute(
             "SELECT COUNT(*) FROM authorization_consumption WHERE authorization_digest = ?",
-            (request.execution_authorization_digest(execution_input.state_digest),),
+            (request.authorization_digest(),),
         ).fetchone()
     assert row[0] == 1
 
@@ -150,7 +150,7 @@ def test_restart_fails_closed_when_authorization_consumption_is_tampered(tmp_pat
     with sqlite3.connect(database) as conn:
         conn.execute(
             "UPDATE authorization_consumption SET consumed_event = ? WHERE authorization_digest = ?",
-            ("tampered-event", request.execution_authorization_digest(execution_input.state_digest)),
+            ("tampered-event", request.authorization_digest()),
         )
         conn.commit()
 
@@ -190,23 +190,23 @@ def test_authorization_cannot_cross_state_record(tmp_path):
         durable_store=store,
     )
 
+    AuthorizedExecution(executor).step(
+        info,
+        genesis,
+        PsiTransition(lambda x, relations: (x + ("first-commit",), relations)),
+        genesis_input,
+        request,
+    )
+
+    # The same authorization must not cross records by being reused
+    # against a different state after its first durable consumption.
     with pytest.raises(ValueError, match="authorization has already been consumed"):
-        # Seed the exact authorization consumption for the declared genesis state.
         AuthorizedExecution(executor).step(
             info,
-            genesis,
-            PsiTransition(lambda x, relations: (x + ("first-commit",), relations)),
-            genesis_input,
-            request,
-        )
-        AuthorizedExecution(executor).step(
-            info,
-            genesis,
-            PsiTransition(lambda x, relations: (x + ("second-commit",), relations)),
-            genesis_input,
+            alternate,
+            PsiTransition(lambda x, relations: (x + ("cross-state",), relations)),
+            alternate_input,
             request,
         )
 
-    assert request.execution_authorization_digest(genesis_input.state_digest) != (
-        request.execution_authorization_digest(alternate_input.state_digest)
-    )
+    assert request.authorization_digest()
