@@ -1,0 +1,13 @@
+id: R3-FIRST-TASK-2026-09-26
+status: IMPLEMENTED_PENDING_RUNTIME_VERIFICATION
+update:
+  - "CanonicalExecutor now accepts an optional durable SQLiteHistoryStore."
+  - "Canonical step/evolve route durable commits through commit_admitted_psi -> commit_once_with_audit."
+  - "Task processing test covers durable History + Provenance + Audit creation."
+milestone:
+  first_task_path: "executable"
+  first_product_final: "not yet; runtime verification and restart/recovery remain"
+next:
+  - "run CI/runtime tests"
+  - "recover the durable task result after process restart"
+  - "remove remaining compatibility-only history path from canonical production surface"
