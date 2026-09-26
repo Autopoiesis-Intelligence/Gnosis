@@ -10,3 +10,10 @@
 8. A context restore may reconstruct authorized working context, but cannot silently restore authority.
 9. Downstream repository updates cannot mutate trusted Core state implicitly.
 10. Missing evidence blocks a maturity claim; implementation alone is insufficient.
+
+
+## Evolution influence gate
+
+Candidate generation is not authority. A generated candidate can affect canonical evolution only through the existing proof/admission boundary. A rejected candidate produces no transition result and leaves the input state unchanged. Selection remains endogenous and deterministic; no external candidate selector is consulted.
+
+Adversarial evidence: `tests/test_evolution_selection_boundaries.py` covers rejected-candidate non-commit and endogenous candidate selection. CI at the current test baseline is GREEN.
