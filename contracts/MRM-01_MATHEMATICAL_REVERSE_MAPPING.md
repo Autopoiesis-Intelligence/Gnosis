@@ -157,3 +157,8 @@ Evidence and provenance are now explicitly non-constructive with respect to cert
 ### Stage-7 fundamental/evolutionary admission bridge
 
 The runtime distinction is now explicitly represented in the formal layer: `FundamentalAdmission` requires only `passed ∧ invariant_ok`; `EvolutionaryAdmission` additionally requires `viable`. Regression tests prove the same distinction at runtime (`fundamental + viable=False` accepted; `evolutionary + viable=False` rejected). This closes the semantic mismatch without strengthening the fundamental regime artificially. CI at HEAD `ef98b97465e692441158fa5983f517491d5c6972`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+### Stage-7 end-to-end certification gate
+
+The runtime end-to-end gate now covers both regimes: `fundamental` with `viable=False` is admitted; `evolutionary` requires viability; both accepted paths require an independent valid K0 `MetaTransition`; a valid K0 certificate cannot upgrade a rejected Ψ admission. This closes the runtime authority composition boundary. CI at HEAD `f955b52444dde7ac38363420f38e7c3e7e5df87c`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
