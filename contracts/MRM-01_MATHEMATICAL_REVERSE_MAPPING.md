@@ -152,3 +152,8 @@ Adversarial tests now establish that `PsiTransition` can change only the canonic
 ### Stage-7 evidence/proof authority gate
 
 Evidence and provenance are now explicitly non-constructive with respect to certification. Runtime regression rejects evidence-rich but failed proof; formal `CertifiedTransition` can only exist with explicit `Admission` and `preserves_root` fields. The formal theorem `evidence_does_not_imply_certified_transition` captures the boundary. CI at HEAD `99e8b793d0c223232368c5d6195eed2ed28bc8aa`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+### Stage-7 fundamental/evolutionary admission bridge
+
+The runtime distinction is now explicitly represented in the formal layer: `FundamentalAdmission` requires only `passed ∧ invariant_ok`; `EvolutionaryAdmission` additionally requires `viable`. Regression tests prove the same distinction at runtime (`fundamental + viable=False` accepted; `evolutionary + viable=False` rejected). This closes the semantic mismatch without strengthening the fundamental regime artificially. CI at HEAD `ef98b97465e692441158fa5983f517491d5c6972`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
