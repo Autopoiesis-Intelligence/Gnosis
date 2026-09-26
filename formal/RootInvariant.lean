@@ -6,6 +6,14 @@ structure Psi where
 
 def K0 (K : Psi → Prop) : Prop := ∀ P, K P → K P
 
+structure Kernel where
+  sealed : Bool
+
+/-- Canonical K0 corresponding to the runtime protected-kernel condition:
+    the kernel must remain sealed. -/
+def canonicalK0 (k : Kernel) : Prop :=
+  k.sealed = true
+
 /-- Exact logical shape of Python preserve_root:
     the protected predicate holds before and after. -/
 def preserves (K : Psi → Prop) (before after : Psi) : Prop :=
@@ -38,3 +46,10 @@ theorem compose_preserves_root
   exact (Transition.compose a b).preserves_proof h
 
 end Gnozis
+
+
+theorem canonicalK0_preserved
+    (t : Transition canonicalK0 P)
+    (h : canonicalK0 P) :
+    canonicalK0 t.next := by
+  exact t.preserves_proof h
