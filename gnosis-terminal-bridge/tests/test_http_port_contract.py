@@ -32,9 +32,9 @@ def _handshake(server):
         "protocol": "gnozis-port/1",
         "client_id": "test-client",
         "provenance": {"source": "test-client"},
-                "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "allowed"},
-            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "allowed"},
-            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "allowed"},
+                "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "ALLOWED"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "ALLOWED"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "ALLOWED"},
     })
 
 
@@ -63,7 +63,7 @@ def test_handshake_and_exchange_roundtrip():
             "type": "hypothesis",
             "payload": {"text": "test"},
             "provenance": {"source": "test-client"},
-            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "allowed"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "request", "destination": "core", "status": "ALLOWED"},
         })
         assert status == 200
         assert result["status"] == "accepted"
