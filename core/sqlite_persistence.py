@@ -66,6 +66,12 @@ class SQLiteHistoryStore:
         for i, (record, audit, proof) in enumerate(zip(history.records, audits, provenances)):
             if record.sequence != i or audit.sequence != i:
                 raise ValueError("durable sequence binding mismatch")
+            if i == 0 and record.previous_hash != "genesis":
+                raise ValueError("durable genesis predecessor mismatch")
+            if i > 0 and record.previous_hash != history.records[i - 1].state_hash:
+                raise ValueError("durable predecessor chain mismatch")
+            if i > 0 and audit.previous_audit_hash != audits[i - 1].digest():
+                raise ValueError("durable audit predecessor chain mismatch")
             if record.candidate_hash != proof.candidate_hash:
                 raise ValueError("durable candidate binding mismatch")
             if record.evidence_hash != proof.evidence_hash:
