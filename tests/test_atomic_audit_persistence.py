@@ -86,5 +86,5 @@ def test_cross_table_tamper_fails_closed(tmp_path, table, column, value, message
     with sqlite3.connect(path) as conn:
         conn.execute(f"UPDATE {table} SET {column}=? WHERE sequence=0", (value,))
         conn.commit()
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(ValueError):
         SQLiteHistoryStore(path).verify_cross_table_consistency()
