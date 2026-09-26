@@ -45,7 +45,7 @@ def test_unknown_session_fails():
 def test_replay_fails():
     port = make_port()
     hs = port.handshake({"protocol": PROTOCOL, "client_id": "x", "provenance": {}})
-    msg = {"protocol": PROTOCOL, "session_id": hs["session_id"], "message_id": "same", "type": "request", "payload": {}, "provenance": {}}
+    msg = {"protocol": PROTOCOL, "session_id": hs["session_id"], "message_id": "same", "type": "request", "payload": {}, "provenance": {}, "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"}}
     port.exchange(msg)
     with pytest.raises(PortError, match="replayed"):
         port.exchange(msg)
