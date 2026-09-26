@@ -8,7 +8,7 @@ from core.state import Psi
 
 
 def test_unified_meta_admission_requires_k0_refinement_and_closure():
-    root = RootInvariant(lambda k: k["sealed"])
+    root = canonical_root_invariant()
     before = {"sealed": True, "v": 1}
     after = {"sealed": True, "v": 2}
 
@@ -35,7 +35,7 @@ def test_unified_meta_admission_requires_k0_refinement_and_closure():
 
 
 def test_meta_admission_cannot_bypass_root_invariant():
-    root = RootInvariant(lambda k: k["sealed"])
+    root = canonical_root_invariant()
     before = {"sealed": True, "v": 1}
     after = {"sealed": False, "v": 999}
     transition = MetaTransition(
@@ -52,7 +52,7 @@ def test_meta_admission_cannot_bypass_root_invariant():
 
 
 def test_meta_admission_cannot_bypass_closure_obligation():
-    root = RootInvariant(lambda k: k["sealed"])
+    root = canonical_root_invariant()
     before = {"sealed": True, "v": 1}
     after = {"sealed": True, "v": 999}
     transition = MetaTransition(
@@ -66,14 +66,18 @@ def test_meta_admission_cannot_bypass_closure_obligation():
     assert not admission.admissible()
 
 
-def test_meta_transition_cannot_replace_canonical_k0():
+def test_meta_admission_cannot_replace_canonical_k0():
     canonical = canonical_root_invariant()
     forged = RootInvariant(lambda _kernel: True, name="K0")
     before = {"sealed": True, "v": 1}
     after = {"sealed": False, "v": 2}
     proof = RefinementProof(forged, before, after, "forged", refinement=lambda _a, _b: True)
     transition = MetaTransition(before, after, proof)
-    assert not transition.admissible()
+    f = make_psi_transition(lambda x, r: (x, r))
+    psi = Psi(x=("a",), relations=())
+    obligation = closure(f, lambda p: "a" in p.x, [psi])
+    admission = MetaAdmission(transition, obligation, forged)
+    assert not admission.admissible()
     with pytest.raises(ValueError, match="not admitted"):
-        transition.apply()
+        admission.apply()
     assert canonical.holds(before)
