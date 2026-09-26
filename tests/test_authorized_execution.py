@@ -102,3 +102,33 @@ def test_content_substitution_is_rejected_at_authorized_boundary():
     )
     with pytest.raises(ValueError, match="does not match execution input"):
         bridge.step(info, psi, transition, execution_input, request)
+
+
+def test_replay_request_with_same_content_but_different_information_is_rejected():
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    transition = PsiTransition(lambda x, relations: (x + 1, relations))
+    first = make_information(AuthorizationStatus.ALLOWED)
+    second = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    stale_request = ExternalExecutionRequest.from_information(
+        first, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="test"
+    )
+    with pytest.raises(ValueError, match="does not match information"):
+        bridge.step(second, psi, transition, execution_input, stale_request)
+
+
+def test_replay_request_with_same_identity_but_stale_execution_state_is_rejected():
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    transition = PsiTransition(lambda x, relations: (x + 1, relations))
+    info = make_information(AuthorizationStatus.ALLOWED)
+    stale_input = make_input(psi)
+    changed = Psi(x=psi.x + 10, relations=psi.relations)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=stale_input.content_digest, purpose="test"
+    )
+    with pytest.raises(ValueError, match="state_id"):
+        bridge.step(info, changed, transition, stale_input, request)
