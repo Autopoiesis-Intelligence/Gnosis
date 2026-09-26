@@ -54,11 +54,11 @@ class SQLiteHistoryStore:
     def load_audit(self) -> tuple[AuditRecord, ...]:
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute("""SELECT sequence, transition_hash,
-                previous_audit_hash, provenance_hash, event
+                previous_audit_hash, provenance_hash, event, audit_hash
                 FROM audit_history ORDER BY sequence""").fetchall()
-        records = tuple(AuditRecord(*row) for row in rows)
-        for i, record in enumerate(records):
-            if record.digest() != self._audit_digest(record):
+        records = tuple(AuditRecord(*row[:5]) for row in rows)
+        for i, (row, record) in enumerate(zip(rows, records)):
+            if record.digest() != row[5]:
                 raise ValueError("durable audit digest mismatch")
             if record.sequence != i:
                 raise ValueError("durable audit sequence is not contiguous")
@@ -136,7 +136,10 @@ class SQLiteHistoryStore:
 
         self._fail("after_commit")
         durable = self.load()
-        self.load_audit()
+        durable_audit = self.load_audit()
+        durable_provenance = self.load_provenance()
+        if len(durable.records) != len(durable_audit) or len(durable.records) != len(durable_provenance):
+            raise ValueError("durable triple cardinality mismatch")
         return CommitResult(next_value, durable, True)
 
     def commit_once(self, record: TransitionRecord, current, next_value) -> CommitResult:
