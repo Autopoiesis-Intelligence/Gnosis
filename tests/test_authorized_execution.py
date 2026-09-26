@@ -48,7 +48,7 @@ def make_input(psi):
 def test_allowed_information_reaches_canonical_executor():
     psi = make_psi()
     bridge = AuthorizedExecution(make_executor())
-    transition = PsiTransition(lambda p: Psi(x=p.x + 1, relations=p.relations))
+    transition = PsiTransition(lambda x, relations: (x + 1, relations))
     info = make_information(AuthorizationStatus.ALLOWED)
     execution_input = make_input(psi)
     request = ExternalExecutionRequest.from_information(info, operation=ExternalOperation.REQUEST, content_digest=execution_input.content_digest, purpose="test")
