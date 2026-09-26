@@ -1,7 +1,8 @@
 import pytest
 
 from core.history import TransitionRecord
-from core.sqlite_persistence import SQLiteHistoryStore\nfrom core.provenance import Provenance
+from core.sqlite_persistence import SQLiteHistoryStore
+from core.provenance import Provenance
 
 
 def rec(seq, prev, state):
