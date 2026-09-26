@@ -14,8 +14,8 @@ def _handshake(port):
         "protocol": "gnozis-port/1",
         "client_id": "security-test",
         "provenance": {"source": "test"},
-        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
-        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
+        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
     })
 
 
@@ -27,7 +27,7 @@ def _exchange(session_id, message_id="m1", body=None, **extra):
         "type": "hypothesis",
         "payload": {} if body is None else body,
         "provenance": {"source": "test"},
-        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "ALLOWED"},
     }
     payload.update(extra)
     return payload
