@@ -15,6 +15,7 @@ def _handshake(port):
         "client_id": "security-test",
         "provenance": {"source": "test"},
         "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
     })
 
 
