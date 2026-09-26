@@ -31,3 +31,16 @@ theorem recovery_cannot_reauthorize_consumed
   exact hExec (recovered_authorization_remains_consumed before after hRecovery a hConsumed)
 
 end Gnozis
+
+
+/-- The SQLite binding maps the authorization identity and its pre-transition
+    state digest to the durable consumption fact. -/
+def ConsumptionBinding (authorizationDigest stateDigest : String)
+    (consumedDigest consumedState : String) : Prop :=
+  authorizationDigest = consumedDigest ∧ stateDigest = consumedState
+
+theorem valid_consumption_binding_implies_consumed
+    (authorizationDigest stateDigest consumedDigest consumedState : String)
+    (h : ConsumptionBinding authorizationDigest stateDigest consumedDigest consumedState) :
+    authorizationDigest = consumedDigest := by
+  exact h.1
