@@ -39,3 +39,10 @@ The adversarial test performs:
 The rejected replay leaves the durable transition count unchanged and preserves exactly one authorization-consumption record. A conflicting replay cannot become a new committed transition merely because the original authorization survived process restart.
 
 This closes the persistence/restart authorization-replay gate at the application level. It does not claim protection against physical storage rollback, filesystem snapshots restored to an earlier point, or external authorization systems that are themselves mutable outside Core.
+
+
+## Authorization provenance tamper gate
+
+Recovery now validates durable authorization-consumption evidence before replay. The adversarial test mutates the persisted consumption event after a valid commit; recovery fails closed instead of reconstructing an executable state from tampered authorization evidence.
+
+CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN on the resulting implementation.
