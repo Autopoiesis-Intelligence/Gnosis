@@ -45,7 +45,7 @@ def test_task_processing_can_use_durable_audited_store(tmp_path):
         content_digest=task.content_digest, purpose="task-processing")
     execution_input=execution_input_from_psi(
         psi,input_type="task",content_digest=task.content_digest)
-    transition=PsiTransition(lambda x, relations: (x + ("done",), relations)),relations=s.relations))
+    transition=PsiTransition(lambda x, relations: (x + ("done",), relations))
     store=SQLiteHistoryStore(tmp_path/"task.db")
     executor=CanonicalExecutor(history=__import__("core.history",fromlist=["AppendOnlyHistory"]).AppendOnlyHistory(),
         kernel_version="task-kernel", durable_store=store)
