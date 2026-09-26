@@ -19,6 +19,7 @@ def recover_psi(
     history = store.load()
     provenance = store.load_provenance()
     audits = store.load_audit()
+    store.verify_authorization_consumption()
     if len(history.records) != len(provenance) or len(history.records) != len(audits):
         raise ValueError("durable history/provenance/audit cardinality mismatch")
     AuditChain(audits).verify_against_history(history.records, provenance)
