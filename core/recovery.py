@@ -22,4 +22,6 @@ def recover_psi(
     if len(history.records) != len(provenance) or len(history.records) != len(audits):
         raise ValueError("durable history/provenance/audit cardinality mismatch")
     AuditChain(audits).verify_against_history(history.records, provenance)
-    return replay(genesis, history, apply)
+    result = replay(genesis, history, apply)
+    # Recovery is observational: it reconstructs state but cannot mutate or commit it.
+    return result
