@@ -116,3 +116,50 @@ def test_authorized_request_cannot_be_replayed_after_restart(tmp_path):
             (request.authorization_digest(),),
         ).fetchone()
     assert row[0] == 1
+
+
+def test_restart_fails_closed_when_authorization_consumption_is_tampered(tmp_path):
+    database = tmp_path / "authorization-tamper.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="restart-content-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="restart-task",
+    )
+
+    store = SQLiteHistoryStore(database)
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="restart-test-v1",
+        durable_store=store,
+    )
+    AuthorizedExecution(executor).step(
+        info,
+        genesis,
+        PsiTransition(lambda x, relations: (x + ("first-commit",), relations)),
+        execution_input,
+        request,
+    )
+
+    import sqlite3
+    with sqlite3.connect(database) as conn:
+        conn.execute(
+            "UPDATE authorization_consumption SET consumed_event = ? WHERE authorization_digest = ?",
+            ("tampered-event", request.authorization_digest()),
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError, match="durable authorization consumption event is invalid"):
+        recover_psi(
+            genesis,
+            SQLiteHistoryStore(database),
+            lambda state, record: (
+                Psi(x=state.x + ("first-commit",), relations=())
+                if record.sequence == 0 else state
+            ),
+        )
