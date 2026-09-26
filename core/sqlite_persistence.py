@@ -54,6 +54,32 @@ class SQLiteHistoryStore:
                 admitted=bool(row[5]), evidence_hash=row[6]))
         return history
 
+    def load_authorization_consumption(self) -> tuple[tuple[str, int, str], ...]:
+        with sqlite3.connect(self.path) as conn:
+            rows = conn.execute(
+                """SELECT authorization_digest, sequence, consumed_event
+                FROM authorization_consumption ORDER BY sequence, authorization_digest"""
+            ).fetchall()
+        return tuple(rows)
+
+    def verify_authorization_consumption(self) -> None:
+        """Fail closed if durable authorization-consumption evidence is malformed."""
+        history = self.load()
+        consumptions = self.load_authorization_consumption()
+        seen: set[str] = set()
+        for digest, sequence, event in consumptions:
+            if not digest or not digest.strip():
+                raise ValueError("durable authorization digest is empty")
+            if digest in seen:
+                raise ValueError("duplicate durable authorization consumption")
+            seen.add(digest)
+            if event != "execution-authorized-commit":
+                raise ValueError("durable authorization consumption event is invalid")
+            if sequence < 0 or sequence >= len(history.records):
+                raise ValueError("durable authorization consumption sequence is invalid")
+        if len(consumptions) > len(history.records):
+            raise ValueError("durable authorization consumption cardinality mismatch")
+
     def load_audit(self) -> tuple[AuditRecord, ...]:
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute("""SELECT sequence, transition_hash,
