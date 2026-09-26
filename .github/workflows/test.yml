@@ -25,6 +25,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
 
+      - name: Execute first task runtime surface
+        run: |
+          python tools/run_first_task.py --output runtime-evidence/first-task.json --database runtime-evidence/first-task.sqlite
+
+      - name: Upload first-task runtime evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-task-runtime-evidence
+          path: runtime-evidence/
+          if-no-files-found: error
+
       - name: Run first-task milestone tests
         run: |
           python -m pytest -q tests/test_task_processing.py tests/test_recovery_causal_triple.py tests/test_atomic_audit_persistence.py tests/test_canonical_durable_boundary.py 2>&1 | tee milestone-output.txt
