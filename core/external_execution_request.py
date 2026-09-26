@@ -25,6 +25,13 @@ class ExternalExecutionRequest:
         )).encode("utf-8")
         return hashlib.sha256(payload).hexdigest()
 
+    def execution_authorization_digest(self, state_digest: str) -> str:
+        """Bind authorization consumption to the exact execution input state."""
+        if not state_digest.strip():
+            raise ValueError("state_digest is required")
+        payload = repr((self.authorization_digest(), state_digest)).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
     @classmethod
     def from_information(
         cls,
