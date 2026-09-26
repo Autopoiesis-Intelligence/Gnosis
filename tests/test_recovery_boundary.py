@@ -91,3 +91,28 @@ def test_recovered_state_cannot_bypass_canonical_commit_boundary(tmp_path):
     before = SQLiteHistoryStore(path).load()
     assert len(before.records) == 1
     assert before.head.state_hash == state_digest(state)
+
+
+def test_adversarial_tamper_recovery_rejects_and_does_not_commit(tmp_path):
+    genesis = Psi(x=("g",), relations=())
+    state = Psi(x=("g", "s0"), relations=())
+    path = tmp_path / "history.db"
+    store = SQLiteHistoryStore(path)
+    rec = record(0, "genesis", state)
+    proof = Provenance(candidate_hash=rec.candidate_hash, evidence_hash=rec.evidence_hash, kernel_version=rec.kernel_version)
+    store.commit_once_with_audit(rec, proof, genesis, state)
+
+    import sqlite3
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE transition_history SET state_hash = ? WHERE sequence = 0",
+            ("tampered-state",),
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError):
+        recover_psi(genesis, SQLiteHistoryStore(path), lambda _s, _r: state)
+
+    durable = SQLiteHistoryStore(path).load()
+    assert len(durable.records) == 1
+    assert durable.head.state_hash == state_digest(state)
