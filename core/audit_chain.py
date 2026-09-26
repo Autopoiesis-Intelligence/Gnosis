@@ -50,6 +50,10 @@ class AuditChain:
         chain = AuditChain()
         for audit, transition, proof in zip(self.records, history, provenance):
             expected = audit_for_commit(transition, proof, chain.records[-1] if chain.records else None)
+            if audit.transition_hash != transition_digest(transition):
+                raise ValueError("transition binding mismatch")
+            if audit.provenance_hash != provenance_digest(proof):
+                raise ValueError("provenance binding mismatch")
             if audit != expected:
                 raise ValueError("audit binding mismatch")
             chain = chain.append(audit)
