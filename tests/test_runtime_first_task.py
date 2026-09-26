@@ -1,4 +1,4 @@
-from pathlib import Path
+from pathlib import Path\nimport pytest
 from tools.run_first_task import run
 
 def test_runtime_surface_emits_durable_evidence(tmp_path: Path):
@@ -97,3 +97,39 @@ def test_restart_boundary_uses_durable_head_without_memory_carryover(tmp_path: P
     assert len(durable.records) == 2
     assert result.execution.psi == Psi(
         x=("runtime-start", "runtime-done", "restart-done"), relations=())
+
+
+def test_end_to_end_crash_restart_retry_has_single_durable_commit(tmp_path: Path):
+    from core.history import AppendOnlyHistory, TransitionRecord
+    from core.provenance import Provenance
+    from core.sqlite_persistence import SQLiteHistoryStore
+
+    database = tmp_path / "e2e.sqlite"
+    fired = {"value": False}
+
+    def crash(point):
+        if point == "after_commit" and not fired["value"]:
+            fired["value"] = True
+            raise RuntimeError("simulated process crash after durable commit")
+
+    rec = TransitionRecord(
+        sequence=0, previous_hash="genesis", state_hash="e2e-state",
+        kernel_version="e2e-v1", candidate_hash="e2e-state",
+        admitted=True, evidence_hash="e2e-evidence",
+    )
+    provenance = Provenance("e2e-state", "e2e-evidence", "e2e-v1", ("runtime",))
+
+    store = SQLiteHistoryStore(database, failure_injector=crash)
+    with pytest.raises(RuntimeError, match="simulated process crash"):
+        store.commit_once_with_audit(rec, provenance, "start", "e2e-state")
+
+    restarted = SQLiteHistoryStore(database)
+    retry = restarted.commit_once_with_audit(
+        rec, provenance, "start-after-restart", "e2e-state"
+    )
+
+    assert not retry.applied
+    assert len(retry.history.records) == 1
+    assert len(restarted.load().records) == 1
+    assert len(restarted.load_provenance()) == 1
+    assert len(restarted.load_audit()) == 1
