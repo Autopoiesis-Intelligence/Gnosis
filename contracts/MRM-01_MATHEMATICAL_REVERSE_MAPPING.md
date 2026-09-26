@@ -104,3 +104,21 @@ No single global percentage may substitute for this map.
 ## 11. Next
 
 After MRM-01 reaches VERIFIED status, optimize the existing contract registry against the resulting dependency graph. Do not introduce a new economic scoring system before this reverse map is complete.
+
+
+## 12. Stage-7 runtime-to-formal mapping
+
+| Runtime contract | Formal target | Executable evidence | Status |
+|---|---|---|---|
+| Canonical K0 authority | `RootInvariant.lean` | root-invariant/admission adversarial tests | VERIFIED at runtime; formal refinement pending |
+| Proof-before-commit | `AdmissionCommit.lean` | admission/commit tests | VERIFIED at runtime; formal refinement pending |
+| Admission boundary | `AdmissionCommit.lean` | no-bypass tests | VERIFIED at runtime; formal refinement pending |
+| Persistence != authority | no complete formal theorem yet | restart/persisted-evidence tests | RUNTIME VERIFIED |
+| Authorization != replay permission | no complete formal theorem yet | durable replay tests | RUNTIME VERIFIED |
+| Runtime/formal semantic projection | `RuntimeConformance.lean` | no complete executable bridge theorem | THEORETICAL/BRIDGE PENDING |
+
+### Stage-7 acceptance rule
+
+A row may move to VERIFIED only when the same semantic proposition is represented in the formal layer and connected to executable evidence. Existing Lean files are therefore treated as proof targets, not as evidence that the full architecture has already been formally verified.
+
+Current conclusion: runtime trust-boundary evidence is stronger than the current formal correspondence. The remaining Stage-7 work is to close that correspondence without introducing a second authority or state model.
