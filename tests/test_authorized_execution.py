@@ -71,3 +71,34 @@ def test_unauthorized_information_cannot_reach_canonical_executor(status):
     request = ExternalExecutionRequest.from_information(info, operation=ExternalOperation.REQUEST, content_digest=execution_input.content_digest, purpose="test")
     with pytest.raises(PermissionError):
         bridge.step(info, psi, transition, execution_input, request)
+
+
+def test_state_substitution_is_rejected_before_transition():
+    psi = make_psi()
+    foreign = Psi(x=99, relations=())
+    bridge = AuthorizedExecution(make_executor())
+    transition = PsiTransition(lambda x, relations: (_ for _ in ()).throw(
+        AssertionError("transition was reached")
+    ))
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(foreign)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="test"
+    )
+    with pytest.raises(ValueError, match="state_id"):
+        bridge.step(info, psi, transition, execution_input, request)
+
+
+def test_content_substitution_is_rejected_at_authorized_boundary():
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    transition = PsiTransition(lambda x, relations: (x + 1, relations))
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest="foreign-content", purpose="test"
+    )
+    with pytest.raises(ValueError, match="does not match execution input"):
+        bridge.step(info, psi, transition, execution_input, request)
