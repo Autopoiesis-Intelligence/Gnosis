@@ -1,28 +1,66 @@
-# Canonical Mutation Boundary Audit — 2026-09-18
+# Canonical Mutation Boundary — reconciled 2026-09-26
 
 ## Finding
 
-The repository currently has two related commit layers:
+The previous architecture exposed two related commit layers:
 
-1. `core/canonical_chain.py::admit_transition()` is the declared generic canonical admission boundary and owns SafetyGate + GasBudget + Provenance + `commit_once()`.
-2. `core/execution.py::CanonicalExecutor.evolve()` is the canonical Ψ evolutionary owner and currently calls `commit(...).apply()` directly.
+1. `core/canonical_chain.py::admit_transition()` — generic SafetyGate + GasBudget + Provenance + idempotent commit.
+2. `core/commit.py::SemanticCommit.apply()` — Ψ-specific semantic commit.
 
-These are not automatically equivalent.
+The two layers were previously separate implementations of overlapping pre-commit responsibility.
 
-## Consequence
+## Architectural change
 
-The Ψ executor currently guarantees admission, selection and history continuity, but it does not consume the generic canonical-chain SafetyGate/GasBudget/Provenance contract.
+They are now explicitly composed:
 
-Therefore the repository must not claim that all canonical mutations pass through one universal `canonical_chain` entrypoint.
+`SemanticCommit.apply()`
+→ `canonical_chain.commit_admitted_psi()`
+→ `canonical_chain.admit_transition()`
+→ `guard_transition()`
+→ `commit_once()`
 
-The defensible statement is narrower: canonical Ψ evolution passes through `CanonicalExecutor` and its history-bound `SemanticCommit`; generic canonical admission has a separate Safety/Gas/Provenance boundary.
+The Ψ layer remains responsible for:
 
-## Required next decision
+- requiring an admitted candidate;
+- canonicalizing Ψ;
+- verifying previous-state continuity;
+- constructing the causal TransitionRecord and evidence hash.
 
-Either unify `CanonicalExecutor` with `canonical_chain.admit_transition()` without weakening Ψ-specific invariants, or explicitly define the two boundaries as separate layers with a documented composition contract.
+The universal canonical boundary remains responsible for:
 
-Do not blindly route the executor through `canonical_chain`: the generic API currently accepts arbitrary current/next state and does not itself enforce Ψ, transition identity, or the executor's selected-candidate semantics.
+- SafetyGate;
+- GasBudget;
+- Provenance binding;
+- idempotent history commit.
 
-## Gate
+Therefore the mathematical separation is:
 
-This is an architectural consistency finding, not a claimed runtime failure. Full regression remains pending.
+[
+	ext{Ψ semantic validity}
+
+eq
+	ext{runtime authorization/safety}
+
+eq
+	ext{durable commit}
+]
+
+while the architecture now guarantees their required order:
+
+[
+	ext{Ψ Admission}
+ightarrow
+	ext{Canonical Guard}
+ightarrow
+	ext{Commit}
+]
+
+## Invariant
+
+No accepted Ψ transition may cross the semantic commit boundary without passing the shared canonical guard.
+
+This closes the previously documented architectural split without weakening Ψ-specific candidate/proof/selection semantics.
+
+## Remaining boundary
+
+SQLite persistence remains a separate durable substrate. It is not promoted to semantic authority merely by being called from a commit path.
