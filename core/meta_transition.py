@@ -2,7 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Generic, TypeVar
-from .root_invariant import RootInvariant, preserve_root
+from .root_invariant import RootInvariant, canonical_root_invariant, preserve_root
 T = TypeVar("T")
 @dataclass(frozen=True)
 class RefinementProof(Generic[T]):
@@ -26,7 +26,7 @@ class MetaTransition(Generic[T]):
     after: T
     proof: RefinementProof[T]
     def admissible(self) -> bool:
-        return self.proof.before == self.before and self.proof.after == self.after and self.proof.valid
+        return (self.proof.before == self.before and self.proof.after == self.after and self.proof.root == canonical_root_invariant() and self.proof.valid)
     def apply(self) -> T:
         if not self.admissible():
             raise ValueError("meta-transition is not admitted by its refinement proof")
