@@ -13,6 +13,7 @@ def test_handshake_and_exchange():
         "protocol": PROTOCOL,
         "client_id": "test-agent",
         "provenance": {"provider": "test"},
+        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
     })
     response = port.exchange({
         "protocol": PROTOCOL,
