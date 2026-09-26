@@ -31,6 +31,7 @@ def admit_transition(
     history, record, provenance, current_state, next_state,
     operation_count, gas_costs, gate=None, gas_limit=20, durable_store=None,
     authorization_digest=None,
+    authorization_state_digest=None,
 ) -> CommitResult:
     """Universal gate; durable commits must use the audited store boundary."""
     guard_transition(record, provenance, operation_count=operation_count,
@@ -43,6 +44,7 @@ def admit_transition(
         return durable_store.commit_once_with_audit(
             record, provenance, current_state, next_state,
             authorization_digest=authorization_digest,
+            authorization_state_digest=authorization_state_digest,
         )
     return CommitResult(next_state, history.append(record), True)
 
@@ -58,6 +60,7 @@ def commit_admitted_psi(
     gas_limit: int = 20,
     durable_store=None,
     authorization_digest=None,
+    authorization_state_digest=None,
 ) -> CommitResult[Psi]:
     candidate = require_admitted(admission)
     canonical = canonicalize_psi(candidate)
@@ -75,4 +78,4 @@ def commit_admitted_psi(
         evidence_hash=evidence_hash, kernel_version=kernel_version)
     return admit_transition(history, record, provenance, previous, canonical.psi,
         operation_count, gas_costs, gate, gas_limit, durable_store,
-        authorization_digest)
+        authorization_digest, authorization_state_digest)
