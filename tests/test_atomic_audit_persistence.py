@@ -133,3 +133,34 @@ def test_chain_continuity_mutation_fails_closed(tmp_path, mutation):
 
     with pytest.raises(ValueError):
         store.verify_cross_table_consistency()
+
+
+def test_audit_chain_reorder_and_previous_audit_tamper_fail_closed(tmp_path):
+    path = tmp_path / "audit-chain.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(rec(), prov(), None, "state")
+    second = TransitionRecord(1, "s0", "s1", "k1", "s1", True, "e1")
+    store.commit_once_with_audit(second, Provenance("s1", "e1", "k1"), "state", "state-1")
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE audit_history SET previous_audit_hash='reordered' WHERE sequence=1"
+        )
+        conn.commit()
+    with pytest.raises(ValueError):
+        SQLiteHistoryStore(path).load_audit()
+
+
+def test_audit_sequence_gap_fails_closed_after_restart(tmp_path):
+    path = tmp_path / "audit-gap.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(rec(), prov(), None, "state")
+    second = TransitionRecord(1, "s0", "s1", "k1", "s1", True, "e1")
+    store.commit_once_with_audit(second, Provenance("s1", "e1", "k1"), "state", "state-1")
+
+    with sqlite3.connect(path) as conn:
+        conn.execute("DELETE FROM audit_history WHERE sequence=0")
+        conn.commit()
+    reopened = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError):
+        reopened.verify_cross_table_consistency()
