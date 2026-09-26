@@ -47,4 +47,5 @@ class AuthorizedExecution:
             execution_input,
             test=test,
             authorization_digest=request.authorization_digest(),
+            authorization_state_digest=execution_input.state_digest,
         )
