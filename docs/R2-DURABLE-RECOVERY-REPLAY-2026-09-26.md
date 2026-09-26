@@ -84,3 +84,10 @@ Recovery-side durable verification now enforces contiguous transition sequence, 
 A CI assertion mismatch was corrected without weakening the invariant: predecessor corruption remains classified as transition-binding failure while the stronger chain-continuity checks remain active.
 
 CI evidence: Architecture Gate and Gnozis Port CI are GREEN on HEAD 6b96c113bf8c987cee6c2ae2ca6903d72540ec15; Tests is still running at the time of this record.
+
+
+## Audit-chain reorder/restart gate
+
+Audit persistence is now adversarially checked for previous-audit-hash mutation and sequence gaps after restart. Because `load_audit()` verifies each stored digest and contiguous sequence, and recovery additionally verifies the causal chain against history/provenance, reordered or gapped audit evidence fails closed before replay.
+
+CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN at HEAD e2de525eb52e0eb5f438a843ba7521457a2144a6.
