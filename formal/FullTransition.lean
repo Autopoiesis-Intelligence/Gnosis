@@ -63,3 +63,18 @@ theorem psi_transition_requires_separate_root_certificate
   constructor
   · exact proof.invariant_ok
   · exact hPreserves hRoot
+
+
+/-- Evidence is not a constructor for certification.  The only way to obtain
+    a CertifiedTransition is to supply its explicit Admission and
+    root-preservation fields. -/
+theorem evidence_does_not_imply_certified_transition
+    (I : Psi → Prop) (root : K → Prop)
+    (s : Sigma)
+    (candidate : Psi)
+    (proof : ProofObligation I candidate) :
+    ¬ Admission I candidate proof →
+    ¬ ∃ t : CertifiedTransition I root s, t.candidate = candidate := by
+  intro hNoAdmission hExists
+  rcases hExists with ⟨t, hCandidate⟩
+  exact hNoAdmission t.admission
