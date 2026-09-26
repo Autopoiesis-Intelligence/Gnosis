@@ -80,6 +80,8 @@ class SQLiteHistoryStore:
                 raise ValueError("durable authorization consumption event is invalid")
             if sequence < 0 or sequence >= len(history.records):
                 raise ValueError("durable authorization consumption sequence is invalid")
+            if candidate_hash != history.records[sequence].candidate_hash:
+                raise ValueError("durable authorization candidate binding mismatch")
         if len(consumptions) > len(history.records):
             raise ValueError("durable authorization consumption cardinality mismatch")
 
