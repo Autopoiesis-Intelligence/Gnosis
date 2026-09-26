@@ -462,3 +462,45 @@ def test_restart_rejects_authorization_with_tampered_state_binding(tmp_path):
 
     with pytest.raises(ValueError, match="durable authorization state binding mismatch"):
         SQLiteHistoryStore(database).verify_cross_table_consistency()
+
+
+def test_authorized_commit_failure_rolls_back_consumption_and_transition(tmp_path):
+    database = tmp_path / "authorization-atomicity.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="atomicity-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="restart-task",
+    )
+
+    def fail(point):
+        if point == "after_authorization_before_audit":
+            raise RuntimeError("injected atomicity failure")
+
+    store = SQLiteHistoryStore(database, failure_injector=fail)
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="atomicity-v1",
+        durable_store=store,
+    )
+
+    with pytest.raises(RuntimeError, match="atomicity failure"):
+        AuthorizedExecution(executor).step(
+            info,
+            genesis,
+            PsiTransition(lambda x, relations: (x + ("must-rollback",), relations)),
+            execution_input,
+            request,
+        )
+
+    durable = SQLiteHistoryStore(database)
+    assert len(durable.load().records) == 0
+    assert durable.load_authorization_consumption() == ()
+    assert durable.load_audit() == ()
+    assert durable.load_provenance() == ()
+    durable.assert_authorization_unused(request.authorization_digest())
