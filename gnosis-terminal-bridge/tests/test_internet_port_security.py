@@ -27,6 +27,7 @@ def _exchange(session_id, message_id="m1", body=None, **extra):
         "type": "hypothesis",
         "payload": {} if body is None else body,
         "provenance": {"source": "test"},
+        "authorization": {"source": "security-test", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
     }
     payload.update(extra)
     return payload
