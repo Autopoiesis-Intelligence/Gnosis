@@ -63,6 +63,17 @@ class SQLiteHistoryStore:
             ).fetchall()
         return tuple(rows)
 
+    def assert_authorization_unused(self, authorization_digest: str) -> None:
+        if not authorization_digest.strip():
+            raise ValueError("authorization_digest is required")
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                "SELECT 1 FROM authorization_consumption WHERE authorization_digest = ?",
+                (authorization_digest,),
+            ).fetchone()
+        if row is not None:
+            raise ValueError("authorization has already been consumed")
+
     def verify_authorization_consumption(self) -> None:
         """Fail closed if durable authorization-consumption evidence is malformed."""
         history = self.load()
