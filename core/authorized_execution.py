@@ -40,6 +40,8 @@ class AuthorizedExecution:
             raise ValueError("execution request does not match information")
         if request.content_digest != execution_input.content_digest:
             raise ValueError("execution request does not match execution input")
+        if self.executor.durable_store is not None:
+            self.executor.durable_store.assert_authorization_unused(request.authorization_digest())
 
         return self.executor.step(
             psi,
