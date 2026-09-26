@@ -1,16 +1,12 @@
-"""Canonical semantic commit boundary with mandatory safety and causal history."""
+"""Ψ semantic commit facade composed with the universal canonical gate."""
+
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 
-from .admission import Admission, require_admitted
-from .canonical_boundary import canonicalize_psi
-from .commit_contract import CommitResult, commit_once
-from .execution_contract import state_digest
-from .history import AppendOnlyHistory, TransitionRecord
-from .mutation_guard import guard_transition
-from .provenance import Provenance
+from .admission import Admission
+from .canonical_chain import commit_admitted_psi
+from .history import AppendOnlyHistory
 from .safety import SafetyGate
 from .state import Psi
 
@@ -26,55 +22,17 @@ class SemanticCommit:
     gas_limit: int = 20
 
     def apply(self, history: AppendOnlyHistory) -> tuple[Psi, AppendOnlyHistory]:
-        candidate = require_admitted(self.admission)
-        canonical = canonicalize_psi(candidate)
-        head = history.head
-        sequence = 0 if head is None else head.sequence + 1
-        previous_hash = "genesis" if head is None else head.state_hash
-
-        if head is not None and _state_hash(self.previous) != head.state_hash:
-            raise ValueError("previous Psi does not match history head.")
-
-        next_hash = _state_hash(canonical.psi)
-        evidence_hash = _evidence_hash(self.admission)
-        record = TransitionRecord(
-            sequence=sequence,
-            previous_hash=previous_hash,
-            state_hash=next_hash,
+        result = commit_admitted_psi(
+            history,
+            self.previous,
+            self.admission,
             kernel_version=self.kernel_version,
-            candidate_hash=next_hash,
-            admitted=True,
-            evidence_hash=evidence_hash,
-        )
-        provenance = Provenance(
-            candidate_hash=next_hash,
-            evidence_hash=evidence_hash,
-            kernel_version=self.kernel_version,
-        )
-        guard_transition(
-            record,
-            provenance,
             operation_count=self.operation_count,
             gas_costs=self.gas_costs,
             gate=self.safety_gate,
             gas_limit=self.gas_limit,
         )
-        result: CommitResult[Psi] = commit_once(
-            history,
-            record,
-            self.previous,
-            canonical.psi,
-        )
         return result.value, result.history
-
-
-def _state_hash(psi: Psi) -> str:
-    return state_digest(psi)
-
-
-def _evidence_hash(admission: Admission) -> str:
-    payload = repr(sorted(admission.proof.evidence.items())).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
 
 
 def commit(
