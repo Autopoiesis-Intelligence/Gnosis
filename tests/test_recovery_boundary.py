@@ -55,7 +55,9 @@ def test_recovery_fails_closed_on_tampered_durable_chain(tmp_path):
     state = Psi(x=("g", "s0"), relations=())
     path = tmp_path / "history.db"
     store = SQLiteHistoryStore(path)
-    store.commit_once(record(0, "genesis", state), genesis, state)
+    rec = record(0, "genesis", state)
+    proof = Provenance(candidate_hash=rec.candidate_hash, evidence_hash=rec.evidence_hash, kernel_version=rec.kernel_version)
+    store.commit_once_with_audit(rec, proof, genesis, state)
 
     import sqlite3
     with sqlite3.connect(path) as conn:
