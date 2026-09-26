@@ -423,3 +423,42 @@ def test_authorization_cannot_cross_state_record(tmp_path):
         )
 
     assert request.authorization_digest()
+
+
+def test_restart_rejects_authorization_with_tampered_state_binding(tmp_path):
+    database = tmp_path / "authorization-state-binding-tamper.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="restart-content-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="restart-task",
+    )
+    store = SQLiteHistoryStore(database)
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="restart-test-v1",
+        durable_store=store,
+    )
+    AuthorizedExecution(executor).step(
+        info,
+        genesis,
+        PsiTransition(lambda x, relations: (x + ("first-commit",), relations)),
+        execution_input,
+        request,
+    )
+
+    import sqlite3
+    with sqlite3.connect(database) as conn:
+        conn.execute(
+            "UPDATE authorization_consumption SET state_digest = ? WHERE authorization_digest = ?",
+            ("forged-state-digest", request.authorization_digest()),
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError, match="durable authorization state binding mismatch"):
+        SQLiteHistoryStore(database).verify_cross_table_consistency()
