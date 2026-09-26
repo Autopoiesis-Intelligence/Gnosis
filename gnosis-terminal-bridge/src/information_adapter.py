@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from core.external_operation import parse_external_operation\nfrom core.information_contract import (
+from core.external_operation import parse_external_operation
+from core.information_contract import (
     Authorization,
     AuthorizationStatus,
     Information,
@@ -11,11 +12,7 @@ from core.external_operation import parse_external_operation\nfrom core.informat
 
 
 def information_from_exchange(envelope: dict[str, Any]) -> Information:
-    """Convert a validated transport envelope into an explicitly authorized input.
-
-    Transport validation alone never grants authorization. The envelope must carry
-    an explicit authorization object with ALLOWED status.
-    """
+    """Convert a validated transport envelope into an explicitly authorized input."""
     authorization = envelope.get("authorization")
     if not isinstance(authorization, dict):
         raise PermissionError("authorization required")
@@ -26,7 +23,8 @@ def information_from_exchange(envelope: dict[str, Any]) -> Information:
     except (TypeError, ValueError):
         status = AuthorizationStatus.UNKNOWN
 
-    operation = parse_external_operation(str(authorization.get("operation", "")))\n    info = Information(
+    operation = parse_external_operation(str(authorization.get("operation", "")))
+    info = Information(
         information_id=str(envelope["message_id"]),
         source=str(authorization.get("source", "")),
         content_reference=str(envelope["payload_sha256"]),
