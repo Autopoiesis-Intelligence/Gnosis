@@ -67,7 +67,7 @@ def test_authorized_request_cannot_be_replayed_after_restart(tmp_path):
     first = AuthorizedExecution(first_executor).step(
         info,
         genesis,
-        PsiTransition(lambda p: Psi(x=p.x + ("first-commit",), relations=p.relations)),
+        PsiTransition(lambda x, relations: (x + ("first-commit",), relations)),
         first_input,
         request,
     )
@@ -102,7 +102,7 @@ def test_authorized_request_cannot_be_replayed_after_restart(tmp_path):
         AuthorizedExecution(retry_executor).step(
             info,
             recovered.state,
-            PsiTransition(lambda p: Psi(x=p.x + ("replayed",), relations=p.relations)),
+            PsiTransition(lambda x, relations: (x + ("replayed",), relations)),
             retry_input,
             request,
         )
