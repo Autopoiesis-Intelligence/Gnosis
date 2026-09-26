@@ -68,8 +68,8 @@ def test_unauthorized_information_cannot_reach_canonical_executor(status):
     transition = PsiTransition(lambda p: (_ for _ in ()).throw(AssertionError("executor was reached")))
     info = make_information(status)
     execution_input = make_input(psi)
-    request = ExternalExecutionRequest.from_information(info, operation=ExternalOperation.REQUEST, content_digest=execution_input.content_digest, purpose="test")
     try:
+        request = ExternalExecutionRequest.from_information(info, operation=ExternalOperation.REQUEST, content_digest=execution_input.content_digest, purpose="test")
         bridge.step(info, psi, transition, execution_input, request)
     except PermissionError:
         pass
