@@ -27,7 +27,7 @@ def test_replay_rejects_non_genesis_previous_hash():
     state = Psi(x=("g", "s0"), relations=())
     history = AppendOnlyHistory().append(record(0, "tampered", state))
 
-    with pytest.raises(ValueError, match="binding mismatch"):
+    with pytest.raises(ValueError, match="genesis"):
         replay(genesis, history, lambda _state, _record: state)
 
 
@@ -67,7 +67,7 @@ def test_recovery_fails_closed_on_tampered_durable_chain(tmp_path):
         )
         conn.commit()
 
-    with pytest.raises(ValueError, match="genesis"):
+    with pytest.raises(ValueError, match="transition binding mismatch"):
         recover_psi(
             genesis,
             SQLiteHistoryStore(path),
