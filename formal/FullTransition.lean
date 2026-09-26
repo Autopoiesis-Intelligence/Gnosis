@@ -45,3 +45,21 @@ theorem full_transition_preserves
   · exact t.preserves_root hRoot
 
 end Gnozis
+
+
+/-- The correct cross-layer boundary keeps K0 on the kernel component:
+    a Psi transition may change Psi, but certification must separately prove
+    root preservation for the kernel transition. -/
+theorem psi_transition_requires_separate_root_certificate
+    (I : Psi → Prop) (root : K → Prop)
+    (s : Sigma)
+    (candidate : Psi)
+    (proof : ProofObligation I candidate)
+    (hAdmission : Admission I candidate proof)
+    (nextK : K)
+    (hRoot : root s.K → root nextK) :
+    J I root { psi := candidate, W := s.W, K := s.K } s.K := by
+  constructor
+  · exact proof.invariant_ok
+  · exact hRoot (by
+      exact True.intro)
