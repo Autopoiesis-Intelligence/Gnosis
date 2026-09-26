@@ -80,4 +80,4 @@ def test_durable_task_result_survives_recovery(tmp_path):
     recovered=recover_psi(
         genesis, SQLiteHistoryStore(tmp_path/"recovery.db"),
         lambda state, record: Psi(x=state.x+("done",),relations=state.relations))
-    assert recovered.psi == result.execution.psi
+    assert recovered.state == result.execution.psi
