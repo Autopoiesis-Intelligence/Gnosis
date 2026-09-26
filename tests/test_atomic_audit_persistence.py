@@ -164,3 +164,29 @@ def test_audit_sequence_gap_fails_closed_after_restart(tmp_path):
     reopened = SQLiteHistoryStore(path)
     with pytest.raises(ValueError):
         reopened.verify_cross_table_consistency()
+
+
+def test_restart_recovery_is_causally_equivalent_to_durable_commit(tmp_path):
+    path = tmp_path / "recovery-equivalence.db"
+    genesis = "state-0"
+    store = SQLiteHistoryStore(path)
+    first = TransitionRecord(0, "genesis", "state-0", "k1", "candidate-0", True, "e0")
+    second = TransitionRecord(1, "state-0", "state-1", "k1", "candidate-1", True, "e1")
+    store.commit_once_with_audit(first, Provenance("candidate-0", "e0", "k1"), None, "state-0")
+    store.commit_once_with_audit(second, Provenance("candidate-1", "e1", "k1"), "state-0", "state-1")
+
+    recovered = store.load()
+    trajectory = [genesis]
+    for record in recovered.records:
+        assert record.previous_hash == trajectory[-1] if record.sequence == 0 else record.previous_hash == trajectory[-1]
+        trajectory.append(record.state_hash)
+
+    assert tuple(trajectory) == ("state-0", "state-0", "state-1")
+    assert recovered.head is not None
+    assert recovered.head.state_hash == "state-1"
+
+    restarted = SQLiteHistoryStore(path)
+    restarted.verify_cross_table_consistency()
+    assert restarted.load().records == recovered.records
+    assert restarted.load_audit() == store.load_audit()
+    assert restarted.load_provenance() == store.load_provenance()
