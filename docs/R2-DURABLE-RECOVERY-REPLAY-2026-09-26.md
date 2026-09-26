@@ -57,3 +57,12 @@ The external execution boundary also checks the durable consumption index before
 The atomic UNIQUE authorization key remains the final commit-time race/conflict barrier. Recovery additionally verifies that persisted candidate binding is consistent with the referenced transition record.
 
 CI evidence: Tests, Architecture Gate and Gnozis Port CI are GREEN at HEAD 32d6fc39025766e747100f8e0c804bace9a60c76.
+
+
+## Persistence integrity gate — full evidence transaction
+
+The durable commit boundary now has adversarial evidence for the complete History + Provenance + Authorization-consumption + Audit unit. A failure injected after authorization consumption but before audit insertion rolls back all four records; no partial durable evidence remains.
+
+A second test mutates persisted authorization candidate binding after a successful commit. Verification fails closed and refuses to treat the tampered authorization evidence as valid.
+
+CI evidence: Tests, Architecture Gate and Gnozis Port CI are GREEN at HEAD e68621b9d5b6e6bf93dba5a64d1b06c2a58d858b.
