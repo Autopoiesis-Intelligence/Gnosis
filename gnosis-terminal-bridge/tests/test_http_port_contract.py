@@ -32,6 +32,8 @@ def _handshake(server):
         "protocol": "gnozis-port/1",
         "client_id": "test-client",
         "provenance": {"source": "test-client"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
     })
 
 
