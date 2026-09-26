@@ -75,3 +75,12 @@ Recovery now verifies the complete durable evidence graph across transition hist
 Adversarial coverage includes independent mutation of each cross-table binding and CI confirmation after the initial assertion was corrected to test the invariant (fail-closed), rather than a particular detection ordering.
 
 CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN at HEAD 3ea6ec07a33eadcbd4eac1cb94dcf6c46d1eed72.
+
+
+## Durable chain continuity gate
+
+Recovery-side durable verification now enforces contiguous transition sequence, genesis predecessor, predecessor state-hash linkage, and predecessor audit-hash linkage. Adversarial coverage exercises first-record deletion, middle-record deletion, sequence uniqueness, and predecessor-hash mutation. SQLite primary-key uniqueness rejects duplicate sequence insertion at the storage boundary; recovery rejects all resulting chain mutations fail-closed.
+
+A CI assertion mismatch was corrected without weakening the invariant: predecessor corruption remains classified as transition-binding failure while the stronger chain-continuity checks remain active.
+
+CI evidence: Architecture Gate and Gnozis Port CI are GREEN on HEAD 6b96c113bf8c987cee6c2ae2ca6903d72540ec15; Tests is still running at the time of this record.
