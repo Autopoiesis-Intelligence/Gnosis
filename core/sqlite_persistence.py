@@ -67,9 +67,9 @@ class SQLiteHistoryStore:
             if record.sequence != i or audit.sequence != i:
                 raise ValueError("durable sequence binding mismatch")
             if i == 0 and record.previous_hash != "genesis":
-                raise ValueError("durable genesis predecessor mismatch")
+                raise ValueError("durable transition binding mismatch: genesis predecessor")
             if i > 0 and record.previous_hash != history.records[i - 1].state_hash:
-                raise ValueError("durable predecessor chain mismatch")
+                raise ValueError("durable transition binding mismatch: predecessor chain")
             if i > 0 and audit.previous_audit_hash != audits[i - 1].digest():
                 raise ValueError("durable audit predecessor chain mismatch")
             if record.candidate_hash != proof.candidate_hash:
