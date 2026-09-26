@@ -137,3 +137,8 @@ Current conclusion: runtime trust-boundary evidence is stronger than the current
 ### Stage-7 transition bridge
 
 `core/psi_transition.py::PsiTransition` is now explicitly bounded to the canonical `Psi=(X,R)` projection. The formal layer records the corresponding `PsiOperator` boundary and projection-commutation obligation. Adversarial runtime coverage confirms auxiliary State metadata cannot enter the fundamental transition. CI at HEAD `20809811a7bc5741ea915ffc8f600b97109b6847`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS. Full theorem-level correspondence of arbitrary Python `PsiTransition.function` with a Lean function remains pending.
+
+
+### Stage-7 K0/Ψ boundary result
+
+Reverse-analysis found an important type-boundary correction: canonical K0 is a kernel authority, not a predicate over Ψ. The formal model therefore keeps `Ψ` transition and K0 kernel preservation as separate components of `Sigma`; a certified transition must carry an explicit root-preservation certificate. This avoids collapsing the two state domains into a second authority model. CI at HEAD `0b6e4f95a517761c0c67c913359a177aac27023a`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
