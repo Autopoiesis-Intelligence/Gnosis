@@ -127,3 +127,8 @@ Current conclusion: runtime trust-boundary evidence is stronger than the current
 ### Stage-7 formal bridge update
 
 `formal/RootInvariant.lean` now contains an explicit `Kernel`/`canonicalK0` target corresponding to the runtime sealed-kernel condition, plus a preservation theorem. This is a formal proof target and correspondence anchor; it is not yet a proof that arbitrary Python runtime states are represented by this Lean `Kernel`. That runtime representation theorem remains pending.
+
+
+### Stage-7 admission formal bridge
+
+`formal/AdmissionCommit.lean` now exposes `RuntimeAdmissionEquivalent` and proves that the formal semantic commit requires the same proof/invariant/viability conditions represented by the runtime admission boundary. CI at HEAD `6d777739fe7db8b7e7f7b46982133f00fdf8544f` is GREEN. Full executable runtime-to-Lean state representation remains a separate pending bridge.
