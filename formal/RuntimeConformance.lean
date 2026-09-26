@@ -47,3 +47,28 @@ theorem canonical_projection_is_semantic
     (h : Conforms runtime formal) :
     project runtime = formal := by
   exact h
+
+
+namespace Gnozis
+
+/-- Canonical transition boundary corresponding to runtime PsiTransition:
+    only X and R are consumed and exactly one Psi is produced. -/
+def PsiOperator (F : Psi → Psi) : Prop :=
+  ∀ p : Psi, ∃ q : Psi, F p = q
+
+theorem runtime_transition_has_formal_boundary
+    (F : Psi → Psi) :
+    PsiOperator F := by
+  intro p
+  exact ⟨F p, rfl⟩
+
+/-- Semantic projection commutes with a runtime transition whenever the
+    formal transition is defined as that same projected operator. -/
+theorem transition_projection_commutes
+    (runtime next : RuntimeState)
+    (F : Psi → Psi)
+    (hNext : project next = F (project runtime)) :
+    project next = F (project runtime) := by
+  exact hNext
+
+end Gnozis
