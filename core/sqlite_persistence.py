@@ -160,8 +160,8 @@ class SQLiteHistoryStore:
                         raise ValueError("authorization_digest is required when supplied")
                     try:
                         conn.execute("""INSERT INTO authorization_consumption
-                            (authorization_digest, sequence, consumed_event)
-                            VALUES (?, ?, ?)""",
+                            (authorization_digest, sequence, state_digest, candidate_hash, consumed_event)
+                            VALUES (?, ?, ?, ?, ?)""",
                             (authorization_digest, record.sequence, authorization_state_digest or record.previous_hash,
              record.candidate_hash, "execution-authorized-commit"))
                     except sqlite3.IntegrityError as exc:
