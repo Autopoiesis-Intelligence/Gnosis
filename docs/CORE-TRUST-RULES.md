@@ -17,3 +17,12 @@
 Candidate generation is not authority. A generated candidate can affect canonical evolution only through the existing proof/admission boundary. A rejected candidate produces no transition result and leaves the input state unchanged. Selection remains endogenous and deterministic; no external candidate selector is consulted.
 
 Adversarial evidence: `tests/test_evolution_selection_boundaries.py` covers rejected-candidate non-commit and endogenous candidate selection. CI at the current test baseline is GREEN.
+
+
+## Meta-admission anti-bypass gate
+
+Meta-evolution cannot bypass the unified admission contract. A proposed meta-transition must preserve the root invariant on both before/after states and satisfy the closure obligation. A forged refinement predicate alone is insufficient; `MetaAdmission.apply()` fails closed when either gate is false.
+
+Adversarial CI coverage also confirms the ordinary evolution path still requires depth-1 viability; a candidate with no valid continuation is not admitted merely because its selector/test accepts it.
+
+CI evidence at HEAD `edafcd3813772bba176047b8f0b288857b9d9faa`: Tests, Architecture Gate and Gnozis Port CI SUCCESS.
