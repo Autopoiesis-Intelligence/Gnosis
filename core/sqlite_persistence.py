@@ -28,6 +28,10 @@ class SQLiteHistoryStore:
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
                 event TEXT NOT NULL, audit_hash TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
+                sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
+                evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
+                source_ids TEXT NOT NULL)""")
             conn.commit()
 
     def _fail(self, point: str) -> None:
@@ -60,9 +64,15 @@ class SQLiteHistoryStore:
                 raise ValueError("durable audit sequence is not contiguous")
         return records
 
-    @staticmethod
-    def _audit_digest(record: AuditRecord) -> str:
-        return record.digest()
+    def load_provenance(self) -> tuple[Provenance, ...]:
+        with sqlite3.connect(self.path) as conn:
+            rows = conn.execute("""SELECT candidate_hash, evidence_hash,
+                kernel_version, source_ids FROM provenance_history
+                ORDER BY sequence""").fetchall()
+        return tuple(
+            Provenance(a, b, c, tuple(d.split("\x1f")) if d else ())
+            for a, b, c, d in rows
+        )
 
     def commit_once_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
@@ -82,8 +92,9 @@ class SQLiteHistoryStore:
             raise ValueError("genesis commit must have sequence zero")
 
         audits = self.load_audit()
-        if len(audits) != len(existing.records):
-            raise ValueError("durable audit/history cardinality mismatch")
+        provenances = self.load_provenance()
+        if len(audits) != len(existing.records) or len(provenances) != len(existing.records):
+            raise ValueError("durable history/audit/provenance cardinality mismatch")
         previous_audit = audits[-1] if audits else None
         audit = audit_for_commit(record, provenance, previous_audit)
 
@@ -102,7 +113,14 @@ class SQLiteHistoryStore:
                     (record.sequence, record.previous_hash, record.state_hash,
                      record.kernel_version, record.candidate_hash,
                      int(record.admitted), record.evidence_hash))
-                self._fail("after_history_before_audit")
+                self._fail("after_history_before_provenance")
+                conn.execute("""INSERT INTO provenance_history
+                    (sequence, candidate_hash, evidence_hash, kernel_version, source_ids)
+                    VALUES (?, ?, ?, ?, ?)""",
+                    (record.sequence, provenance.candidate_hash,
+                     provenance.evidence_hash, provenance.kernel_version,
+                     "\x1f".join(provenance.source_ids)))
+                self._fail("after_provenance_before_audit")
                 conn.execute("""INSERT INTO audit_history
                     (sequence, transition_hash, previous_audit_hash,
                      provenance_hash, event, audit_hash)
