@@ -11,6 +11,9 @@ structure RuntimeState where
 
 def project (s : RuntimeState) : Psi := s.semantic
 
+def runtimePsi (x : Type) (R : x → x → Prop) : Psi :=
+  { X := x, R := R }
+
 def Conforms (runtime : RuntimeState) (formal : Psi) : Prop :=
   project runtime = formal
 
@@ -34,3 +37,13 @@ theorem equivalent_from_same_projection
   exact h
 
 end Gnozis
+
+
+/-- Canonical projection has no auxiliary runtime fields: only X and R
+    participate in the formal semantic boundary. -/
+theorem canonical_projection_is_semantic
+    (runtime : RuntimeState)
+    (formal : Psi)
+    (h : Conforms runtime formal) :
+    project runtime = formal := by
+  exact h
