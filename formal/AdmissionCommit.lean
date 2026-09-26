@@ -41,3 +41,27 @@ theorem admitted_commit_preserves_invariant
   exact h.2.2
 
 end Gnozis
+
+
+/-- Runtime semantic contract: a commit-capable transition cannot exist
+    without the same three boolean admission conditions used by Core. -/
+def RuntimeAdmissionEquivalent
+    (proofPassed proofInvariant proofViable : Bool) : Prop :=
+  proofPassed = true ∧ proofInvariant = true ∧ proofViable = true
+
+theorem runtime_admission_implies_commit_admission
+    (I : Psi → Prop)
+    (candidate : Psi)
+    (proof : ProofObligation I candidate)
+    (h : RuntimeAdmissionEquivalent proof.passed proof.invariant_ok
+      (decide proof.viable)) :
+    EvolutionaryAdmission I candidate proof := by
+  exact ⟨h.1, h.2.1, proof.viable⟩
+
+theorem runtime_commit_cannot_bypass_admission
+    (I : Psi → Prop)
+    (previous candidate : Psi)
+    (proof : ProofObligation I candidate)
+    (h : SemanticCommit I previous candidate proof) :
+    proof.passed = true ∧ I candidate ∧ proof.viable := by
+  exact ⟨h.2.1, h.2.2.2, h.2.2.2⟩
