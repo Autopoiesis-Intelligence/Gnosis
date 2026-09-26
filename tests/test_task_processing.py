@@ -25,7 +25,7 @@ def test_first_independent_task_processing_path():
         info, operation=ExternalOperation.REQUEST, content_digest=task.content_digest, purpose="task-processing"
     )
     execution_input=execution_input_from_psi(psi,input_type="task",content_digest=task.content_digest)
-    transition=PsiTransition(lambda s: Psi(x=s.x+("done",),relations=s.relations))
+    transition=PsiTransition(lambda x, relations: Psi(x=x+("done",),relations=relations))
     result=TaskProcessor(AuthorizedExecution(CanonicalExecutor(history=__import__("core.history",fromlist=["AppendOnlyHistory"]).AppendOnlyHistory(),kernel_version="task-kernel"))).process(
         task,info,psi,transition,execution_input,request
     )
@@ -41,7 +41,7 @@ def test_task_processing_can_use_durable_audited_store(tmp_path):
         Authorization("task","process","transform","core",AuthorizationStatus.ALLOWED),
         payload=task.content)
     request=ExternalExecutionRequest.from_information(
-        info, operation=ExternalOperation(name="transform"),
+        info, operation=ExternalOperation.REQUEST,
         content_digest=task.content_digest, purpose="task-processing")
     execution_input=execution_input_from_psi(
         psi,input_type="task",content_digest=task.content_digest)
@@ -66,7 +66,7 @@ def test_durable_task_result_survives_recovery(tmp_path):
         Authorization("task","process","transform","core",AuthorizationStatus.ALLOWED),
         payload=task.content)
     request=ExternalExecutionRequest.from_information(
-        info, operation=ExternalOperation(name="transform"),
+        info, operation=ExternalOperation.REQUEST,
         content_digest=task.content_digest, purpose="task-processing")
     execution_input=execution_input_from_psi(
         genesis,input_type="task",content_digest=task.content_digest)
