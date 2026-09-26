@@ -132,3 +132,8 @@ Current conclusion: runtime trust-boundary evidence is stronger than the current
 ### Stage-7 admission formal bridge
 
 `formal/AdmissionCommit.lean` now exposes `RuntimeAdmissionEquivalent` and proves that the formal semantic commit requires the same proof/invariant/viability conditions represented by the runtime admission boundary. CI at HEAD `6d777739fe7db8b7e7f7b46982133f00fdf8544f` is GREEN. Full executable runtime-to-Lean state representation remains a separate pending bridge.
+
+
+### Stage-7 transition bridge
+
+`core/psi_transition.py::PsiTransition` is now explicitly bounded to the canonical `Psi=(X,R)` projection. The formal layer records the corresponding `PsiOperator` boundary and projection-commutation obligation. Adversarial runtime coverage confirms auxiliary State metadata cannot enter the fundamental transition. CI at HEAD `20809811a7bc5741ea915ffc8f600b97109b6847`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS. Full theorem-level correspondence of arbitrary Python `PsiTransition.function` with a Lean function remains pending.
