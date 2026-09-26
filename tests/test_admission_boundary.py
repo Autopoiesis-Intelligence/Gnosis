@@ -116,3 +116,28 @@ def test_evidence_cannot_construct_certified_meta_transition():
     assert rejected.accepted is False
     with pytest.raises(ValueError, match="not admitted"):
         require_admitted(rejected)
+
+
+def test_fundamental_admission_does_not_require_viability():
+    candidate = State(values={"x": "fundamental", "relations": ()})
+    proof = ProofObligation(
+        passed=True,
+        invariant=True,
+        viable=False,
+        evidence={"regime": "fundamental"},
+    )
+    result = admit(candidate, proof)
+    assert result.accepted is True
+    assert require_admitted(result) is candidate
+
+
+def test_evolutionary_admission_requires_viability():
+    candidate = State(values={"x": "evolutionary", "relations": ()})
+    proof = ProofObligation(
+        passed=True,
+        invariant=True,
+        viable=False,
+        evidence={"regime": "evolutionary"},
+    )
+    result = admit(candidate, proof)
+    assert result.accepted is False
