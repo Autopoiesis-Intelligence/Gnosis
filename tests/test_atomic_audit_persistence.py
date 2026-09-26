@@ -67,3 +67,24 @@ def test_authorization_tamper_fails_closed_with_candidate_binding(tmp_path):
         conn.commit()
     with pytest.raises(ValueError, match="candidate binding"):
         store.verify_authorization_consumption()
+
+
+@pytest.mark.parametrize(
+    ("table", "column", "value", "message"),
+    [
+        ("transition_history", "candidate_hash", "tampered-candidate", "candidate binding"),
+        ("transition_history", "evidence_hash", "tampered-evidence", "evidence binding"),
+        ("provenance_history", "candidate_hash", "tampered-proof", "candidate binding"),
+        ("audit_history", "provenance_hash", "tampered-proof", "provenance binding"),
+        ("audit_history", "transition_hash", "tampered-transition", "transition binding"),
+    ],
+)
+def test_cross_table_tamper_fails_closed(tmp_path, table, column, value, message):
+    path = tmp_path / "cross-table.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(rec(), prov(), None, "state")
+    with sqlite3.connect(path) as conn:
+        conn.execute(f"UPDATE {table} SET {column}=? WHERE sequence=0", (value,))
+        conn.commit()
+    with pytest.raises(ValueError, match=message):
+        SQLiteHistoryStore(path).verify_cross_table_consistency()
