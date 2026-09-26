@@ -120,9 +120,11 @@ def test_chain_continuity_mutation_fails_closed(tmp_path, mutation):
             conn.execute("DELETE FROM provenance_history WHERE sequence=1")
             conn.execute("DELETE FROM audit_history WHERE sequence=1")
         elif mutation == "duplicate_sequence":
-            conn.execute(
-                "INSERT INTO transition_history VALUES (2, 's1', 's2', 'k1', 's2', 1, 'e2')"
-            )
+            with pytest.raises(sqlite3.IntegrityError):
+                conn.execute(
+                    "INSERT INTO transition_history VALUES (2, 's1', 's2', 'k1', 's2', 1, 'e2')"
+                )
+            return
         elif mutation == "rewrite_previous_hash":
             conn.execute(
                 "UPDATE transition_history SET previous_hash='forged' WHERE sequence=1"
