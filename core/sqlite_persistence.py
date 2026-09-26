@@ -30,6 +30,7 @@ class SQLiteHistoryStore:
                 event TEXT NOT NULL, audit_hash TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS authorization_consumption (
                 authorization_digest TEXT PRIMARY KEY, sequence INTEGER NOT NULL,
+                state_digest TEXT NOT NULL, candidate_hash TEXT NOT NULL,
                 consumed_event TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
                 sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
@@ -57,7 +58,7 @@ class SQLiteHistoryStore:
     def load_authorization_consumption(self) -> tuple[tuple[str, int, str], ...]:
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute(
-                """SELECT authorization_digest, sequence, consumed_event
+                """SELECT authorization_digest, sequence, state_digest, candidate_hash, consumed_event
                 FROM authorization_consumption ORDER BY sequence, authorization_digest"""
             ).fetchall()
         return tuple(rows)
@@ -67,12 +68,14 @@ class SQLiteHistoryStore:
         history = self.load()
         consumptions = self.load_authorization_consumption()
         seen: set[str] = set()
-        for digest, sequence, event in consumptions:
+        for digest, sequence, state_digest, candidate_hash, event in consumptions:
             if not digest or not digest.strip():
                 raise ValueError("durable authorization digest is empty")
             if digest in seen:
                 raise ValueError("duplicate durable authorization consumption")
             seen.add(digest)
+            if not state_digest or not candidate_hash:
+                raise ValueError("durable authorization binding evidence is incomplete")
             if event != "execution-authorized-commit":
                 raise ValueError("durable authorization consumption event is invalid")
             if sequence < 0 or sequence >= len(history.records):
@@ -106,6 +109,7 @@ class SQLiteHistoryStore:
     def commit_once_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         current, next_value, authorization_digest: str | None = None,
+        authorization_state_digest: str | None = None,
     ) -> CommitResult:
         """Atomically commit History + canonical Audit or commit neither."""
         existing = self.load()
@@ -158,7 +162,8 @@ class SQLiteHistoryStore:
                         conn.execute("""INSERT INTO authorization_consumption
                             (authorization_digest, sequence, consumed_event)
                             VALUES (?, ?, ?)""",
-                            (authorization_digest, record.sequence, "execution-authorized-commit"))
+                            (authorization_digest, record.sequence, authorization_state_digest or record.previous_hash,
+             record.candidate_hash, "execution-authorized-commit"))
                     except sqlite3.IntegrityError as exc:
                         raise ValueError("authorization has already been consumed") from exc
                 self._fail("after_authorization_before_audit")
