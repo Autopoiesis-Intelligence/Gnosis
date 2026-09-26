@@ -2,11 +2,11 @@ namespace Gnozis
 
 /-- A durable authorization is consumed at most once.
     Consumption is modeled as a set membership fact, independent of Psi state. -/
-def Consumed (a : A) (consumed : A → Prop) : Prop := consumed a
+def Consumed (a : String) (consumed : String → Prop) : Prop := consumed a
 
 /-- Recovery preserves the durable consumption fact. -/
 def RecoveryPreservesConsumption
-    (before after : A → Prop) : Prop :=
+    (before after : String → Prop) : Prop :=
   ∀ a, before a → after a
 
 theorem recovered_authorization_remains_consumed
