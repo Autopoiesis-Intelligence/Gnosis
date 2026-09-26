@@ -190,3 +190,8 @@ The repository therefore enters Stage 8 with **reconciliation, not expansion** a
 ### Stage-8 durable authorization formal target — 30%
 
 Added `formal/DurableAuthorization.lean`. The first minimal theorem target is intentionally narrower than full persistence verification: durable consumption is an independent fact keyed by authorization identity; recovery must preserve that fact; a consumed authorization therefore cannot become executable again after recovery. This does not yet claim equivalence with SQLite implementation. Runtime restart tests remain the implementation evidence.
+
+
+### Stage-8 authorization ↔ SQLite mapping — 40%
+
+Reverse mapping exposed and closed a real binding gap: `authorization_consumption.state_digest` was persisted but not validated against the transition's pre-state (`previous_hash`). It is now fail-closed checked. The mapping is: `authorization_digest → consumed identity`; `state_digest → pre-transition state`; `candidate_hash → committed candidate`; `sequence → durable transition`. An adversarial test rejects forged `state_digest` after restart. Formal `ConsumptionBinding` records the identity/state binding without creating a second authority model.
