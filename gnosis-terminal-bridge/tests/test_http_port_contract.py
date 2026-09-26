@@ -63,6 +63,7 @@ def test_handshake_and_exchange_roundtrip():
             "type": "hypothesis",
             "payload": {"text": "test"},
             "provenance": {"source": "test-client"},
+            "authorization": {"source": "test-client", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
         })
         assert status == 200
         assert result["status"] == "accepted"
