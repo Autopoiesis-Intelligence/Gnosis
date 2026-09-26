@@ -57,9 +57,9 @@ theorem psi_transition_requires_separate_root_certificate
     (proof : ProofObligation I candidate)
     (hAdmission : Admission I candidate proof)
     (nextK : K)
-    (hRoot : root s.K → root nextK) :
-    J I root { psi := candidate, W := s.W, K := s.K } s.K := by
+    (hRoot : root s.K)
+    (hPreserves : root s.K → root nextK) :
+    J I root { psi := candidate, W := s.W, K := nextK } nextK := by
   constructor
   · exact proof.invariant_ok
-  · exact hRoot (by
-      exact True.intro)
+  · exact hPreserves hRoot
