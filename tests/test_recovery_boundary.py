@@ -4,6 +4,7 @@ from core.history import AppendOnlyHistory, TransitionRecord
 from core.recovery import recover_psi
 from core.replay import replay
 from core.execution_contract import state_digest
+from core.provenance import Provenance
 from core.sqlite_persistence import SQLiteHistoryStore
 from core.state import Psi
 
@@ -17,6 +18,7 @@ def record(sequence, previous_hash, state):
         kernel_version="k1",
         candidate_hash=digest,
         admitted=True,
+        evidence_hash="evidence-0",
     )
 
 
@@ -34,7 +36,9 @@ def test_recovery_loads_durable_history_then_derives_state(tmp_path):
     state = Psi(x=("g", "s0"), relations=())
     path = tmp_path / "history.db"
     store = SQLiteHistoryStore(path)
-    store.commit_once(record(0, "genesis", state), genesis, state)
+    rec = record(0, "genesis", state)
+    proof = Provenance(candidate_hash=rec.candidate_hash, evidence_hash=rec.evidence_hash, kernel_version=rec.kernel_version)
+    store.commit_once_with_audit(rec, proof, genesis, state)
 
     result = recover_psi(
         genesis,
