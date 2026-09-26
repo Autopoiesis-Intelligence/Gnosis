@@ -147,3 +147,8 @@ Reverse-analysis found an important type-boundary correction: canonical K0 is a 
 ### Stage-7 Ψ/K0 runtime separation evidence
 
 Adversarial tests now establish that `PsiTransition` can change only the canonical `Ψ=(X,R)` projection and cannot self-authorize a kernel/K0 change. A valid K0 before/after pair requires the explicit canonical invariant and `preserve_root`; a forged `sealed=False` kernel remains outside authority regardless of a successful Ψ transition. CI at HEAD `b0cb6320a2a6914d661b3db84c700f984cf2cf94`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+### Stage-7 evidence/proof authority gate
+
+Evidence and provenance are now explicitly non-constructive with respect to certification. Runtime regression rejects evidence-rich but failed proof; formal `CertifiedTransition` can only exist with explicit `Admission` and `preserves_root` fields. The formal theorem `evidence_does_not_imply_certified_transition` captures the boundary. CI at HEAD `99e8b793d0c223232368c5d6195eed2ed28bc8aa`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
