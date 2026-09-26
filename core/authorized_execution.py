@@ -46,5 +46,5 @@ class AuthorizedExecution:
             transition,
             execution_input,
             test=test,
-            authorization_digest=request.execution_authorization_digest(execution_input.state_digest),
+            authorization_digest=request.authorization_digest(),
         )
