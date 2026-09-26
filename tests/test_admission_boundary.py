@@ -141,3 +141,50 @@ def test_evolutionary_admission_requires_viability():
     )
     result = admit(candidate, proof)
     assert result.accepted is False
+
+
+@pytest.mark.parametrize(
+    ("regime", "viable", "expected"),
+    [
+        ("fundamental", False, True),
+        ("evolutionary", True, True),
+        ("evolutionary", False, False),
+    ],
+)
+def test_end_to_end_admission_psi_and_k0_certification(regime, viable, expected):
+    from core.meta_transition import MetaTransition, RefinementProof
+    from core.root_invariant import canonical_root_invariant
+
+    candidate = State(values={"x": "certified", "relations": ()})
+    proof = ProofObligation(
+        passed=True,
+        invariant=True,
+        viable=viable,
+        evidence={"regime": regime},
+    )
+    admission = admit(candidate, proof)
+    assert admission.accepted is expected
+
+    before_kernel = {"sealed": True, "version": 1}
+    after_kernel = {"sealed": True, "version": 2}
+    kernel_transition = MetaTransition(
+        before_kernel,
+        after_kernel,
+        RefinementProof(
+            canonical_root_invariant(),
+            before_kernel,
+            after_kernel,
+            "K0 preserved independently of Psi admission",
+        ),
+    )
+
+    if expected:
+        assert require_admitted(admission) is candidate
+        assert kernel_transition.admissible()
+        assert kernel_transition.apply() == after_kernel
+    else:
+        assert not admission.accepted
+        with pytest.raises(ValueError, match="not admitted"):
+            require_admitted(admission)
+        # A valid K0 certificate cannot upgrade a rejected Psi admission.
+        assert kernel_transition.admissible()
