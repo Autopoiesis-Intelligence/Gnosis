@@ -29,6 +29,7 @@ def run(output: Path, database: Path) -> dict:
     execution_input = execution_input_from_psi(
         psi, input_type="task", content_digest=task.content_digest)
     transition = PsiTransition(lambda x, relations: (x + ("runtime-done",), relations))
+    database.parent.mkdir(parents=True, exist_ok=True)
     store = SQLiteHistoryStore(database)
     executor = CanonicalExecutor(history=AppendOnlyHistory(),
         kernel_version="runtime-task-v1", durable_store=store)
