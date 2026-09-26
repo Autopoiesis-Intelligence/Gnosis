@@ -26,7 +26,7 @@ def audit_for_commit(record: TransitionRecord, provenance: Provenance, previous:
     if not provenance.complete():
         raise ValueError("incomplete provenance")
     if record.candidate_hash != provenance.candidate_hash or record.evidence_hash != provenance.evidence_hash or record.kernel_version != provenance.kernel_version:
-        raise ValueError("provenance does not bind transition")
+        raise ValueError("provenance binding does not match transition")
     sequence = record.sequence
     previous_hash = "genesis" if previous is None else previous.digest()
     if previous is not None and previous.sequence + 1 != sequence:
