@@ -23,6 +23,7 @@ def test_handshake_and_exchange():
         "type": "hypothesis",
         "payload": {"x": 1},
         "provenance": {"provider": "test"},
+        "authorization": {"source": "test-agent", "purpose": "test", "operation": "transform", "destination": "core", "status": "allowed"},
     })
     assert response["status"] == "accepted"
     assert response["message_id"] == "m1"
