@@ -33,3 +33,10 @@ CI evidence at HEAD `edafcd3813772bba176047b8f0b288857b9d9faa`: Tests, Architect
 Evidence and provenance are descriptive inputs, not admission authority. A proof carrying trusted-looking source identifiers, attestation metadata, evidence hashes, or attached provenance remains rejected when `passed`/`invariant` are false. Provenance attachment validates identity binding only; it does not mutate the candidate or create an Admission.
 
 Adversarial evidence: `tests/test_admission_boundary.py` covers trusted-looking evidence attempting to upgrade rejection and provenance attempting to create admission authority. CI at HEAD `615925dba19e352603de98fa52c619a67a3da793`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+## Persistence-to-authority gate
+
+Persisted evidence/provenance remains descriptive after restart. `verify_cross_table_consistency()` validates durable binding, then the recovered provenance is supplied to a rejected `ProofObligation`; it does not create an Admission. This explicitly tests `Persistence ≠ Authority` across process restart.
+
+CI evidence at HEAD `7d9ac8c8049b9bac598453464a8ec2e81abc6159`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
