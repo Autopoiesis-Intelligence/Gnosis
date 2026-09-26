@@ -102,6 +102,13 @@ def test_chain_continuity_mutation_fails_closed(tmp_path, mutation):
         "state",
         "state-1",
     )
+    third = TransitionRecord(2, "s1", "s2", "k1", "s2", True, "e2")
+    store.commit_once_with_audit(
+        third,
+        Provenance("s2", "e2", "k1"),
+        "state-1",
+        "state-2",
+    )
 
     with sqlite3.connect(path) as conn:
         if mutation == "delete_first":
