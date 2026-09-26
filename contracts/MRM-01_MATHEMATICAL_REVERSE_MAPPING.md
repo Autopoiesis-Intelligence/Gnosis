@@ -167,3 +167,21 @@ The runtime end-to-end gate now covers both regimes: `fundamental` with `viable=
 ### Stage-8 gate definition
 
 Stage 7 is closed only for the scoped certification boundary above. Stage 8 remains gated pending a repository-wide contract inventory and formal/runtime consistency audit. No new mathematical contract or architecture is to be introduced until existing formal targets, runtime evidence, persistence/replay boundaries, and the MRM-01 registry are reconciled against the current HEAD.
+
+
+### Stage-8 reconciliation checkpoint — 10%
+
+Current HEAD reconciliation establishes:
+
+| Boundary | Runtime evidence | Formal status | Stage-8 action |
+|---|---|---|---|
+| K0 authority | VERIFIED | correspondence target exists | reconcile historical status |
+| Admission / commit | VERIFIED | regime-aware target exists | reconcile historical status |
+| Ψ projection / transition | VERIFIED | projection boundary exists | identify remaining theorem gap |
+| Evidence / certification | VERIFIED | non-construction theorem exists | retain |
+| Persistence / restart replay | VERIFIED | no complete formal theorem | formal target required only if Stage-8 contract selects it |
+| Authorization / replay | VERIFIED | no complete formal theorem | formal target required only if Stage-8 contract selects it |
+
+Important distinction: Stage-7's 100% is scoped to the defined trust-boundary certification contract; it does not mean that every persistence/replay property is formally verified in Lean.
+
+The repository therefore enters Stage 8 with **reconciliation, not expansion** as the active operation. The next contract must be selected from an evidence-backed remaining gap, with no duplicate state/authority model.
