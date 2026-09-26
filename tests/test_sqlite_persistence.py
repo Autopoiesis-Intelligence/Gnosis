@@ -1,7 +1,7 @@
 import pytest
 
 from core.history import TransitionRecord
-from core.sqlite_persistence import SQLiteHistoryStore
+from core.sqlite_persistence import SQLiteHistoryStore\nfrom core.provenance import Provenance
 
 
 def rec(seq, prev, state):
@@ -106,3 +106,23 @@ def test_sqlite_rejects_conflicting_existing_head(tmp_path):
 
     with pytest.raises(ValueError, match="conflicts"):
         store.commit_once(rec(0, "genesis", "different"), "current", "other")
+
+
+def test_atomic_audit_commit_rolls_back_on_interrupted_transaction(tmp_path):
+    path = tmp_path / "atomic.db"
+
+    def fail(point):
+        if point == "after_audit_before_commit":
+            raise RuntimeError("crash before durable commit")
+
+    store = SQLiteHistoryStore(path, failure_injector=fail)
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    with pytest.raises(RuntimeError, match="crash before durable commit"):
+        store.commit_once_with_audit(
+            rec(0, "genesis", "s0"), provenance, "current", "next"
+        )
+
+    reopened = SQLiteHistoryStore(path)
+    assert reopened.load().records == ()
+    assert reopened.load_audit() == ()
+    assert reopened.load_provenance() == ()
