@@ -32,6 +32,8 @@ class AuthorizedExecution:
         """Authorize external information before canonical execution."""
         if not isinstance(information, Information):
             raise TypeError("information must be Information.")
+        if not isinstance(request, ExternalExecutionRequest):
+            raise TypeError("request must be ExternalExecutionRequest.")
 
         information.require_authorized()
         if request.information_id != information.information_id:
