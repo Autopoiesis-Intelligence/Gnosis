@@ -25,6 +25,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
 
+      - name: Run first-task milestone tests
+        run: |
+          python -m pytest -q tests/test_task_processing.py tests/test_recovery_causal_triple.py tests/test_atomic_audit_persistence.py tests/test_canonical_durable_boundary.py 2>&1 | tee milestone-output.txt
+          test ${PIPESTATUS[0]} -eq 0
+
       - name: Run Core tests and capture report
         run: |
           python -m pytest -q tests --ignore=tests/research 2>&1 | tee pytest-output.txt
@@ -35,5 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pytest-report
-          path: pytest-output.txt
+          path: |
+            pytest-output.txt
+            milestone-output.txt
           if-no-files-found: error
