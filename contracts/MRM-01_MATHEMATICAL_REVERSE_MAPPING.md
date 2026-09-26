@@ -162,3 +162,8 @@ The runtime distinction is now explicitly represented in the formal layer: `Fund
 ### Stage-7 end-to-end certification gate
 
 The runtime end-to-end gate now covers both regimes: `fundamental` with `viable=False` is admitted; `evolutionary` requires viability; both accepted paths require an independent valid K0 `MetaTransition`; a valid K0 certificate cannot upgrade a rejected Ψ admission. This closes the runtime authority composition boundary. CI at HEAD `f955b52444dde7ac38363420f38e7c3e7e5df87c`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+### Stage-8 gate definition
+
+Stage 7 is closed only for the scoped certification boundary above. Stage 8 remains gated pending a repository-wide contract inventory and formal/runtime consistency audit. No new mathematical contract or architecture is to be introduced until existing formal targets, runtime evidence, persistence/replay boundaries, and the MRM-01 registry are reconciled against the current HEAD.
