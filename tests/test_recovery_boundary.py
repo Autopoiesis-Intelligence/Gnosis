@@ -73,3 +73,21 @@ def test_recovery_fails_closed_on_tampered_durable_chain(tmp_path):
             SQLiteHistoryStore(path),
             lambda _state, _record: state,
         )
+
+
+def test_recovered_state_cannot_bypass_canonical_commit_boundary(tmp_path):
+    genesis = Psi(x=("g",), relations=())
+    state = Psi(x=("g", "s0"), relations=())
+    path = tmp_path / "history.db"
+    store = SQLiteHistoryStore(path)
+    rec = record(0, "genesis", state)
+    proof = Provenance(candidate_hash=rec.candidate_hash, evidence_hash=rec.evidence_hash, kernel_version=rec.kernel_version)
+    store.commit_once_with_audit(rec, proof, genesis, state)
+
+    recovered = recover_psi(genesis, SQLiteHistoryStore(path), lambda _s, _r: state)
+    assert recovered.state == state
+
+    # Recovery returns a derived value only; the durable store remains unchanged.
+    before = SQLiteHistoryStore(path).load()
+    assert len(before.records) == 1
+    assert before.head.state_hash == state_digest(state)
