@@ -166,3 +166,33 @@ def test_audit_sequence_gap_fails_closed_after_restart(tmp_path):
         reopened.verify_cross_table_consistency()
 
 
+
+
+def test_persisted_evidence_does_not_create_admission_after_restart(tmp_path):
+    path = tmp_path / "evidence-authority.db"
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(
+        rec(), prov(), None, "state",
+        authorization_digest="auth-1",
+        authorization_state_digest="state-0",
+    )
+
+    reopened = SQLiteHistoryStore(path)
+    reopened.verify_cross_table_consistency()
+    persisted = reopened.load_provenance()[0]
+
+    from core.admission import admit
+    from core.proof import ProofObligation
+    from core.state import State
+
+    proof = ProofObligation(
+        passed=False,
+        invariant=False,
+        viable=False,
+        evidence={"persisted_provenance": persisted},
+    )
+    admission = admit(
+        State(values={"x": "replay", "relations": ()}),
+        proof,
+    )
+    assert admission.accepted is False
