@@ -21,7 +21,7 @@ class MetaAdmission(Generic[T]):
     def admissible(self) -> bool:
         return (
             self.transition.admissible()
-            and self.root == canonical_root_invariant()
+            and self.root is canonical_root_invariant()
             and self.root.holds(self.transition.before)
             and self.root.holds(self.transition.after)
             and self.closure.holds()
