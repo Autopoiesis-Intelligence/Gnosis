@@ -1,28 +1,25 @@
-"""Fail-closed recovery from durable history into derived semantic state.
-
-Durable persistence is a substrate, not semantic authority. Recovery first
-loads and validates the append-only history, then derives Psi by deterministic
-replay. A persisted record never becomes trusted merely because it exists.
-"""
+"""Fail-closed recovery from durable history, provenance and audit into derived state."""
 from __future__ import annotations
-
 from collections.abc import Callable
-
-from .history import AppendOnlyHistory
+from .audit_chain import AuditChain
 from .replay import ReplayResult, replay
 from .sqlite_persistence import SQLiteHistoryStore
 from .state import Psi
 
 TransitionApplier = Callable[[Psi, object], Psi]
 
-
 def recover_psi(
     genesis: Psi,
     store: SQLiteHistoryStore,
     apply: TransitionApplier,
 ) -> ReplayResult:
-    """Recover semantic state from validated durable history."""
+    """Verify the durable causal triple before deterministic replay."""
     if not isinstance(store, SQLiteHistoryStore):
         raise TypeError("recovery requires SQLiteHistoryStore.")
-    history: AppendOnlyHistory = store.load()
+    history = store.load()
+    provenance = store.load_provenance()
+    audits = store.load_audit()
+    if len(history.records) != len(provenance) or len(history.records) != len(audits):
+        raise ValueError("durable history/provenance/audit cardinality mismatch")
+    AuditChain(audits).verify_against_history(history.records, provenance)
     return replay(genesis, history, apply)
