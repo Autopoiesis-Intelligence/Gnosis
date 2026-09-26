@@ -69,8 +69,12 @@ def test_unauthorized_information_cannot_reach_canonical_executor(status):
     info = make_information(status)
     execution_input = make_input(psi)
     request = ExternalExecutionRequest.from_information(info, operation=ExternalOperation.REQUEST, content_digest=execution_input.content_digest, purpose="test")
-    with pytest.raises(PermissionError):
+    try:
         bridge.step(info, psi, transition, execution_input, request)
+    except PermissionError:
+        pass
+    else:
+        pytest.fail("unauthorized information reached canonical executor")
 
 
 def test_state_substitution_is_rejected_before_transition():
@@ -109,7 +113,16 @@ def test_replay_request_with_same_content_but_different_information_is_rejected(
     bridge = AuthorizedExecution(make_executor())
     transition = PsiTransition(lambda x, relations: (x + 1, relations))
     first = make_information(AuthorizationStatus.ALLOWED)
-    second = make_information(AuthorizationStatus.ALLOWED)
+    second = Information(
+        information_id="external-2",
+        source="external",
+        content_reference="content-2",
+        provenance_ref="prov-2",
+        authorization=Authorization(
+            source="external", purpose="task", operation="execute",
+            destination="core", status=AuthorizationStatus.ALLOWED,
+        ),
+    )
     execution_input = make_input(psi)
     stale_request = ExternalExecutionRequest.from_information(
         first, operation=ExternalOperation.REQUEST,
