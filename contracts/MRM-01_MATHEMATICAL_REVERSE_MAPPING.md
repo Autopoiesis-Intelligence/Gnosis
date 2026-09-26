@@ -185,3 +185,8 @@ Current HEAD reconciliation establishes:
 Important distinction: Stage-7's 100% is scoped to the defined trust-boundary certification contract; it does not mean that every persistence/replay property is formally verified in Lean.
 
 The repository therefore enters Stage 8 with **reconciliation, not expansion** as the active operation. The next contract must be selected from an evidence-backed remaining gap, with no duplicate state/authority model.
+
+
+### Stage-8 durable authorization formal target — 30%
+
+Added `formal/DurableAuthorization.lean`. The first minimal theorem target is intentionally narrower than full persistence verification: durable consumption is an independent fact keyed by authorization identity; recovery must preserve that fact; a consumed authorization therefore cannot become executable again after recovery. This does not yet claim equivalence with SQLite implementation. Runtime restart tests remain the implementation evidence.
