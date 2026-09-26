@@ -51,14 +51,7 @@ def evolutionary_transition(generate: Generator, test: Tester) -> Callable[[Stat
         DeprecationWarning,
         stacklevel=2,
     )
-    def transition(state: State) -> State:
-        try:
-            return select_next_state(state, generate, test)
-        except ValueError as exc:
-            if str(exc) == "No valid candidate state passed the test":
-                return state
-            raise
-    return transition
+    return lambda state: select_next_state(state, generate, test)
 
 
 def evolutionary_psi_transition(generate: Generator, test: Tester) -> PsiTransition:
