@@ -15,7 +15,6 @@ class ExternalExecutionRequest:
     content_digest: str
     purpose: str
 
-    @classmethod
     def authorization_digest(self) -> str:
         """Stable digest identifying this exact authorization-bearing request."""
         payload = repr((
@@ -26,6 +25,7 @@ class ExternalExecutionRequest:
         )).encode("utf-8")
         return hashlib.sha256(payload).hexdigest()
 
+    @classmethod
     def from_information(
         cls,
         information: Information,
