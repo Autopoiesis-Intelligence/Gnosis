@@ -90,5 +90,6 @@ def test_provenance_attachment_does_not_create_admission_authority():
         viable=False,
         evidence={"provenance": attached, "source_ids": ("trusted-source",)},
     )
+    candidate = State(values={"x": "from-provenance", "relations": ()})
     admission = admit(candidate, proof)
     assert admission.accepted is False
