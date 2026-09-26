@@ -9,7 +9,7 @@ def _read(path: str) -> str:
 
 def test_canonical_commit_authority_is_executor():
     source = _read("core/execution.py")
-    assert "commit(" in source
+    assert "commit_admitted_psi(" in source
     assert "CanonicalExecutor" in source
 
 
