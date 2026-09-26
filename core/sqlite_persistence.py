@@ -3,7 +3,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 from typing import Callable
-from .audit_chain import AuditRecord, audit_for_commit
+from .audit_chain import AuditRecord, audit_for_commit, transition_digest, provenance_digest
 from .commit_contract import CommitResult
 from .history import AppendOnlyHistory, TransitionRecord
 from .provenance import Provenance
@@ -54,6 +54,34 @@ class SQLiteHistoryStore:
                 kernel_version=row[3], candidate_hash=row[4],
                 admitted=bool(row[5]), evidence_hash=row[6]))
         return history
+
+    def verify_cross_table_consistency(self) -> None:
+        """Verify that all durable evidence tables describe the same accepted transitions."""
+        history = self.load()
+        audits = self.load_audit()
+        provenances = self.load_provenance()
+        consumptions = self.load_authorization_consumption()
+        if not (len(history.records) == len(audits) == len(provenances)):
+            raise ValueError("durable evidence cardinality mismatch")
+        for i, (record, audit, proof) in enumerate(zip(history.records, audits, provenances)):
+            if record.sequence != i or audit.sequence != i:
+                raise ValueError("durable sequence binding mismatch")
+            if record.candidate_hash != proof.candidate_hash:
+                raise ValueError("durable candidate binding mismatch")
+            if record.evidence_hash != proof.evidence_hash:
+                raise ValueError("durable evidence binding mismatch")
+            if record.kernel_version != proof.kernel_version:
+                raise ValueError("durable kernel binding mismatch")
+            if audit.transition_hash != transition_digest(record):
+                raise ValueError("durable transition binding mismatch")
+            if audit.provenance_hash != provenance_digest(proof):
+                raise ValueError("durable provenance binding mismatch")
+        self.verify_authorization_consumption()
+        for digest, sequence, state_digest, candidate_hash, event in consumptions:
+            if sequence < 0 or sequence >= len(history.records):
+                raise ValueError("durable authorization sequence binding mismatch")
+            if candidate_hash != history.records[sequence].candidate_hash:
+                raise ValueError("durable authorization candidate binding mismatch")
 
     def load_authorization_consumption(self) -> tuple[tuple[str, int, str], ...]:
         with sqlite3.connect(self.path) as conn:
