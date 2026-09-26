@@ -46,3 +46,14 @@ This closes the persistence/restart authorization-replay gate at the application
 Recovery now validates durable authorization-consumption evidence before replay. The adversarial test mutates the persisted consumption event after a valid commit; recovery fails closed instead of reconstructing an executable state from tampered authorization evidence.
 
 CI evidence: Tests, Architecture Gate and Gnozis Port CI all GREEN on the resulting implementation.
+
+
+## Cross-record authorization binding gate
+
+Durable authorization consumption is now bound to the committed sequence, execution-state digest, and candidate hash. The authorization identity remains immutable and one-time; execution-state metadata is evidence of what the authorization actually consumed.
+
+The external execution boundary also checks the durable consumption index before entering canonical execution. Therefore a previously consumed authorization cannot be transferred to a later/successor state or another transition record, even when the new request reaches a structurally valid execution boundary.
+
+The atomic UNIQUE authorization key remains the final commit-time race/conflict barrier. Recovery additionally verifies that persisted candidate binding is consistent with the referenced transition record.
+
+CI evidence: Tests, Architecture Gate and Gnozis Port CI are GREEN at HEAD 32d6fc39025766e747100f8e0c804bace9a60c76.
