@@ -26,3 +26,10 @@ Meta-evolution cannot bypass the unified admission contract. A proposed meta-tra
 Adversarial CI coverage also confirms the ordinary evolution path still requires depth-1 viability; a candidate with no valid continuation is not admitted merely because its selector/test accepts it.
 
 CI evidence at HEAD `edafcd3813772bba176047b8f0b288857b9d9faa`: Tests, Architecture Gate and Gnozis Port CI SUCCESS.
+
+
+## Evidence/provenance authority gate
+
+Evidence and provenance are descriptive inputs, not admission authority. A proof carrying trusted-looking source identifiers, attestation metadata, evidence hashes, or attached provenance remains rejected when `passed`/`invariant` are false. Provenance attachment validates identity binding only; it does not mutate the candidate or create an Admission.
+
+Adversarial evidence: `tests/test_admission_boundary.py` covers trusted-looking evidence attempting to upgrade rejection and provenance attempting to create admission authority. CI at HEAD `615925dba19e352603de98fa52c619a67a3da793`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
