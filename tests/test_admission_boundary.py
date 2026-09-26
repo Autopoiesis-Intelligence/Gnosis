@@ -93,3 +93,26 @@ def test_provenance_attachment_does_not_create_admission_authority():
     candidate = State(values={"x": "from-provenance", "relations": ()})
     admission = admit(candidate, proof)
     assert admission.accepted is False
+
+
+def test_evidence_cannot_construct_certified_meta_transition():
+    candidate = State(values={"x": "evidence-only", "relations": ()})
+    evidence = {
+        "source_ids": ("trusted-source",),
+        "attestation": True,
+        "candidate_hash": "candidate-hash",
+        "evidence_hash": "evidence-hash",
+        "kernel_version": "k1",
+    }
+    rejected = admit(
+        candidate,
+        ProofObligation(
+            passed=False,
+            invariant=False,
+            viable=False,
+            evidence=evidence,
+        ),
+    )
+    assert rejected.accepted is False
+    with pytest.raises(ValueError, match="not admitted"):
+        require_admitted(rejected)
