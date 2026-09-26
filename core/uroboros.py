@@ -127,12 +127,7 @@ class Uroboros:
                 generate=self.generate,
                 test=self.test,
             )
-        try:
-            next_state = self.engine.step(self.state)
-        except ValueError as exc:
-            if str(exc) != "No valid candidate state passed the test":
-                raise
-            next_state = self.state
+        next_state = self.engine.step(self.state)
         return Uroboros(state=next_state, engine=self.engine, executor=self.executor, generate=self.generate, test=self.test, psi_transition=self.psi_transition)
 
     def with_relations(self, relations: Iterable[Relation]) -> "Uroboros":
