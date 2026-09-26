@@ -29,6 +29,10 @@ class CanonicalExecutor:
     kernel_version: str
     durable_store: SQLiteHistoryStore | None = None
 
+    def __post_init__(self):
+        if self.durable_store is not None:
+            self.history = self.durable_store.load()
+
     def step(
         self,
         psi: Psi,
