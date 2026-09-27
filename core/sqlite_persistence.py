@@ -32,6 +32,8 @@ class SQLiteHistoryStore:
                 authorization_digest TEXT PRIMARY KEY, sequence INTEGER NOT NULL,
                 state_digest TEXT NOT NULL, candidate_hash TEXT NOT NULL,
                 consumed_event TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS durable_metadata (
+                key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
                 sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
                 evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
@@ -108,10 +110,17 @@ class SQLiteHistoryStore:
         if row is not None:
             raise ValueError("authorization has already been consumed")
 
+    def _load_initial_state_digest(self) -> str | None:
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute("SELECT value FROM durable_metadata WHERE key = 'initial_state_digest'").fetchone()
+        return row[0] if row is not None else None
+
     def verify_authorization_consumption(self, *, initial_state_digest: str | None = None) -> None:
         """Fail closed if durable authorization-consumption evidence is malformed."""
         history = self.load()
         consumptions = self.load_authorization_consumption()
+        if initial_state_digest is None:
+            initial_state_digest = self._load_initial_state_digest()
         seen: set[str] = set()
         for digest, sequence, state_digest, candidate_hash, event in consumptions:
             if not digest or not digest.strip():
@@ -160,7 +169,6 @@ class SQLiteHistoryStore:
         self, record: TransitionRecord, provenance: Provenance,
         current, next_value, authorization_digest: str | None = None,
         authorization_state_digest: str | None = None,
-        initial_state_digest: str | None = None,
     ) -> CommitResult:
         """Atomically commit History + canonical Audit or commit neither."""
         existing = self.load()
@@ -178,7 +186,7 @@ class SQLiteHistoryStore:
         # A new commit may extend durable evidence only from a verified base.
         # Cardinality equality alone is insufficient: hashes/bindings may be corrupted
         # while all tables still contain the same number of rows.
-        self.verify_cross_table_consistency(initial_state_digest=initial_state_digest)
+        self.verify_cross_table_consistency()
         audits = self.load_audit()
         provenances = self.load_provenance()
         if len(audits) != len(existing.records) or len(provenances) != len(existing.records):
@@ -194,6 +202,8 @@ class SQLiteHistoryStore:
             conn.execute("BEGIN IMMEDIATE")
             try:
                 self._fail("before_insert")
+                if record.sequence == 0 and authorization_digest is not None:
+                    conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
                 conn.execute("""INSERT INTO transition_history
                     (sequence, previous_hash, state_hash, kernel_version,
                      candidate_hash, admitted, evidence_hash)
