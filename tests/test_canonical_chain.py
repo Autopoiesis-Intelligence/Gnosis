@@ -1,3 +1,4 @@
+from core.state import Psi
 import pytest
 
 from core.canonical_chain import admit_transition
