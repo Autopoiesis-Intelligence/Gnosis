@@ -184,14 +184,14 @@ def test_persisted_evidence_does_not_create_admission_after_restart(tmp_path):
     from core.admission import admit
     from core.proof import ProofObligation
     from core.state import State
-    import hashlib
+        import hashlib
 
     proof = ProofObligation(
         passed=False,
         invariant=False,
         viable=False,
         evidence={"persisted_provenance": persisted},
-        candidate_digest=hashlib.sha256(repr(State(values={"x": "replay", "relations": ()}).to_psi()).encode("utf-8")).hexdigest(),
+        candidate_digest=hashlib.sha256(repr(State(values={"x": "replay", "relations": ()})).encode("utf-8")).hexdigest(),
     )
     admission = admit(
         State(values={"x": "replay", "relations": ()}),
@@ -216,8 +216,9 @@ def test_full_authority_path_closes_after_restart(tmp_path):
     from core.admission import admit, require_admitted
     from core.proof import ProofObligation
     from core.state import State
+        import hashlib
 
-    candidate = State(values={"x": "recovered-evidence", "relations": ()})
+        candidate = State(values={"x": "recovered-evidence", "relations": ()})
     proof = ProofObligation(
         passed=False,
         invariant=False,
