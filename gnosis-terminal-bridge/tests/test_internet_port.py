@@ -59,3 +59,67 @@ def test_invalid_type_and_payload_fail():
         port.exchange({**base, "type": "unknown"})
     with pytest.raises(PortError):
         port.exchange({**base, "message_id": "m2", "type": "request", "payload": []})
+
+
+def test_duplicate_message_race_is_not_atomic():
+    """Adversarial proof: check-then-add must not accept the same message twice."""
+    import threading
+
+    class BarrierSet(set):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._barrier = threading.Barrier(2)
+
+        def __contains__(self, item):
+            result = super().__contains__(item)
+            self._barrier.wait(timeout=2)
+            return result
+
+    calls = 0
+    calls_lock = threading.Lock()
+
+    def handler(_envelope):
+        nonlocal calls
+        with calls_lock:
+            calls += 1
+        return {"ok": True}
+
+    port = InternetPort(handler)
+    hs = port.handshake({
+        "protocol": PROTOCOL,
+        "client_id": "race-test",
+        "provenance": {},
+    })
+    session = port.sessions[hs["session_id"]]
+    session.seen_messages = BarrierSet()
+
+    message = {
+        "protocol": PROTOCOL,
+        "session_id": hs["session_id"],
+        "message_id": "race",
+        "type": "request",
+        "payload": {},
+        "provenance": {},
+    }
+
+    results = []
+    errors = []
+
+    def run():
+        try:
+            results.append(port.exchange(message))
+        except Exception as exc:
+            errors.append(exc)
+
+    threads = [threading.Thread(target=run) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=3)
+
+    assert not any(thread.is_alive() for thread in threads)
+    assert calls == 1
+    assert len(results) == 1
+    assert len(errors) == 1
+    assert isinstance(errors[0], PortError)
+    assert "replayed" in str(errors[0])
