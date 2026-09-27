@@ -40,7 +40,8 @@ def admit(candidate: Any, proof: ProofObligation) -> Admission:
         raise TypeError("ProofObligation.invariant must be bool.")
     if type(proof.viable) is not bool:
         raise TypeError("ProofObligation.viable must be bool.")
-    actual_digest = hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest()
+    canonical = candidate.to_psi() if hasattr(candidate, "to_psi") else candidate
+    actual_digest = hashlib.sha256(repr(canonical).encode("utf-8")).hexdigest()
     if proof.candidate_digest != actual_digest:
         raise ValueError("Proof candidate identity mismatch.")
 
