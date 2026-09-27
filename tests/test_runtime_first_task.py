@@ -174,7 +174,7 @@ def test_end_to_end_authorized_execution_rejects_durable_head_substitution(tmp_p
         durable_store=SQLiteHistoryStore(database),
     )
 
-    with pytest.raises(ValueError, match="previous Psi does not match history head"):
+    with pytest.raises(ValueError, match="ExecutionInput state does not match durable history head."):
         TaskProcessor(AuthorizedExecution(executor)).process(
             task, info, supplied,
             PsiTransition(lambda x, relations: (_ for _ in ()).throw(
