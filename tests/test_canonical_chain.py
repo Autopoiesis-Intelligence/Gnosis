@@ -1,7 +1,7 @@
 from core.state import Psi
 import pytest
 
-from core.canonical_chain import admit_transition
+from core.canonical_chain import admit_transition, commit_admitted_psi
 from core.history import AppendOnlyHistory, TransitionRecord
 from core.provenance import Provenance
 from core.safety import SafetyGate
