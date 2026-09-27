@@ -102,3 +102,9 @@ theorem durable_evidence_does_not_create_authority
   exact hSeparation
 
 end Gnozis
+
+
+/-- Runtime authorization evidence is a projection of identity/state/content
+    bindings; it does not constitute an executable authorization by itself. -/
+def AuthorizationEvidenceProjection (authorizationDigest stateDigest contentDigest : String) : Prop :=
+  authorizationDigest ≠ "" ∧ stateDigest ≠ "" ∧ contentDigest ≠ ""
