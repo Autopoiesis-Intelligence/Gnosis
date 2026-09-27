@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Mapping
+import hashlib
 
 from .proof import ProofObligation
 
@@ -39,6 +40,9 @@ def admit(candidate: Any, proof: ProofObligation) -> Admission:
         raise TypeError("ProofObligation.invariant must be bool.")
     if type(proof.viable) is not bool:
         raise TypeError("ProofObligation.viable must be bool.")
+    actual_digest = hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest()
+    if proof.candidate_digest != actual_digest:
+        raise ValueError("Proof candidate identity mismatch.")
 
     regime = proof.evidence.get("regime")
     if regime == "fundamental":
