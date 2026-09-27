@@ -216,9 +216,9 @@ def test_full_authority_path_closes_after_restart(tmp_path):
     from core.admission import admit, require_admitted
     from core.proof import ProofObligation
     from core.state import State
-        import hashlib
+    import hashlib
 
-        candidate = State(values={"x": "recovered-evidence", "relations": ()})
+    candidate = State(values={"x": "recovered-evidence", "relations": ()})
     proof = ProofObligation(
         passed=False,
         invariant=False,
