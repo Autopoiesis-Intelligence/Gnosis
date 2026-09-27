@@ -4,6 +4,7 @@ from core.admission import Admission
 from core.commit import commit
 from core.history import AppendOnlyHistory
 from core.proof import ProofObligation
+import hashlib
 from core.safety import SafetyGate
 from core.state import Psi
 
