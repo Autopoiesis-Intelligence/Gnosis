@@ -1,4 +1,4 @@
-from core.legacy_engine import LegacyEngine
+from core.legacy_engine import LegacyEngine\nfrom core.engine import Engine
 from core.evolution import evolutionary_transition
 from core.state import State
 
@@ -25,7 +25,7 @@ def test_same_x_and_r_have_same_transition_even_with_extra_metadata():
     })
 
     transition = _transition()
-    result_base = LegacyEngine(transition).step(base)
+    result_base = Engine(transition).step(base)
     result_enriched = Engine(transition).step(enriched)
 
     assert result_base.values["x"] == result_enriched.values["x"] == 4
