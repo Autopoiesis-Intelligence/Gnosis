@@ -3,12 +3,12 @@ from core.psi_transition import make_psi_transition
 
 
 def increment_psi(x, relations):
-    value = x.get("value", 0)
-    return {"value": value + 1}, relations
+    value = x.get("x", 0)
+    return {"x": value + 1, "relations": relations}, relations
 
 
 def test_state_creation():
-    state = State(values={"value": 1})
+    state = State(values={"x": 1, "relations": ()})
     assert state.values["value"] == 1
 
 
@@ -24,17 +24,17 @@ def test_engine_creation():
 
 
 def test_engine_step():
-    state = State(values={"value": 1})
+    state = State(values={"x": 1, "relations": ()})
     engine = Engine(transition=make_psi_transition(increment_psi))
     next_state = engine.step(state)
-    assert next_state.values["value"] == 2
+    assert next_state.values["x"] == 2
 
 
 def test_engine_run():
     state = State(values={"value": 1})
     engine = Engine(transition=make_psi_transition(increment_psi))
     result = engine.run(state, steps=3)
-    assert result.values["value"] == 4
+    assert result.values["x"] == 4
 
 
 def test_engine_trajectory():
@@ -42,7 +42,7 @@ def test_engine_trajectory():
     engine = Engine(transition=make_psi_transition(increment_psi))
     trajectory = list(engine.trajectory(state, steps=3))
     assert len(trajectory) == 4
-    assert [s.values["value"] for s in trajectory] == [1, 2, 3, 4]
+    assert [s.values["x"] for s in trajectory] == [1, 2, 3, 4]
 
 
 def test_uroboros_initialization():
