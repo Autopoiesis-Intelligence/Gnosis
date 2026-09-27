@@ -14,5 +14,5 @@ def test_canonical_engine_executes_psi_transition() -> None:
     transition = make_psi_transition(
         lambda x, relations: ({"x": x.get("x", 0) + 1}, relations)
     )
-    result = Engine(transition=transition).step(State(values={"x": 0}))
+    result = LegacyEngine(transition=transition).step(State(values={"x": 0}))
     assert result.values["x"] == 1
