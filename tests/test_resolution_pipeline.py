@@ -3,6 +3,7 @@ import pytest
 from core.branch import Branch
 from core.merge import Conflict
 from core.proof import ProofObligation
+import hashlib
 from core.resolution import (
     DeferredConflict,
     admit_resolution,
@@ -20,6 +21,7 @@ def proof(passed: bool) -> ProofObligation:
         invariant=passed,
         viable=passed,
         evidence={"test": True},
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
 
 
