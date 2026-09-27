@@ -127,3 +127,43 @@ def test_atomic_audit_commit_rolls_back_on_interrupted_transaction(tmp_path):
     assert reopened.load().records == ()
     assert reopened.load_audit() == ()
     assert reopened.load_provenance() == ()
+
+
+@pytest.mark.parametrize(
+    "failure_point",
+    [
+        "after_history_before_audit",
+        "after_history_before_provenance",
+        "after_provenance_before_audit",
+        "after_authorization_before_audit",
+        "after_audit_before_commit",
+    ],
+)
+def test_atomic_commit_rolls_back_all_evidence_for_every_precommit_failure(
+    tmp_path, failure_point
+):
+    path = tmp_path / f"atomic-{failure_point}.db"
+
+    def fail(point):
+        if point == failure_point:
+            raise RuntimeError(f"injected failure at {point}")
+
+    store = SQLiteHistoryStore(path, failure_injector=fail)
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+
+    with pytest.raises(RuntimeError, match=failure_point):
+        store.commit_once_with_audit(
+            rec(0, "genesis", "s0"),
+            provenance,
+            "current",
+            "next",
+            authorization_digest="auth-0" if failure_point == "after_authorization_before_audit" else None,
+            authorization_state_digest="genesis" if failure_point == "after_authorization_before_audit" else None,
+        )
+
+    reopened = SQLiteHistoryStore(path)
+    assert reopened.load().records == ()
+    assert reopened.load_audit() == ()
+    assert reopened.load_provenance() == ()
+    assert reopened.load_authorization_consumption() == ()
+    reopened.verify_cross_table_consistency()
