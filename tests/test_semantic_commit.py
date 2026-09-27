@@ -3,6 +3,7 @@ import pytest
 from core.commit import commit
 from core.admission import admit
 from core.proof import ProofObligation
+import hashlib
 from core.state import Psi
 
 
@@ -12,6 +13,7 @@ def proof(passed):
         invariant=passed,
         viable=passed,
         evidence={"test": True},
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
 
 
