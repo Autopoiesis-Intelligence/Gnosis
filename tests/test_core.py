@@ -3,8 +3,7 @@ from core.psi_transition import make_psi_transition
 
 
 def increment_psi(x, relations):
-    value = x if isinstance(x, int) else x.get("x", 0)
-    return {"x": value + 1}, relations
+    return x + 1, relations
 
 
 def test_state_creation():
@@ -38,7 +37,7 @@ def test_engine_run():
 
 
 def test_engine_trajectory():
-    state = State(values={"value": 1})
+    state = State(values={"x": 1, "relations": ()})
     engine = Engine(transition=make_psi_transition(increment_psi))
     trajectory = list(engine.trajectory(state, steps=3))
     assert len(trajectory) == 4
@@ -53,8 +52,8 @@ def test_uroboros_initialization():
 
 def test_uroboros_step():
     uroboros = Uroboros(
-        state=State(values={"value": 1}),
+        state=State(values={"x": 1, "relations": ()}),
         engine=Engine(transition=make_psi_transition(increment_psi)),
     )
     next_uroboros = uroboros.step()
-    assert next_uroboros.state.values["value"] == 2
+    assert next_uroboros.state.values["x"] == 2
