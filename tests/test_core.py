@@ -3,13 +3,13 @@ from core.psi_transition import make_psi_transition
 
 
 def increment_psi(x, relations):
-    value = x.get("x", 0)
-    return {"x": value + 1, "relations": relations}, relations
+    value = x if isinstance(x, int) else x.get("x", 0)
+    return {"x": value + 1}, relations
 
 
 def test_state_creation():
     state = State(values={"x": 1, "relations": ()})
-    assert state.values["value"] == 1
+    assert state.values["x"] == 1
 
 
 def test_relation_creation():
@@ -31,7 +31,7 @@ def test_engine_step():
 
 
 def test_engine_run():
-    state = State(values={"value": 1})
+    state = State(values={"x": 1, "relations": ()})
     engine = Engine(transition=make_psi_transition(increment_psi))
     result = engine.run(state, steps=3)
     assert result.values["x"] == 4
