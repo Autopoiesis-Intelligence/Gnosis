@@ -1,4 +1,4 @@
-from core.engine import Engine
+from core.legacy_engine import LegacyEngine
 from core.evolution import evolutionary_transition
 from core.state import State
 
@@ -14,7 +14,7 @@ def test_invalid_rule_candidate_is_rejected_before_next_generation():
     def tester(state):
         return state.values["rule"] in {"stable", "extend"}
 
-    result = Engine(evolutionary_transition(generator, tester)).step(initial)
+    result = LegacyEngine(evolutionary_transition(generator, tester)).step(initial)
 
     assert result.values["rule"] == "extend"
     assert result.values["x"] == 1
@@ -33,7 +33,7 @@ def test_no_valid_rule_cannot_enter_recursive_cycle():
     transition = evolutionary_transition(generator, tester)
 
     try:
-        Engine(transition).step(initial)
+        LegacyEngine(transition).step(initial)
     except (ValueError, RuntimeError):
         return
 

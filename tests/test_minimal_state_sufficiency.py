@@ -1,19 +1,14 @@
 from core.engine import Engine
-from core.evolution import evolutionary_transition
+from core.psi_transition import make_psi_transition
 from core.state import State
 
 
 def _transition():
-    def generator(state):
+    def transition(x, relations):
         # E is intentionally defined only from the exposed (X, R) projection.
-        x = state.values["x"]
-        relations = state.values["relations"]
-        return (state.evolve(values={"x": x + len(relations), "relations": relations}),)
+        return x + len(relations), relations
 
-    def tester(state):
-        return True
-
-    return evolutionary_transition(generator, tester)
+    return make_psi_transition(transition)
 
 
 def test_same_x_and_r_have_same_transition_even_with_extra_metadata():

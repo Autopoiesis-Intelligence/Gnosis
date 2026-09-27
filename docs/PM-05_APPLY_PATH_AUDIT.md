@@ -5,40 +5,37 @@
 | Path | Classification | Semantic Ψ authority |
 |---|---|---|
 | core/psi_engine.py PsiEngine(PsiTransition) | CANONICAL Ψ | Yes |
-| Uroboros.evolutionary -> Engine(PsiTransition) | CANONICAL Ψ adapter | Yes, through PsiTransition.on_state() |
-| Engine(State -> State) | LEGACY/GENERIC COMPATIBILITY | No, not evidence of fundamental Ψ semantics |
-| gnosis-terminal-bridge/src/core_evolution.py | BRIDGE/COMPATIBILITY | No, must not be treated as canonical Ψ evidence |
-| CoreChat | BRIDGE/ADAPTER | No, stateful adapter only |
+| core/engine.py Engine(PsiTransition) | CANONICAL Ψ execution boundary | Yes |
+| core/uroboros.py Uroboros.canonical | CANONICAL Ψ adapter | Yes, through PsiTransition and CanonicalExecutor |
+| core/legacy_engine.py LegacyEngine(State -> State) | LEGACY/GENERIC COMPATIBILITY | No |
+| gnosis-terminal-bridge/src/core_evolution.py | BRIDGE/COMPATIBILITY | No |
+| CoreChat | BRIDGE/ADAPTER | No |
 
 ## Evidence
 
-core/psi_engine.py accepts only PsiTransition and Psi.
-core/psi_transition.py defines the canonical Psi -> Psi boundary and its on_state() adapter.
-core/evolution.py::evolutionary_psi_transition() now constructs Admission objects before selection.
-core/admission.py provides admit() and fail-closed require_admitted().
-
-The generic Engine(State -> State) remains intentionally compatible with existing tests/examples. Removing it would conflate compatibility cleanup with proof of the canonical model.
-
-The bridge creates a generic Engine from an authenticated context. That path is explicitly not canonical Ψ semantics and therefore cannot be used to claim T41 for Ψ.
+`core/psi_transition.py` defines the canonical `Psi -> Psi` boundary and its State adapter.
+`core/engine.py` accepts `PsiTransition` and executes only `PsiTransition.on_state()`.
+`core/legacy_engine.py` is the explicitly named compatibility surface for `State -> State`.
+`core/uroboros.py::evolutionary()` and the terminal bridge use `LegacyEngine`, keeping compatibility separate from canonical Ψ execution.
+`core/evolution.py::evolutionary_psi_transition()` constructs Admission objects before selection.
+`core/admission.py` provides `admit()` and fail-closed `require_admitted()`.
 
 ## Result
 
-PM-05 remains PARTIAL.
+The D-001 audit branch removes the previous ambiguity where `Engine` itself accepted both canonical and legacy transition forms.
 
-The canonical evolutionary Ψ path has an explicit Admission gate, but the repository does not yet have a universal type-level or runtime rule making every possible State -> State mutation pass through Admission.
+The canonical execution boundary is now explicit: `Engine -> PsiTransition`. Compatibility is explicit: `LegacyEngine -> State -> State`.
 
-## Required next design decision
+This does **not** claim that every possible State mutation in the repository is globally canonical Ψ semantics. Compatibility surfaces remain intentionally non-canonical.
 
-Do not silently delete Engine(State -> State).
+## Acceptance evidence
 
-Choose one of:
+- canonical Ψ execution uses `PsiTransition`;
+- compatibility callers are routed through `LegacyEngine`;
+- adversarial regression tests distinguish the two paths;
+- Architecture Gate passes;
+- full Tests workflow passes.
 
-A. Deprecate it and require an explicit legacy compatibility namespace.
-B. Keep it as a non-semantic generic utility and formally exclude it from the Ψ semantic surface.
-C. Replace it with a typed compatibility adapter that cannot be imported by canonical Ψ modules.
+## Scope
 
-Acceptance for PM-05 COMPLETE:
-- canonical Ψ semantic mutations have exactly one admissible commit path;
-- compatibility adapters cannot be mistaken for Ψ semantic transitions;
-- adversarial tests demonstrate the classification and non-bypass;
-- documentation names the trusted semantic boundary.
+PM-05 remains scoped to the canonical semantic surface. Global claims about every State mutation remain excluded unless independently proven.
