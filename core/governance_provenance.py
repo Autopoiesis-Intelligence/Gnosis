@@ -1,4 +1,4 @@
-"""Fail-closed provenance checks for GovernanceBinding evidence references."""
+"""Fail-closed structural provenance checks for GovernanceBinding evidence."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -10,12 +10,13 @@ from .governance_execution_adapter import GovernanceBinding, verify_governance_b
 class GovernanceEvidence:
     digest: str
     state_id: str
+    evidence_type: str
 
     def __post_init__(self) -> None:
-        if not isinstance(self.digest, str) or not self.digest.strip():
-            raise ValueError("evidence digest is required.")
-        if not isinstance(self.state_id, str) or not self.state_id.strip():
-            raise ValueError("evidence state_id is required.")
+        for name in ("digest", "state_id", "evidence_type"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} is required.")
 
 
 def verify_governance_binding_provenance(
@@ -25,20 +26,21 @@ def verify_governance_binding_provenance(
     shadow_result: GovernanceEvidence,
     governance_decision: GovernanceEvidence,
 ) -> None:
-    """Verify binding integrity plus existence/identity of its referenced evidence.
+    """Verify binding integrity, evidence identity, type, and state binding.
 
-    This does not establish semantic correctness of the evidence. It only proves
-    that the referenced evidence objects exist in the supplied evidence set,
-    match the declared digests, and are bound to the same state identity.
+    This establishes structural provenance only; it does not establish
+    semantic correctness or causal validity of the supplied evidence.
     """
     verify_governance_binding(binding)
     expected = (
-        ("proposal_digest", proposal),
-        ("shadow_result_digest", shadow_result),
-        ("governance_decision_digest", governance_decision),
+        ("proposal_digest", proposal, "proposal"),
+        ("shadow_result_digest", shadow_result, "shadow_result"),
+        ("governance_decision_digest", governance_decision, "governance_decision"),
     )
-    for field_name, evidence in expected:
+    for field_name, evidence, expected_type in expected:
         if getattr(binding, field_name) != evidence.digest:
             raise ValueError(f"{field_name} does not match supplied evidence.")
+        if evidence.evidence_type != expected_type:
+            raise ValueError(f"{field_name} has invalid evidence type.")
         if evidence.state_id != binding.state_id:
             raise ValueError(f"{field_name} is bound to a different state.")
