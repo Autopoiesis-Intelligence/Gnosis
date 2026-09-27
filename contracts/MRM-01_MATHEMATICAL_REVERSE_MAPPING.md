@@ -215,3 +215,8 @@ The durable commit path is now tested across every pre-COMMIT failure injection 
 ### Stage-8 pre-COMMIT atomicity — VERIFIED / 60%
 
 CI is GREEN on `e753179a`: the pre-COMMIT failure matrix passes. Every injected failure before COMMIT leaves no partial history/provenance/audit/authorization consumption. Next boundary is post-COMMIT failure: the durable artifacts must remain present and authorization must remain consumed exactly once.
+
+
+### Stage-8 post-COMMIT durability — 70% pending CI
+
+CI is GREEN on `9135093f`: post-COMMIT failure leaves the durable history/provenance/audit/authorization set intact and authorization remains consumed. Added the final restart bridge test: after a post-COMMIT injected failure, recovery reconstructs the committed Ψ and a fresh executor rejects replay of the same authorization. This is the direct durable-restart adversarial path.
