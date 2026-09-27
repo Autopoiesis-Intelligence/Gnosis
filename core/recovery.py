@@ -4,6 +4,7 @@ from collections.abc import Callable
 from .audit_chain import AuditChain
 from .replay import ReplayResult, replay
 from .sqlite_persistence import SQLiteHistoryStore
+from .execution_contract import state_digest
 from .state import Psi
 
 TransitionApplier = Callable[[Psi, object], Psi]
@@ -19,7 +20,7 @@ def recover_psi(
     history = store.load()
     provenance = store.load_provenance()
     audits = store.load_audit()
-    store.verify_cross_table_consistency()
+    store.verify_cross_table_consistency(initial_state_digest=state_digest(genesis))
     if len(history.records) != len(provenance) or len(history.records) != len(audits):
         raise ValueError("durable history/provenance/audit cardinality mismatch")
     AuditChain(audits).verify_against_history(history.records, provenance)
