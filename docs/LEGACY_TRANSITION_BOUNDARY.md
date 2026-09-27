@@ -2,24 +2,30 @@
 
 ## Status
 
-The canonical fundamental transition path is `PsiTransition`:
+The canonical fundamental transition path is:
 
 `State -> Psi -> PsiTransition -> Psi' -> State`
 
-`Engine` retains a `State -> State` callable only as an explicit compatibility boundary for existing clients. It is not the canonical Ψ evolution path.
+`core.engine.Engine` is now canonical and accepts `PsiTransition` only at its execution boundary. Legacy `State -> State` callables are isolated in `core.legacy_engine.LegacyEngine`.
 
 ## Rules
 
 1. New core evolution code MUST use `PsiTransition`.
-2. Legacy `State -> State` callables MUST NOT be presented as proof of the canonical Ψ semantics.
-3. The compatibility path remains temporarily while existing callers and tests are audited.
-4. Removal requires evidence that no supported caller depends on it and a regression pass after removal.
-5. Any future mutation of the compatibility path must preserve the Engine contract: the transition must return a `State`.
+2. Legacy `State -> State` callables MUST use `LegacyEngine` and MUST NOT be presented as proof of canonical Ψ semantics.
+3. `Engine.step()` invokes `PsiTransition.on_state()`; a legacy callable supplied to `Engine` cannot execute through the canonical boundary.
+4. Compatibility remains explicit and separately named while supported callers are migrated.
+5. Any future mutation of either path must preserve its declared contract.
 
 ## Evidence
 
-Current `Engine` implementation explicitly distinguishes `PsiTransition` from the compatibility callable and validates the returned state type.
+The D-001 audit branch contains explicit regression tests proving:
+- canonical `Engine` executes `PsiTransition`;
+- a legacy callable cannot execute through canonical `Engine`;
+- legacy evolution is routed through `LegacyEngine`;
+- the terminal bridge returns `LegacyEngine`, not canonical `Engine`.
+
+Architecture Gate and full Tests CI pass on the audited head.
 
 ## Next gate
 
-Audit all repository callers of `Engine(transition=...)`, classify them as canonical Ψ usage or legacy compatibility usage, then decide whether the compatibility path can be removed.
+D-001 final closure requires preserving this separation when the branch is merged.
