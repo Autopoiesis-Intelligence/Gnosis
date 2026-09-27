@@ -18,20 +18,17 @@ def rec(seq, prev, state):
     )
 
 
-def test_sqlite_commit_survives_reopen(tmp_path):
+def test_legacy_history_only_commit_is_fail_closed(tmp_path):
     path = tmp_path / "history.db"
     store = SQLiteHistoryStore(path)
 
     with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
-        with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
         store.commit_once(rec(0, "genesis", "s0"), "current", "next")
 
-    assert result.applied
-    reopened = SQLiteHistoryStore(path)
-    assert reopened.load().records == (rec(0, "genesis", "s0"),)
+    assert store.load().records == ()
 
 
-def test_failure_before_insert_rolls_back(tmp_path):
+def test_failure_injection_cannot_reach_disabled_legacy_path(tmp_path):
     path = tmp_path / "history.db"
 
     def fail(point):
@@ -39,74 +36,10 @@ def test_failure_before_insert_rolls_back(tmp_path):
             raise RuntimeError("injected crash")
 
     store = SQLiteHistoryStore(path, failure_injector=fail)
-
     with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
         store.commit_once(rec(0, "genesis", "s0"), "current", "next")
 
     assert SQLiteHistoryStore(path).load().records == ()
-
-
-def test_failure_after_insert_before_commit_rolls_back(tmp_path):
-    path = tmp_path / "history.db"
-
-    def fail(point):
-        if point == "after_insert_before_commit":
-            raise RuntimeError("injected crash")
-
-    store = SQLiteHistoryStore(path, failure_injector=fail)
-
-    with pytest.raises(RuntimeError, match="injected crash"):
-        store.commit_once(rec(0, "genesis", "s0"), "current", "next")
-
-    assert SQLiteHistoryStore(path).load().records == ()
-
-
-def test_failure_after_commit_leaves_durable_record_for_recovery(tmp_path):
-    path = tmp_path / "history.db"
-
-    def fail(point):
-        if point == "after_commit":
-            raise RuntimeError("process stopped after durable commit")
-
-    store = SQLiteHistoryStore(path, failure_injector=fail)
-
-    with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
-        store.commit_once(rec(0, "genesis", "s0"), "current", "next")
-
-    recovered = SQLiteHistoryStore(path).load()
-    assert recovered.records == (rec(0, "genesis", "s0"),)
-
-
-def test_retry_after_post_commit_failure_is_idempotent(tmp_path):
-    path = tmp_path / "history.db"
-
-    fired = {"value": False}
-
-    def fail(point):
-        if point == "after_commit" and not fired["value"]:
-            fired["value"] = True
-            raise RuntimeError("post-commit failure")
-
-    store = SQLiteHistoryStore(path, failure_injector=fail)
-
-    with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
-        store.commit_once(rec(0, "genesis", "s0"), "current", "next")
-
-    with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
-        SQLiteHistoryStore(path).commit_once(
-            rec(0, "genesis", "s0"),
-            "current-after-recovery",
-            "next-after-recovery",
-        )
-
-
-def test_sqlite_rejects_conflicting_existing_head(tmp_path):
-    path = tmp_path / "history.db"
-    store = SQLiteHistoryStore(path)
-    store.commit_once(rec(0, "genesis", "s0"), "current", "next")
-
-    with pytest.raises(ValueError, match="history-only durable commit path is disabled"):
-        store.commit_once(rec(0, "genesis", "different"), "current", "other")
 
 
 def test_atomic_audit_commit_rolls_back_on_interrupted_transaction(tmp_path):
