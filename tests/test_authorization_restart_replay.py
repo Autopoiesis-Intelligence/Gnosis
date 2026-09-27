@@ -2,7 +2,8 @@ import pytest
 
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
-from core.execution_contract import execution_input_from_psi, state_digest, transition_digest
+from core.execution_contract import execution_input_from_psi, state_digest
+from core.audit_chain import transition_digest
 from core.external_execution_request import ExternalExecutionRequest
 from core.external_operation import ExternalOperation
 from core.history import AppendOnlyHistory
