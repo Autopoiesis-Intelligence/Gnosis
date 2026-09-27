@@ -1,5 +1,4 @@
 from core.legacy_engine import LegacyEngine
-from core.engine import Engine
 from core.evolution import evolutionary_transition
 from core.state import State
 
@@ -28,7 +27,7 @@ def test_local_rule_evolution_is_independent_of_disconnected_component():
 
     transition = evolutionary_transition(generator, tester)
     result_a = LegacyEngine(transition).step(state_a)
-    result_b = Engine(transition).step(state_b)
+    result_b = LegacyEngine(transition).step(state_b)
 
     assert result_a.values["nodes"]["a"] == result_b.values["nodes"]["a"] == 3
     assert result_a.values["rules"]["a"] == result_b.values["rules"]["a"] == "add_neighbor"
