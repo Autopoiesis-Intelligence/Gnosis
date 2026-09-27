@@ -708,3 +708,50 @@ def test_restart_fails_closed_on_tampered_authorization_binding(tmp_path, tamper
                 x=state.x + ("committed",), relations=state.relations
             ),
         )
+
+
+@pytest.mark.parametrize(
+    "tamper_sql",
+    [
+        "UPDATE transition_history SET candidate_hash = ? WHERE sequence = 0",
+        "UPDATE provenance_history SET candidate_hash = ? WHERE sequence = 0",
+        "UPDATE audit_history SET candidate_hash = ? WHERE sequence = 0",
+    ],
+)
+def test_restart_fails_closed_on_tampered_durable_evidence(tmp_path, tamper_sql):
+    database = tmp_path / "durable-evidence-tamper.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="tamper-evidence-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="tamper-evidence",
+    )
+    AuthorizedExecution(
+        CanonicalExecutor(
+            history=AppendOnlyHistory(),
+            kernel_version="tamper-evidence-v1",
+            durable_store=SQLiteHistoryStore(database),
+        )
+    ).step(
+        info, genesis,
+        PsiTransition(lambda x, relations: (x + ("committed",), relations)),
+        execution_input, request,
+    )
+    import sqlite3
+    with sqlite3.connect(database) as conn:
+        conn.execute(tamper_sql, ("forged-evidence",))
+        conn.commit()
+
+    with pytest.raises(ValueError):
+        recover_psi(
+            genesis,
+            SQLiteHistoryStore(database),
+            lambda state, record: Psi(
+                x=state.x + ("committed",), relations=state.relations
+            ),
+        )
