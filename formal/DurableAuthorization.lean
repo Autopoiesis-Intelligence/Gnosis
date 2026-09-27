@@ -83,3 +83,22 @@ theorem runtime_durable_authorization_replay_forbidden
     e.authorizationDigest hConsumed
 
 end Gnozis
+
+
+namespace Gnozis
+
+/-- Durable evidence is not itself authority: it only supplies facts used by
+    the authorization predicate. -/
+def EvidenceIsNotAuthority (evidence : Prop) (authority : Prop) : Prop :=
+  evidence → ¬ authority
+
+/-- In the runtime model, durable consumption evidence cannot imply that a
+    fresh execution is authorized. Authorization remains a separate predicate. -/
+theorem durable_evidence_does_not_create_authority
+    (evidence : Prop)
+    (freshAuthorization : Prop)
+    (hSeparation : EvidenceIsNotAuthority evidence freshAuthorization) :
+    evidence → ¬ freshAuthorization := by
+  exact hSeparation
+
+end Gnozis
