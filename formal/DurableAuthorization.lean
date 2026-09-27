@@ -49,41 +49,37 @@ theorem valid_consumption_binding_implies_consumed
 namespace Gnozis
 
 /-- Minimal formal projection of the runtime durable-authorization evidence.
-    The projection carries identity, pre-transition state binding, and durable
-    consumption as separate facts; it introduces no executable authority. -/
+    Identity/state binding and recovery preservation remain separate facts. -/
 structure RuntimeDurableAuthorizationEvidence where
   authorizationDigest : String
   stateDigest : String
   consumedDigest : String
-  consumedState : String
-  consumedBeforeRecovery : Prop
-  consumedAfterRecovery : Prop
 
 def RuntimeDurableAuthorizationConforms
-    (e : RuntimeDurableAuthorizationEvidence) : Prop :=
+    (e : RuntimeDurableAuthorizationEvidence)
+    (before after : String → Prop) : Prop :=
   ConsumptionBinding e.authorizationDigest e.stateDigest
-    e.consumedDigest e.consumedState ∧
-  e.consumedBeforeRecovery → e.consumedAfterRecovery
+    e.consumedDigest e.stateDigest ∧
+  RecoveryPreservesConsumption before after
 
 theorem runtime_durable_authorization_conforms_to_formal
     (e : RuntimeDurableAuthorizationEvidence)
+    (before after : String → Prop)
     (hBinding : ConsumptionBinding e.authorizationDigest e.stateDigest
-      e.consumedDigest e.consumedState)
-    (hRecovery : e.consumedBeforeRecovery → e.consumedAfterRecovery) :
-    RuntimeDurableAuthorizationConforms e := by
+      e.consumedDigest e.stateDigest)
+    (hRecovery : RecoveryPreservesConsumption before after) :
+    RuntimeDurableAuthorizationConforms e before after := by
   exact ⟨hBinding, hRecovery⟩
 
-/-- Once the runtime evidence establishes durable consumption and recovery
-    preserves it, the formal replay prohibition follows. -/
+/-- Runtime evidence plus recovery preservation yields the same formal
+    replay prohibition used by the durable-authorization model. -/
 theorem runtime_durable_authorization_replay_forbidden
     (e : RuntimeDurableAuthorizationEvidence)
-    (h : RuntimeDurableAuthorizationConforms e)
-    (hConsumed : e.consumedBeforeRecovery) :
-    ¬ Executable e.authorizationDigest (fun a => a = e.consumedDigest) := by
-  have hAfter : e.consumedAfterRecovery := h.2 hConsumed
-  have hIdentity : e.authorizationDigest = e.consumedDigest := h.1.1
-  intro hExec
-  apply hExec
-  exact hIdentity
+    (before after : String → Prop)
+    (h : RuntimeDurableAuthorizationConforms e before after)
+    (hConsumed : Consumed e.authorizationDigest before) :
+    ¬ Executable e.authorizationDigest after := by
+  exact recovery_cannot_reauthorize_consumed before after h.2
+    e.authorizationDigest hConsumed
 
 end Gnozis
