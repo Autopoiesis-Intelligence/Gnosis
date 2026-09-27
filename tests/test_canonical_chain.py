@@ -112,3 +112,57 @@ def test_state_identity_failure_leaves_durable_history_unchanged(tmp_path):
     assert store.load().records == ()
     assert store.load_audit() == ()
     assert store.load_provenance() == ()
+
+
+def test_semantic_commit_composes_identity_admission_and_atomic_durable_commit(tmp_path):
+    from core.sqlite_persistence import SQLiteHistoryStore
+
+    database = tmp_path / "semantic-commit.sqlite"
+    store = SQLiteHistoryStore(database)
+
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    current_hash = state_digest(current)
+
+    head = TransitionRecord(
+        sequence=0,
+        previous_hash="genesis",
+        state_hash=current_hash,
+        kernel_version="test-v1",
+        candidate_hash=current_hash,
+        admitted=True,
+        evidence_hash="head-evidence",
+    )
+    head_provenance = Provenance(
+        candidate_hash=current_hash,
+        evidence_hash="head-evidence",
+        kernel_version="test-v1",
+    )
+    store.commit_once_with_audit(head, head_provenance, current, current)
+
+    history = store.load()
+
+    proof = prove_fundamental_transition(
+        current,
+        candidate,
+        lambda _: True,
+    )
+    admission = admit(candidate, proof)
+
+    result = commit_admitted_psi(
+        history,
+        current,
+        admission,
+        kernel_version="test-v1",
+        durable_store=store,
+    )
+
+    assert result.applied
+    assert result.value == candidate
+    assert result.history.head.state_hash == state_digest(candidate)
+
+    durable = SQLiteHistoryStore(database)
+    assert len(durable.load().records) == 2
+    assert len(durable.load_audit()) == 2
+    assert len(durable.load_provenance()) == 2
+    durable.verify_cross_table_consistency()
