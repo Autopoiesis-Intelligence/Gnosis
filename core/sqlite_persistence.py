@@ -160,6 +160,7 @@ class SQLiteHistoryStore:
         self, record: TransitionRecord, provenance: Provenance,
         current, next_value, authorization_digest: str | None = None,
         authorization_state_digest: str | None = None,
+        initial_state_digest: str | None = None,
     ) -> CommitResult:
         """Atomically commit History + canonical Audit or commit neither."""
         existing = self.load()
@@ -177,7 +178,7 @@ class SQLiteHistoryStore:
         # A new commit may extend durable evidence only from a verified base.
         # Cardinality equality alone is insufficient: hashes/bindings may be corrupted
         # while all tables still contain the same number of rows.
-        self.verify_cross_table_consistency(initial_state_digest="genesis")
+        self.verify_cross_table_consistency(initial_state_digest=initial_state_digest)
         audits = self.load_audit()
         provenances = self.load_provenance()
         if len(audits) != len(existing.records) or len(provenances) != len(existing.records):
