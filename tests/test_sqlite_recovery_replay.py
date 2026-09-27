@@ -4,6 +4,7 @@ from core.execution_contract import state_digest
 from core.history import TransitionRecord
 from core.replay import replay
 from core.sqlite_persistence import SQLiteHistoryStore
+from core.provenance import Provenance
 from core.state import Psi
 
 
@@ -37,7 +38,12 @@ def test_crash_recover_replay_continue(tmp_path):
 
     crashing_store = SQLiteHistoryStore(path, failure_injector=fail)
     with pytest.raises(RuntimeError, match="process stop"):
-        crashing_store.commit_once(first, genesis, state0)
+        crashing_store.commit_once_with_audit(
+            first,
+            Provenance(state_digest(state0), "e1", "k1"),
+            genesis,
+            state0,
+        )
 
     recovered = SQLiteHistoryStore(path)
     durable = recovered.load()
@@ -50,7 +56,12 @@ def test_crash_recover_replay_continue(tmp_path):
     assert replayed.state == state0
     assert replayed.applied == 1
 
-    continued = recovered.commit_once(second, state0, state1)
+    continued = recovered.commit_once_with_audit(
+        second,
+        Provenance(state_digest(state1), "e1", "k1"),
+        state0,
+        state1,
+    )
     assert continued.applied
 
     final_history = SQLiteHistoryStore(path).load()
@@ -71,7 +82,12 @@ def test_recovery_rejects_durable_state_hash_mismatch(tmp_path):
     tampered = Psi(x=("g", "tampered"), relations=())
 
     store = SQLiteHistoryStore(path)
-    store.commit_once(record(0, "genesis", valid), genesis, valid)
+    store.commit_once_with_audit(
+        record(0, "genesis", valid),
+        Provenance(state_digest(valid), "e1", "k1"),
+        genesis,
+        valid,
+    )
 
     with pytest.raises(ValueError, match="state_hash"):
         replay(
