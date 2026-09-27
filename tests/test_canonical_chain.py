@@ -64,3 +64,23 @@ def test_commit_rejects_substituted_candidate_after_admission():
             history, substituted, provenance, "before", "after", 1, (1,)
         )
     assert history.head is None
+
+
+def test_state_identity_failure_leaves_durable_history_unchanged(tmp_path):
+    from core.sqlite_persistence import SQLiteHistoryStore
+    database = tmp_path / "state-identity-atomicity.sqlite"
+    store = SQLiteHistoryStore(database)
+    history = AppendOnlyHistory()
+    previous = Psi(x=("wrong",), relations=())
+    admission = rec()
+    with pytest.raises(ValueError, match="previous Psi does not match history head"):
+        commit_admitted_psi(
+            history,
+            previous,
+            admission,
+            kernel_version="test-v1",
+            durable_store=store,
+        )
+    assert store.load().records == ()
+    assert store.load_audit() == ()
+    assert store.load_provenance() == ()
