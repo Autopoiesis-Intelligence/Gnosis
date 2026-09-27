@@ -44,7 +44,7 @@ class Uroboros:
         initial = state if state is not None else State(values={"x": (), "relations": ()})
         if not isinstance(initial, State): raise TypeError("evolutionary Uroboros requires a State adapter input.")
         initial.to_psi()
-        return cls(state=initial, engine=Engine(transition=evolutionary_transition(generate, test)), executor=None, generate=generate, test=test)
+        return cls(state=initial, engine=LegacyEngine(transition=evolutionary_transition(generate, test)), executor=None, generate=generate, test=test)
 
     def step(self) -> "Uroboros":
         if self.psi_transition is not None and self.executor is not None:
