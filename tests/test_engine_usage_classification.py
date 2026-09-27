@@ -1,12 +1,18 @@
+import pytest
+
 from core.engine import Engine
+from core.psi_transition import make_psi_transition
 from core.state import State
 
 
-def test_generic_engine_is_not_canonical_psi_evidence() -> None:
-    def transition(state: State) -> State:
-        return state.evolve(values={"x": state.values.get("x", 0) + 1})
+def test_canonical_engine_requires_psi_transition() -> None:
+    with pytest.raises(AttributeError):
+        Engine(transition=lambda state: state).step(State(values={"x": 0}))
 
+
+def test_canonical_engine_executes_psi_transition() -> None:
+    transition = make_psi_transition(
+        lambda x, relations: ({"x": x.get("x", 0) + 1}, relations)
+    )
     result = Engine(transition=transition).step(State(values={"x": 0}))
-
     assert result.values["x"] == 1
-    assert isinstance(result, State)
