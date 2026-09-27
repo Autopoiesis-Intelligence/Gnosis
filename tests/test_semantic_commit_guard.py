@@ -18,6 +18,7 @@ def accepted(candidate):
             invariant=True,
             viable=True,
             evidence={"test": True},
+            candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
         ),
     )
 
