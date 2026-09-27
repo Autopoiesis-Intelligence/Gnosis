@@ -263,8 +263,10 @@ class SQLiteHistoryStore:
         return CommitResult(next_value, durable, True)
 
     def commit_once(self, record: TransitionRecord, current, next_value) -> CommitResult:
-        """Legacy history-only compatibility path; new durable commits use audit."""
-        return self._commit_history_only(record, current, next_value)
+        """Fail closed: history-only durable writes are not a canonical commit path."""
+        raise ValueError(
+            "history-only durable commit path is disabled; use commit_once_with_audit()"
+        )
 
     def _commit_history_only(self, record: TransitionRecord, current, next_value) -> CommitResult:
         existing = self.load()
