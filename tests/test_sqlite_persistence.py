@@ -167,3 +167,85 @@ def test_atomic_commit_rolls_back_all_evidence_for_every_precommit_failure(
     assert reopened.load_provenance() == ()
     assert reopened.load_authorization_consumption() == ()
     reopened.verify_cross_table_consistency()
+
+
+
+def test_atomic_audit_post_commit_failure_is_recoverable_and_idempotent(tmp_path):
+    path = tmp_path / "post-commit-recovery.db"
+    fired = {"value": False}
+
+    def fail(point):
+        if point == "after_commit" and not fired["value"]:
+            fired["value"] = True
+            raise RuntimeError("process stopped after durable commit")
+
+    record = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    store = SQLiteHistoryStore(path, failure_injector=fail)
+
+    with pytest.raises(RuntimeError, match="durable commit"):
+        store.commit_once_with_audit(record, provenance, "current", "next")
+
+    recovered = SQLiteHistoryStore(path)
+    assert recovered.load().records == (record,)
+    assert len(recovered.load_audit()) == 1
+    assert recovered.load_provenance() == (provenance,)
+    recovered.verify_cross_table_consistency()
+
+    retry = recovered.commit_once_with_audit(
+        record,
+        provenance,
+        "current-after-recovery",
+        "next-after-recovery",
+    )
+    assert not retry.applied
+    assert retry.value == "current-after-recovery"
+    assert retry.history.records == (record,)
+    assert len(SQLiteHistoryStore(path).load_audit()) == 1
+    assert SQLiteHistoryStore(path).load_provenance() == (provenance,)
+
+
+def test_atomic_audit_post_commit_failure_with_authorization_is_idempotent(tmp_path):
+    path = tmp_path / "authorized-post-commit-recovery.db"
+    fired = {"value": False}
+
+    def fail(point):
+        if point == "after_commit" and not fired["value"]:
+            fired["value"] = True
+            raise RuntimeError("process stopped after durable commit")
+
+    record = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    store = SQLiteHistoryStore(path, failure_injector=fail)
+
+    with pytest.raises(RuntimeError, match="durable commit"):
+        store.commit_once_with_audit(
+            record,
+            provenance,
+            "current",
+            "next",
+            authorization_digest="auth-0",
+            authorization_state_digest="genesis",
+        )
+
+    recovered = SQLiteHistoryStore(path)
+    assert len(recovered.load().records) == 1
+    assert len(recovered.load_audit()) == 1
+    assert recovered.load_provenance() == (provenance,)
+    assert len(recovered.load_authorization_consumption()) == 1
+    recovered.verify_cross_table_consistency(initial_state_digest="genesis")
+
+    retry = recovered.commit_once_with_audit(
+        record,
+        provenance,
+        "current-after-recovery",
+        "next-after-recovery",
+        authorization_digest="auth-0",
+        authorization_state_digest="genesis",
+    )
+    assert not retry.applied
+    assert retry.value == "current-after-recovery"
+    assert len(SQLiteHistoryStore(path).load().records) == 1
+    assert len(SQLiteHistoryStore(path).load_audit()) == 1
+    assert len(SQLiteHistoryStore(path).load_provenance()) == 1
+    assert len(SQLiteHistoryStore(path).load_authorization_consumption()) == 1
