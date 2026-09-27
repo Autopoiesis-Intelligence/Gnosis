@@ -54,7 +54,8 @@ def test_rejected_admission_cannot_cross_commit_boundary_or_survive_recovery(tmp
         restarted,
         lambda state, _record: state,
     )
-    assert recovered == genesis
+    assert recovered.state == genesis
+    assert recovered.applied == 0
     assert restarted.load().records == ()
     assert restarted.load_audit() == ()
     assert restarted.load_provenance() == ()
