@@ -200,3 +200,8 @@ Reverse mapping exposed and closed a real binding gap: `authorization_consumptio
 ### Stage-8 genesis authorization binding correction — 45%
 
 CI exposed that `authorization_state_digest` is the canonical digest of the actual pre-transition Ψ, while `TransitionRecord.previous_hash` intentionally remains the history-chain sentinel `genesis` for sequence 0. The correct bridge is therefore `sequence=0 → initial_state_digest supplied by recovery`, and `sequence>0 → previous durable state_hash`. Recovery now supplies `state_digest(genesis)` to the persistence verifier. This preserves the existing history-chain semantics and closes the authorization binding without changing the state model.
+
+
+### Stage-8 consistency-context distinction
+
+`verify_cross_table_consistency()` remains a structural/durable consistency check when no initial Ψ digest is supplied. Full genesis authorization-state binding is performed when recovery supplies `initial_state_digest`; then `sequence=0` is bound to the actual recovered initial Ψ digest. This avoids conflating structural persistence validation with contextual authorization verification and preserves existing callers without weakening the recovery trust boundary.
