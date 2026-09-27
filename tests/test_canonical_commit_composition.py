@@ -14,6 +14,7 @@ def admitted(current: Psi, candidate: Psi):
         invariant=True,
         viable=True,
         evidence={"regime": "evolution", "reason": "canonical-gate-test"},
+        candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
     )
     return admit(candidate, proof)
 
