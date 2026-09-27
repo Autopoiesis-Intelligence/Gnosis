@@ -55,7 +55,7 @@ class SQLiteHistoryStore:
                 admitted=bool(row[5]), evidence_hash=row[6]))
         return history
 
-    def verify_cross_table_consistency(self) -> None:
+    def verify_cross_table_consistency(self, *, initial_state_digest: str | None = None) -> None:
         """Verify that all durable evidence tables describe the same accepted transitions."""
         history = self.load()
         audits = self.load_audit()
@@ -82,7 +82,7 @@ class SQLiteHistoryStore:
                 raise ValueError("durable transition binding mismatch")
             if audit.provenance_hash != provenance_digest(proof):
                 raise ValueError("durable provenance binding mismatch")
-        self.verify_authorization_consumption()
+        self.verify_authorization_consumption(initial_state_digest=initial_state_digest)
         for digest, sequence, state_digest, candidate_hash, event in consumptions:
             if sequence < 0 or sequence >= len(history.records):
                 raise ValueError("durable authorization sequence binding mismatch")
@@ -108,7 +108,7 @@ class SQLiteHistoryStore:
         if row is not None:
             raise ValueError("authorization has already been consumed")
 
-    def verify_authorization_consumption(self) -> None:
+    def verify_authorization_consumption(self, *, initial_state_digest: str | None = None) -> None:
         """Fail closed if durable authorization-consumption evidence is malformed."""
         history = self.load()
         consumptions = self.load_authorization_consumption()
@@ -127,7 +127,9 @@ class SQLiteHistoryStore:
                 raise ValueError("durable authorization consumption sequence is invalid")
             if candidate_hash != history.records[sequence].candidate_hash:
                 raise ValueError("durable authorization candidate binding mismatch")
-            expected_state_digest = history.records[sequence - 1].state_hash if sequence > 0 else history.records[sequence].previous_hash
+            expected_state_digest = (history.records[sequence - 1].state_hash if sequence > 0 else initial_state_digest)
+            if expected_state_digest is None:
+                raise ValueError("initial state digest is required to verify genesis authorization binding")
             if state_digest != expected_state_digest:
                 raise ValueError("durable authorization state binding mismatch")
         if len(consumptions) > len(history.records):
