@@ -205,3 +205,8 @@ CI exposed that `authorization_state_digest` is the canonical digest of the actu
 ### Stage-8 consistency-context distinction
 
 `verify_cross_table_consistency()` remains a structural/durable consistency check when no initial Ψ digest is supplied. Full genesis authorization-state binding is performed when recovery supplies `initial_state_digest`; then `sequence=0` is bound to the actual recovered initial Ψ digest. This avoids conflating structural persistence validation with contextual authorization verification and preserves existing callers without weakening the recovery trust boundary.
+
+
+### Stage-8 atomicity matrix — 60% pending CI
+
+The durable commit path is now tested across every pre-COMMIT failure injection point: `before_transaction`, `before_insert`, `after_history_before_audit`, `after_history_before_provenance`, `after_provenance_before_audit`, `after_authorization_before_audit`, and `after_audit_before_commit`. Each case requires rollback of transition history, provenance, audit, and authorization consumption, and leaves the authorization reusable. `after_commit` remains a separate post-commit invariant because rollback is no longer possible after SQLite COMMIT.
