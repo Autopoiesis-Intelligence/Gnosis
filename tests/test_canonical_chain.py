@@ -45,3 +45,22 @@ def test_canonical_chain_respects_gas_limit():
             AppendOnlyHistory(), rec(), prov(), "before", "after", 2, (15, 6),
             gas_limit=20
         )
+
+
+def test_commit_rejects_substituted_candidate_after_admission():
+    history = AppendOnlyHistory()
+    admitted = rec()
+    provenance = prov()
+
+    # The provenance binds candidate c0. Supplying a different candidate hash
+    # at the canonical commit boundary must fail before durable mutation.
+    substituted = TransitionRecord(
+        admitted.sequence, admitted.previous_hash, admitted.state_hash,
+        admitted.kernel_version, "substituted-candidate", admitted.admitted,
+        admitted.evidence_hash,
+    )
+    with pytest.raises(ValueError, match="candidate"):
+        admit_transition(
+            history, substituted, provenance, "before", "after", 1, (1,)
+        )
+    assert history.head is None
