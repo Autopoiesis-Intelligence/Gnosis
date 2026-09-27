@@ -8,7 +8,7 @@ from core.state import State
 
 def test_canonical_engine_requires_psi_transition() -> None:
     with pytest.raises(AttributeError):
-        Engine(transition=lambda state: state).step(State(values={"x": 0}))
+        Engine(transition=lambda state: state).step(State(values={"x": 0, "relations": ()}))
 
 
 def test_canonical_engine_executes_psi_transition() -> None:
