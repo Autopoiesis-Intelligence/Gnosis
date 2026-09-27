@@ -1,4 +1,4 @@
-from core.legacy_engine import LegacyEngine
+from core.legacy_engine import LegacyEngine\nfrom core.engine import Engine
 from core.evolution import evolutionary_transition
 from core.state import State
 
