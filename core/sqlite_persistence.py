@@ -34,6 +34,8 @@ class SQLiteHistoryStore:
                 consumed_event TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS durable_metadata (
                 key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS durable_metadata (
+                key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
                 sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
                 evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
@@ -109,6 +111,11 @@ class SQLiteHistoryStore:
             ).fetchone()
         if row is not None:
             raise ValueError("authorization has already been consumed")
+
+    def _load_initial_state_digest(self) -> str | None:
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute("SELECT value FROM durable_metadata WHERE key = 'initial_state_digest'").fetchone()
+        return row[0] if row is not None else None
 
     def _load_initial_state_digest(self) -> str | None:
         with sqlite3.connect(self.path) as conn:
@@ -202,6 +209,8 @@ class SQLiteHistoryStore:
             conn.execute("BEGIN IMMEDIATE")
             try:
                 self._fail("before_insert")
+                if record.sequence == 0 and authorization_digest is not None:
+                    conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
                 if record.sequence == 0 and authorization_digest is not None:
                     conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
                 conn.execute("""INSERT INTO transition_history
