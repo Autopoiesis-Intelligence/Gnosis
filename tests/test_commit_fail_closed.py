@@ -3,6 +3,7 @@ import pytest
 from core.commit import commit
 from core.admission import Admission
 from core.proof import ProofObligation
+import hashlib
 from core.state import Psi, State
 from core.history import AppendOnlyHistory
 
