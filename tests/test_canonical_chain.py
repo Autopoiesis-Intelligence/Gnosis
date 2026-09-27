@@ -1,8 +1,11 @@
 from core.state import Psi
 import pytest
 
+from core.admission import admit
 from core.canonical_chain import admit_transition, commit_admitted_psi
+from core.execution_contract import state_digest
 from core.history import AppendOnlyHistory, TransitionRecord
+from core.proof import prove_fundamental_transition
 from core.provenance import Provenance
 from core.safety import SafetyGate
 
@@ -69,19 +72,43 @@ def test_commit_rejects_substituted_candidate_after_admission():
 
 def test_state_identity_failure_leaves_durable_history_unchanged(tmp_path):
     from core.sqlite_persistence import SQLiteHistoryStore
+
     database = tmp_path / "state-identity-atomicity.sqlite"
     store = SQLiteHistoryStore(database)
-    history = AppendOnlyHistory()
-    previous = Psi(x=("wrong",), relations=())
-    admission = rec()
+
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    wrong_previous = Psi(x=("wrong",), relations=())
+
+    proof = prove_fundamental_transition(
+        current,
+        candidate,
+        lambda _: True,
+    )
+    admission = admit(candidate, proof)
+
+    head = TransitionRecord(
+        sequence=0,
+        previous_hash="genesis",
+        state_hash=state_digest(current),
+        kernel_version="test-v1",
+        candidate_hash=state_digest(current),
+        admitted=True,
+        evidence_hash="head-evidence",
+    )
+    history = AppendOnlyHistory().append(head)
+    history_before = history
+
     with pytest.raises(ValueError, match="previous Psi does not match history head"):
         commit_admitted_psi(
             history,
-            previous,
+            wrong_previous,
             admission,
             kernel_version="test-v1",
             durable_store=store,
         )
+
+    assert history == history_before
     assert store.load().records == ()
     assert store.load_audit() == ()
     assert store.load_provenance() == ()
