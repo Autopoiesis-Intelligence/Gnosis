@@ -191,7 +191,7 @@ def test_persisted_evidence_does_not_create_admission_after_restart(tmp_path):
         invariant=False,
         viable=False,
         evidence={"persisted_provenance": persisted},
-        candidate_digest=hashlib.sha256(repr(State(values={"x": "replay", "relations": ()})).encode("utf-8")).hexdigest(),
+        candidate_digest=hashlib.sha256(repr(State(values={"x": "replay", "relations": ()}).to_psi()).encode("utf-8")).hexdigest(),
     )
     admission = admit(
         State(values={"x": "replay", "relations": ()}),
