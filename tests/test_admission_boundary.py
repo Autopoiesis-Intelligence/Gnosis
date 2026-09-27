@@ -7,6 +7,7 @@ from core.admission import Admission, admit, require_admitted
 from core.evolution import evolutionary_psi_transition
 from core.proof import ProofObligation
 from core.state import State
+import hashlib
 
 
 def _proof(passed: bool) -> ProofObligation:
@@ -15,6 +16,7 @@ def _proof(passed: bool) -> ProofObligation:
         invariant=passed,
         viable=passed,
         evidence={"test": True},
+        candidate_digest=hashlib.sha256(repr(State(values={"x": "next", "relations": ()}).to_psi()).encode("utf-8")).hexdigest(),
     )
 
 
