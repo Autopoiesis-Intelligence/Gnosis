@@ -1,16 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Iterable
+from typing import Iterable
 
 from .psi_transition import PsiTransition
 from .state import State
-
-# Deprecated compatibility surface. New code should import LegacyEngine
-# from core.legacy_engine instead; canonical Ψ uses PsiEngine/PsiTransition.
-
-
-Transition = Callable[[State], State] | PsiTransition
 
 
 def _validate_steps(steps: int) -> None:
@@ -23,28 +17,21 @@ def _validate_steps(steps: int) -> None:
 
 @dataclass
 class Engine:
-    """Deterministic state-transition engine for GNOSIS/UROBOROS."""
+    """Canonical Ψ transition engine.
 
-    transition: Transition
+    Legacy State-callable transitions are intentionally excluded from this API.
+    Use core.legacy_engine.LegacyEngine only for explicit compatibility use.
+    """
+
+    transition: PsiTransition
 
     def step(self, state: State) -> State:
-        """Apply one transition to the current state.
-
-        PsiTransition is the canonical fundamental path. A State callable is
-        retained as an explicit compatibility boundary for existing clients.
-        """
-        if isinstance(self.transition, PsiTransition):
-            next_state = self.transition.on_state(state)
-        else:
-            next_state = self.transition(state)
-
+        next_state = self.transition.on_state(state)
         if not isinstance(next_state, State):
-            raise TypeError("Engine transition must return a State instance.")
-
+            raise TypeError("PsiTransition must return a State instance.")
         return next_state
 
     def run(self, state: State, steps: int) -> State:
-        """Apply the transition repeatedly for a finite number of steps."""
         _validate_steps(steps)
         current = state
         for _ in range(steps):
@@ -52,7 +39,6 @@ class Engine:
         return current
 
     def trajectory(self, state: State, steps: int) -> Iterable[State]:
-        """Yield the initial state followed by each subsequent state."""
         _validate_steps(steps)
         current = state
         yield current
