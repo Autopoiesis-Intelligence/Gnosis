@@ -42,7 +42,6 @@ class CanonicalExecutor:
         test: Tester | None = None,
         authorization_digest: str | None = None,
         authorization_state_digest: str | None = None,
-        initial_state_digest: str | None = None,
     ) -> ExecutionResult:
         """Own one canonical Psi execution step with fail-closed input binding."""
         if not isinstance(psi, Psi):
@@ -81,7 +80,6 @@ class CanonicalExecutor:
             durable_store=self.durable_store,
             authorization_digest=authorization_digest,
             authorization_state_digest=authorization_state_digest,
-            initial_state_digest=initial_state_digest,
         )
         self.history = committed.history
         return ExecutionResult(psi=committed.value, history=committed.history)
