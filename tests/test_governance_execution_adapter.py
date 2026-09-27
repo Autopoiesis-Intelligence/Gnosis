@@ -21,6 +21,20 @@ def make_binding(**overrides):
     return GovernanceBinding(**values)
 
 
+def tamper_with_original_digest(binding, **changes):
+    values = {
+        "proposal_id": binding.proposal_id,
+        "proposal_digest": binding.proposal_digest,
+        "state_id": binding.state_id,
+        "state_digest": binding.state_digest,
+        "shadow_result_digest": binding.shadow_result_digest,
+        "governance_decision_digest": binding.governance_decision_digest,
+        "binding_digest": binding.binding_digest,
+    }
+    values.update(changes)
+    return GovernanceBinding(**values)
+
+
 def test_valid_binding_projects_execution_identity():
     binding = make_binding()
     result = execution_input_from_verified_governance_binding(
@@ -34,7 +48,7 @@ def test_valid_binding_projects_execution_identity():
 
 def test_proposal_tamper_is_rejected():
     binding = make_binding()
-    tampered = make_binding(proposal_id="p2", binding_digest=binding.binding_digest)
+    tampered = tamper_with_original_digest(binding, proposal_id="p2")
     try:
         execution_input_from_verified_governance_binding(
             tampered, input_type="external-information", content_digest="cd1"
@@ -46,7 +60,7 @@ def test_proposal_tamper_is_rejected():
 
 def test_state_digest_tamper_is_rejected():
     binding = make_binding()
-    tampered = make_binding(state_digest="tampered", binding_digest=binding.binding_digest)
+    tampered = tamper_with_original_digest(binding, state_digest="tampered")
     try:
         execution_input_from_verified_governance_binding(
             tampered, input_type="external-information", content_digest="cd1"
@@ -58,7 +72,7 @@ def test_state_digest_tamper_is_rejected():
 
 def test_binding_digest_tamper_is_rejected():
     binding = make_binding()
-    tampered = make_binding(binding_digest="tampered")
+    tampered = tamper_with_original_digest(binding, binding_digest="tampered")
     try:
         execution_input_from_verified_governance_binding(
             tampered, input_type="external-information", content_digest="cd1"
@@ -70,9 +84,7 @@ def test_binding_digest_tamper_is_rejected():
 
 def test_shadow_digest_tamper_is_rejected():
     binding = make_binding()
-    tampered = make_binding(
-        shadow_result_digest="tampered", binding_digest=binding.binding_digest
-    )
+    tampered = tamper_with_original_digest(binding, shadow_result_digest="tampered")
     try:
         execution_input_from_verified_governance_binding(
             tampered, input_type="external-information", content_digest="cd1"
@@ -83,20 +95,9 @@ def test_shadow_digest_tamper_is_rejected():
 
 
 def test_governance_digest_tamper_is_rejected():
-    binding = make_binding(
-        governance_decision_digest="tampered"
-    )
-    # make_binding recomputes the digest, so this is a structurally valid
-    # alternate binding; using the original digest below simulates tampering.
-    original = make_binding()
-    tampered = GovernanceBinding(
-        proposal_id=binding.proposal_id,
-        proposal_digest=binding.proposal_digest,
-        state_id=binding.state_id,
-        state_digest=binding.state_digest,
-        shadow_result_digest=binding.shadow_result_digest,
-        governance_decision_digest=binding.governance_decision_digest,
-        binding_digest=original.binding_digest,
+    binding = make_binding()
+    tampered = tamper_with_original_digest(
+        binding, governance_decision_digest="tampered"
     )
     try:
         execution_input_from_verified_governance_binding(
