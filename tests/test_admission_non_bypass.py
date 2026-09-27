@@ -8,6 +8,7 @@ from core.state import State
 def test_canonical_evolution_cannot_select_when_all_proofs_fail(monkeypatch):
     def reject_all(*_args, **_kwargs):
         from core.proof import ProofObligation
+import hashlib
         return ProofObligation(
             passed=False,
             invariant=False,
