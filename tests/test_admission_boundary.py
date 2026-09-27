@@ -168,6 +168,7 @@ def test_end_to_end_admission_psi_and_k0_certification(regime, viable, expected)
         invariant=True,
         viable=viable,
         evidence={"regime": regime},
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
     admission = admit(candidate, proof)
     assert admission.accepted is expected
