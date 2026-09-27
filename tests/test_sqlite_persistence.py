@@ -379,7 +379,7 @@ def test_commit_fails_closed_when_audit_rows_are_cross_bound(tmp_path):
         conn.commit()
 
     store = SQLiteHistoryStore(path)
-    with pytest.raises(ValueError, match="durable transition binding mismatch"):
+    with pytest.raises(ValueError, match="durable audit digest mismatch"):
         store.commit_once_with_audit(
             rec(2, "s1", "s2"),
             Provenance("s2", "e1", "k1", ("source-2",)),
