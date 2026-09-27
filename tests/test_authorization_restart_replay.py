@@ -755,3 +755,30 @@ def test_restart_fails_closed_on_tampered_durable_evidence(tmp_path, tamper_sql)
                 x=state.x + ("committed",), relations=state.relations
             ),
         )
+
+
+def test_recovery_is_observational_and_does_not_create_or_consume_authority(tmp_path):
+    database = tmp_path / "recovery-observational.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    store = SQLiteHistoryStore(database)
+    before = (
+        store.load().records,
+        store.load_provenance(),
+        store.load_audit(),
+        store.load_authorization_consumption(),
+    )
+
+    result = recover_psi(
+        genesis,
+        store,
+        lambda state, record: Psi(x=state.x, relations=state.relations),
+    )
+
+    assert result.state == genesis
+    after = (
+        store.load().records,
+        store.load_provenance(),
+        store.load_audit(),
+        store.load_authorization_consumption(),
+    )
+    assert after == before
