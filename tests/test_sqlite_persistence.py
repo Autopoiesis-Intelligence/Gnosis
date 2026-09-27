@@ -324,3 +324,65 @@ def test_commit_fails_closed_when_audit_is_tampered(tmp_path):
             "current",
             "next",
         )
+
+
+def _seed_two_transition_audit_store(path):
+    store = SQLiteHistoryStore(path)
+    first = rec(0, "genesis", "s0")
+    second = rec(1, "s0", "s1")
+    p0 = Provenance("s0", "e1", "k1", ("source-0",))
+    p1 = Provenance("s1", "e1", "k1", ("source-1",))
+    store.commit_once_with_audit(first, p0, "current", "s0")
+    store.commit_once_with_audit(second, p1, "s0", "s1")
+    return first, second, p0, p1
+
+
+def test_commit_fails_closed_when_provenance_rows_are_cross_bound(tmp_path):
+    path = tmp_path / "cross-bound-provenance.db"
+    first, second, p0, p1 = _seed_two_transition_audit_store(path)
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE provenance_history SET candidate_hash = ? WHERE sequence = 0",
+            (p1.candidate_hash,),
+        )
+        conn.execute(
+            "UPDATE provenance_history SET candidate_hash = ? WHERE sequence = 1",
+            (p0.candidate_hash,),
+        )
+        conn.commit()
+
+    store = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError, match="durable candidate binding mismatch"):
+        store.commit_once_with_audit(
+            rec(2, "s1", "s2"),
+            Provenance("s2", "e1", "k1", ("source-2",)),
+            "s1",
+            "s2",
+        )
+
+
+def test_commit_fails_closed_when_audit_rows_are_cross_bound(tmp_path):
+    path = tmp_path / "cross-bound-audit.db"
+    first, second, p0, p1 = _seed_two_transition_audit_store(path)
+
+    audits = SQLiteHistoryStore(path).load_audit()
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE audit_history SET transition_hash = ? WHERE sequence = 0",
+            (audits[1].transition_hash,),
+        )
+        conn.execute(
+            "UPDATE audit_history SET transition_hash = ? WHERE sequence = 1",
+            (audits[0].transition_hash,),
+        )
+        conn.commit()
+
+    store = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError, match="durable transition binding mismatch"):
+        store.commit_once_with_audit(
+            rec(2, "s1", "s2"),
+            Provenance("s2", "e1", "k1", ("source-2",)),
+            "s1",
+            "s2",
+        )
