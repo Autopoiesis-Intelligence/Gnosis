@@ -90,6 +90,9 @@ theorem evolutionary_requires_viability
 
 /-- Commit identity is a separate obligation: the committed candidate must be
     the same candidate that satisfied the admission proof. -/
+def StateIdentity (previous : Psi) (headStateHash : String) : Prop :=
+  headStateHash = stateDigest previous
+
 def CommitIdentity (admittedCandidate committedCandidate : Psi) : Prop :=
   committedCandidate = admittedCandidate
 
@@ -110,3 +113,11 @@ theorem commit_identity_required_for_semantic_effect
     (hIdentity : CommitIdentity admittedCandidate committedCandidate) :
     I committedCandidate := by
   simpa [CommitIdentity] using hAdmission.2.1
+
+
+theorem semantic_commit_requires_state_identity
+    (previous : Psi)
+    (headStateHash : String)
+    (hState : StateIdentity previous headStateHash) :
+    headStateHash = stateDigest previous := by
+  exact hState
