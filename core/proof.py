@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Mapping
+import hashlib
 
 
 Invariant = Callable[[Any], bool]
@@ -19,6 +20,11 @@ class ProofObligation:
     invariant: bool
     viable: bool
     evidence: Mapping[str, Any]
+    candidate_digest: str
+
+
+def _candidate_digest(candidate: Any) -> str:
+    return hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest()
 
 
 def _strict_bool(value: object, *, name: str) -> bool:
@@ -66,6 +72,7 @@ def prove_fundamental_transition(
         passed=invariant_ok,
         invariant=invariant_ok,
         viable=False,
+        candidate_digest=_candidate_digest(candidate),
         evidence={
             "regime": "fundamental",
             "fixed_point": candidate == current,
@@ -104,5 +111,6 @@ def prove_transition(
         passed=invariant_ok and viable_ok,
         invariant=invariant_ok,
         viable=viable_ok,
+        candidate_digest=_candidate_digest(candidate),
         evidence=evidence,
     )
