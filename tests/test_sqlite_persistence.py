@@ -1,4 +1,5 @@
 import pytest
+import sqlite3
 
 from core.history import TransitionRecord
 from core.sqlite_persistence import SQLiteHistoryStore
@@ -249,3 +250,77 @@ def test_atomic_audit_post_commit_failure_with_authorization_is_idempotent(tmp_p
     assert len(SQLiteHistoryStore(path).load_audit()) == 1
     assert len(SQLiteHistoryStore(path).load_provenance()) == 1
     assert len(SQLiteHistoryStore(path).load_authorization_consumption()) == 1
+
+
+def _seed_consistent_audit_store(path):
+    store = SQLiteHistoryStore(path)
+    record = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    store.commit_once_with_audit(record, provenance, "current", "next")
+    return record, provenance
+
+
+def test_commit_fails_closed_when_history_is_tampered(tmp_path):
+    path = tmp_path / "tampered-history.db"
+    record, provenance = _seed_consistent_audit_store(path)
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE transition_history SET state_hash = ? WHERE sequence = 0",
+            ("tampered-state",),
+        )
+        conn.commit()
+
+    store = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError, match="durable transition binding mismatch"):
+        store.commit_once_with_audit(
+            rec(1, "tampered-state", "s1"),
+            provenance,
+            "current",
+            "next",
+        )
+
+    reopened = SQLiteHistoryStore(path)
+    assert reopened.load().records[0].state_hash == "tampered-state"
+
+
+def test_commit_fails_closed_when_provenance_is_tampered(tmp_path):
+    path = tmp_path / "tampered-provenance.db"
+    record, provenance = _seed_consistent_audit_store(path)
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE provenance_history SET candidate_hash = ? WHERE sequence = 0",
+            ("tampered-candidate",),
+        )
+        conn.commit()
+
+    store = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError, match="durable candidate binding mismatch"):
+        store.commit_once_with_audit(
+            rec(1, record.state_hash, "s1"),
+            provenance,
+            "current",
+            "next",
+        )
+
+
+def test_commit_fails_closed_when_audit_is_tampered(tmp_path):
+    path = tmp_path / "tampered-audit.db"
+    record, provenance = _seed_consistent_audit_store(path)
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE audit_history SET transition_hash = ? WHERE sequence = 0",
+            ("tampered-transition",),
+        )
+        conn.commit()
+
+    store = SQLiteHistoryStore(path)
+    with pytest.raises(ValueError, match="durable audit digest mismatch"):
+        store.commit_once_with_audit(
+            rec(1, record.state_hash, "s1"),
+            provenance,
+            "current",
+            "next",
+        )
