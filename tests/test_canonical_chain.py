@@ -166,3 +166,32 @@ def test_semantic_commit_composes_identity_admission_and_atomic_durable_commit(t
     assert len(durable.load_audit()) == 2
     assert len(durable.load_provenance()) == 2
     durable.verify_cross_table_consistency()
+
+
+def test_semantic_commit_rejects_proof_candidate_identity_substitution_before_durable_commit(tmp_path):
+    from core.sqlite_persistence import SQLiteHistoryStore
+    from core.proof import ProofObligation
+
+    database = tmp_path / "proof-identity-substitution.sqlite"
+    store = SQLiteHistoryStore(database)
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    proof = prove_fundamental_transition(current, candidate, lambda _: True)
+    tampered = ProofObligation(
+        passed=proof.passed,
+        invariant=proof.invariant,
+        viable=proof.viable,
+        evidence=proof.evidence,
+        candidate_digest=state_digest(Psi(x=("substituted",), relations=())),
+    )
+    with pytest.raises(ValueError, match="candidate identity"):
+        commit_admitted_psi(
+            AppendOnlyHistory(),
+            current,
+            admit(candidate, tampered),
+            kernel_version="test-v1",
+            durable_store=store,
+        )
+    assert store.load().records == ()
+    assert store.load_audit() == ()
+    assert store.load_provenance() == ()
