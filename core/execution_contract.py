@@ -109,3 +109,35 @@ def execution_input_identity(execution_input: ExecutionInput) -> str:
         )
     ).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+@dataclass(frozen=True)
+class AuthorizationEvidence:
+    """Runtime projection of authorization identity without granting authority."""
+    authorization_digest: str
+    state_digest: str
+    content_digest: str
+
+    def __post_init__(self) -> None:
+        for field_name in (
+            "authorization_digest",
+            "state_digest",
+            "content_digest",
+        ):
+            value = getattr(self, field_name)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{field_name} is required.")
+
+
+def authorization_evidence_from_input(
+    authorization_digest: str,
+    execution_input: ExecutionInput,
+) -> AuthorizationEvidence:
+    """Bind evidence to the same state/content identity as the execution input."""
+    if not isinstance(authorization_digest, str) or not authorization_digest.strip():
+        raise ValueError("authorization_digest is required.")
+    return AuthorizationEvidence(
+        authorization_digest=authorization_digest,
+        state_digest=execution_input.state_digest,
+        content_digest=execution_input.content_digest,
+    )
