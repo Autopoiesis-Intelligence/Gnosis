@@ -230,3 +230,8 @@ The complete adversarial persistence/restart authorization contract is verified 
 ### R2-MATH↔RUNTIME — Admission/Commit mapping: 40%
 
 Formal `Admission`/`SemanticCommit` is mapped to the runtime boundary: `PsiTransition` is a pure candidate-producing operator; `prove_transition` creates proof obligations; `admit` filters candidates; `CanonicalExecutor` owns durable SemanticCommit. The formal model therefore assigns commit authority only after admission, while transition/evolution remains non-authoritative.
+
+
+### R2-MATH↔RUNTIME — Admission/Select boundary: 50%
+
+Runtime evidence confirms rejected candidates terminate before selection. `admit()` produces immutable accepted/rejected results; `CanonicalExecutor.evolve()` constructs `valid = [admission for admission if accepted]` and only then applies deterministic `min(...)`. Therefore Select has no path to revive or repair a rejected candidate. Commit receives only the selected admitted candidate. This maps formal admission as a prerequisite to semantic selection/commit rather than making Select an authority source.
