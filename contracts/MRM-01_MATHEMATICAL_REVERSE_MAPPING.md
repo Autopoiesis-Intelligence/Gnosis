@@ -195,3 +195,8 @@ Added `formal/DurableAuthorization.lean`. The first minimal theorem target is in
 ### Stage-8 authorization ↔ SQLite mapping — 40%
 
 Reverse mapping exposed and closed a real binding gap: `authorization_consumption.state_digest` was persisted but not validated against the transition's pre-state (`previous_hash`). It is now fail-closed checked. The mapping is: `authorization_digest → consumed identity`; `state_digest → pre-transition state`; `candidate_hash → committed candidate`; `sequence → durable transition`. An adversarial test rejects forged `state_digest` after restart. Formal `ConsumptionBinding` records the identity/state binding without creating a second authority model.
+
+
+### Stage-8 genesis authorization binding correction — 45%
+
+CI exposed that `authorization_state_digest` is the canonical digest of the actual pre-transition Ψ, while `TransitionRecord.previous_hash` intentionally remains the history-chain sentinel `genesis` for sequence 0. The correct bridge is therefore `sequence=0 → initial_state_digest supplied by recovery`, and `sequence>0 → previous durable state_hash`. Recovery now supplies `state_digest(genesis)` to the persistence verifier. This preserves the existing history-chain semantics and closes the authorization binding without changing the state model.
