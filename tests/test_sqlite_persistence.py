@@ -386,3 +386,69 @@ def test_commit_fails_closed_when_audit_rows_are_cross_bound(tmp_path):
             "s1",
             "s2",
         )
+
+
+def test_commit_fails_closed_when_authorization_rows_are_cross_bound(tmp_path):
+    path = tmp_path / "cross-bound-authorization.db"
+    store = SQLiteHistoryStore(path)
+
+    first = rec(0, "genesis", "s0")
+    second = rec(1, "s0", "s1")
+    p0 = Provenance("s0", "e1", "k1", ("source-0",))
+    p1 = Provenance("s1", "e1", "k1", ("source-1",))
+
+    store.commit_once_with_audit(
+        first, p0, "current", "s0",
+        authorization_digest="auth-0",
+        authorization_state_digest="genesis",
+    )
+    store.commit_once_with_audit(
+        second, p1, "s0", "s1",
+        authorization_digest="auth-1",
+        authorization_state_digest="s0",
+    )
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            """UPDATE authorization_consumption
+               SET state_digest = CASE sequence
+                   WHEN 0 THEN 's0'
+                   WHEN 1 THEN 'genesis'
+               END,
+               candidate_hash = CASE sequence
+                   WHEN 0 THEN 's1'
+                   WHEN 1 THEN 's0'
+               END"""
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError, match="durable authorization candidate binding mismatch"):
+        SQLiteHistoryStore(path).commit_once_with_audit(
+            rec(2, "s1", "s2"),
+            Provenance("s2", "e1", "k1", ("source-2",)),
+            "s1",
+            "s2",
+        )
+
+
+def test_authorization_consumption_cannot_be_replayed_across_transitions(tmp_path):
+    path = tmp_path / "authorization-replay.db"
+    store = SQLiteHistoryStore(path)
+
+    first = rec(0, "genesis", "s0")
+    second = rec(1, "s0", "s1")
+    p0 = Provenance("s0", "e1", "k1", ("source-0",))
+    p1 = Provenance("s1", "e1", "k1", ("source-1",))
+
+    store.commit_once_with_audit(
+        first, p0, "current", "s0",
+        authorization_digest="auth-replay",
+        authorization_state_digest="genesis",
+    )
+
+    with pytest.raises(ValueError, match="authorization has already been consumed"):
+        store.commit_once_with_audit(
+            second, p1, "s0", "s1",
+            authorization_digest="auth-replay",
+            authorization_state_digest="s0",
+        )
