@@ -210,3 +210,8 @@ CI exposed that `authorization_state_digest` is the canonical digest of the actu
 ### Stage-8 atomicity matrix — 60% pending CI
 
 The durable commit path is now tested across every pre-COMMIT failure injection point: `before_transaction`, `before_insert`, `after_history_before_audit`, `after_history_before_provenance`, `after_provenance_before_audit`, `after_authorization_before_audit`, and `after_audit_before_commit`. Each case requires rollback of transition history, provenance, audit, and authorization consumption, and leaves the authorization reusable. `after_commit` remains a separate post-commit invariant because rollback is no longer possible after SQLite COMMIT.
+
+
+### Stage-8 pre-COMMIT atomicity — VERIFIED / 60%
+
+CI is GREEN on `e753179a`: the pre-COMMIT failure matrix passes. Every injected failure before COMMIT leaves no partial history/provenance/audit/authorization consumption. Next boundary is post-COMMIT failure: the durable artifacts must remain present and authorization must remain consumed exactly once.
