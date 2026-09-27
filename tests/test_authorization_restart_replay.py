@@ -464,6 +464,63 @@ def test_restart_rejects_authorization_with_tampered_state_binding(tmp_path):
         SQLiteHistoryStore(database).verify_cross_table_consistency(initial_state_digest=state_digest(genesis))
 
 
+def _assert_no_durable_commit(database, authorization_digest):
+    durable = SQLiteHistoryStore(database)
+    assert len(durable.load().records) == 0
+    assert durable.load_authorization_consumption() == ()
+    assert durable.load_audit() == ()
+    assert durable.load_provenance() == ()
+    durable.assert_authorization_unused(authorization_digest)
+
+
+@pytest.mark.parametrize(
+    "failure_point",
+    [
+        "before_transaction",
+        "before_insert",
+        "after_history_before_audit",
+        "after_history_before_provenance",
+        "after_provenance_before_audit",
+        "after_authorization_before_audit",
+        "after_audit_before_commit",
+    ],
+)
+def test_authorized_commit_rolls_back_as_one_durable_unit(tmp_path, failure_point):
+    database = tmp_path / f"authorization-atomicity-{failure_point}.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="atomicity-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="restart-task",
+    )
+
+    def fail(point):
+        if point == failure_point:
+            raise RuntimeError(f"injected failure: {point}")
+
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="atomicity-matrix-v1",
+        durable_store=SQLiteHistoryStore(database, failure_injector=fail),
+    )
+
+    with pytest.raises(RuntimeError, match="injected failure"):
+        AuthorizedExecution(executor).step(
+            info,
+            genesis,
+            PsiTransition(lambda x, relations: (x + ("must-rollback",), relations)),
+            execution_input,
+            request,
+        )
+
+    _assert_no_durable_commit(database, request.authorization_digest())
+
+
 def test_authorized_commit_failure_rolls_back_consumption_and_transition(tmp_path):
     database = tmp_path / "authorization-atomicity.sqlite"
     genesis = Psi(x=("genesis",), relations=())
