@@ -10,19 +10,19 @@ from core.state import State
 import hashlib
 
 
-def _proof(passed: bool) -> ProofObligation:
+def _proof(candidate: State, passed: bool) -> ProofObligation:
     return ProofObligation(
         passed=passed,
         invariant=passed,
         viable=passed,
         evidence={"test": True},
-        candidate_digest=hashlib.sha256(repr(State(values={"x": "next", "relations": ()}).to_psi()).encode("utf-8")).hexdigest(),
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
 
 
 def test_admission_accepts_only_proof_result():
     candidate = State(values={"x": "next", "relations": ()})
-    result = admit(candidate, _proof(True))
+    result = admit(candidate, _proof(candidate, True))
     assert isinstance(result, Admission)
     assert result.accepted is True
     assert require_admitted(result) is candidate
@@ -30,7 +30,7 @@ def test_admission_accepts_only_proof_result():
 
 def test_rejected_admission_cannot_be_required():
     candidate = State(values={"x": "next", "relations": ()})
-    result = admit(candidate, _proof(False))
+    result = admit(candidate, _proof(candidate, False))
     assert result.accepted is False
     with pytest.raises(ValueError, match="not admitted"):
         require_admitted(result)
@@ -69,6 +69,7 @@ def test_evidence_cannot_upgrade_rejected_admission():
             "evidence_hash": "valid-looking",
             "attestation": True,
         },
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
     result = admit(candidate, proof)
     assert result.accepted is False
@@ -91,6 +92,7 @@ def test_provenance_attachment_does_not_create_admission_authority():
         invariant=False,
         viable=False,
         evidence={"provenance": attached, "source_ids": ("trusted-source",)},
+        candidate_digest=hashlib.sha256(repr(State(values={"x": "from-provenance", "relations": ()}).to_psi()).encode("utf-8")).hexdigest(),
     )
     candidate = State(values={"x": "from-provenance", "relations": ()})
     admission = admit(candidate, proof)
@@ -113,6 +115,7 @@ def test_evidence_cannot_construct_certified_meta_transition():
             invariant=False,
             viable=False,
             evidence=evidence,
+            candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
         ),
     )
     assert rejected.accepted is False
@@ -127,6 +130,7 @@ def test_fundamental_admission_does_not_require_viability():
         invariant=True,
         viable=False,
         evidence={"regime": "fundamental"},
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
     result = admit(candidate, proof)
     assert result.accepted is True
@@ -140,6 +144,7 @@ def test_evolutionary_admission_requires_viability():
         invariant=True,
         viable=False,
         evidence={"regime": "evolutionary"},
+        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
     result = admit(candidate, proof)
     assert result.accepted is False
