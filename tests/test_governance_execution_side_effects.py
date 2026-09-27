@@ -42,11 +42,20 @@ def test_adapter_is_observational_only(monkeypatch):
 
 
 def test_rejected_binding_is_observational_only():
-    binding = make_binding(binding_digest="tampered")
+    binding = make_binding()
+    tampered = GovernanceBinding(
+        proposal_id=binding.proposal_id,
+        proposal_digest=binding.proposal_digest,
+        state_id=binding.state_id,
+        state_digest=binding.state_digest,
+        shadow_result_digest=binding.shadow_result_digest,
+        governance_decision_digest=binding.governance_decision_digest,
+        binding_digest="tampered",
+    )
 
     try:
         execution_input_from_verified_governance_binding(
-            binding,
+            tampered,
             input_type="external-information",
             content_digest="cd1",
         )
