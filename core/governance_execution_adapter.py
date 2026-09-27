@@ -1,17 +1,14 @@
-"""Minimal GovernanceBinding -> ExecutionInput adapter.
-
-Audit-stage implementation only. This module intentionally contains no
-authority creation, authorization consumption, executor invocation, or commit.
-"""
+"""Minimal GovernanceBinding -> ExecutionInput adapter and fail-closed verifier."""
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
 
 from .execution_contract import ExecutionInput
 
 
 @dataclass(frozen=True)
-class VerifiedGovernanceBinding:
+class GovernanceBinding:
     proposal_id: str
     proposal_digest: str
     state_id: str
@@ -21,19 +18,47 @@ class VerifiedGovernanceBinding:
     binding_digest: str
 
 
+def governance_binding_digest(binding: GovernanceBinding) -> str:
+    canonical = "\x1f".join(
+        (
+            binding.proposal_id,
+            binding.proposal_digest,
+            binding.state_id,
+            binding.state_digest,
+            binding.shadow_result_digest,
+            binding.governance_decision_digest,
+        )
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def verify_governance_binding(binding: GovernanceBinding) -> None:
+    if not isinstance(binding, GovernanceBinding):
+        raise TypeError("binding must be GovernanceBinding.")
+    fields = (
+        "proposal_id",
+        "proposal_digest",
+        "state_id",
+        "state_digest",
+        "shadow_result_digest",
+        "governance_decision_digest",
+    )
+    if any(
+        not isinstance(getattr(binding, name), str) or not getattr(binding, name).strip()
+        for name in fields
+    ):
+        raise ValueError("governance binding fields are required.")
+    if binding.binding_digest != governance_binding_digest(binding):
+        raise ValueError("governance binding digest mismatch.")
+
+
 def execution_input_from_verified_governance_binding(
-    binding: VerifiedGovernanceBinding,
+    binding: GovernanceBinding,
     *,
     content_digest: str,
     input_type: str,
 ) -> ExecutionInput:
-    """Project a verified governance identity into the existing execution identity.
-
-    Verification of the binding itself is intentionally a precondition of this
-    adapter. The adapter performs no authorization or execution.
-    """
-    if not isinstance(binding, VerifiedGovernanceBinding):
-        raise TypeError("binding must be VerifiedGovernanceBinding.")
+    verify_governance_binding(binding)
     if not isinstance(content_digest, str) or not content_digest.strip():
         raise ValueError("content_digest is required.")
     if not isinstance(input_type, str) or not input_type.strip():
