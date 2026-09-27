@@ -563,6 +563,56 @@ def test_authorized_commit_failure_rolls_back_consumption_and_transition(tmp_pat
     durable.assert_authorization_unused(request.authorization_digest())
 
 
+
+
+def test_post_commit_failure_then_restart_recovers_and_rejects_replay(tmp_path):
+    database = tmp_path / "authorization-post-commit-restart.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="post-commit-restart-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="post-commit-restart-task",
+    )
+
+    def fail(point):
+        if point == "after_commit":
+            raise RuntimeError("injected post-commit failure")
+
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="post-commit-restart-v1",
+        durable_store=SQLiteHistoryStore(database, failure_injector=fail),
+    )
+    with pytest.raises(RuntimeError, match="injected post-commit failure"):
+        AuthorizedExecution(executor).step(
+            info, genesis,
+            PsiTransition(lambda x, relations: (x + ("committed",), relations)),
+            execution_input, request,
+        )
+
+    recovered = recover_psi(
+        genesis,
+        SQLiteHistoryStore(database),
+        lambda state, record: Psi(x=state.x + ("committed",), relations=state.relations),
+    )
+    assert recovered.state.x == ("genesis", "committed")
+
+    restarted = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="post-commit-restart-v1",
+        durable_store=SQLiteHistoryStore(database),
+    )
+    with pytest.raises(ValueError, match="already been consumed"):
+        AuthorizedExecution(restarted).step(
+            info, genesis,
+            PsiTransition(lambda x, relations: (x + ("replay",), relations)),
+            execution_input, request,
+        )
 def test_authorized_commit_after_commit_failure_is_durable(tmp_path):
     database = tmp_path / "authorization-after-commit.sqlite"
     genesis = Psi(x=("genesis",), relations=())
