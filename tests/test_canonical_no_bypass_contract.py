@@ -62,3 +62,22 @@ def test_legacy_uroboros_does_not_construct_canonical_executor():
     assert "LegacyEngine" in block
     assert "executor=None" in block
     assert "CanonicalExecutor(" not in block
+
+
+def test_replay_is_reconstruction_only():
+    source = _read("core/replay.py")
+    assert "commit_once_with_audit" not in source
+    assert "SemanticCommit" not in source
+
+
+def test_snapshot_is_observation_only():
+    source = _read("core/snapshot.py")
+    assert "commit_once_with_audit" not in source
+    assert "SemanticCommit" not in source
+
+
+def test_merge_produces_candidates_or_conflicts_only():
+    source = _read("core/merge.py")
+    assert "commit_once_with_audit" not in source
+    assert "SemanticCommit" not in source
+    assert "candidate=None" in source
