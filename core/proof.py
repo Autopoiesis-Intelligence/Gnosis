@@ -24,7 +24,8 @@ class ProofObligation:
 
 
 def _candidate_digest(candidate: Any) -> str:
-    return hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest()
+    canonical = candidate.to_psi() if hasattr(candidate, "to_psi") else candidate
+    return hashlib.sha256(repr(canonical).encode("utf-8")).hexdigest()
 
 
 def _strict_bool(value: object, *, name: str) -> bool:
