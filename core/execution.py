@@ -49,6 +49,11 @@ class CanonicalExecutor:
         if not isinstance(transition, PsiTransition):
             raise TypeError("transition must be PsiTransition.")
 
+        if self.durable_store is not None:
+            durable_head = self.history.head
+            if durable_head is not None and execution_input.state_digest != durable_head.state_hash:
+                raise ValueError("ExecutionInput state does not match durable history head.")
+
         # Runtime trust boundary: the declared execution input must identify
         # exactly the Psi supplied to this execution. A foreign state_id or
         # state_digest is rejected before transition execution.
