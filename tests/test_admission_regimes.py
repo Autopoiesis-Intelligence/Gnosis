@@ -43,3 +43,20 @@ def test_forged_non_fundamental_proof_cannot_bypass_viability():
     admission = admit(object(), proof)
 
     assert admission.accepted is False
+
+
+def test_admission_rejects_proof_bound_to_different_candidate():
+    from core.admission import admit
+    from core.proof import prove_transition
+
+    candidate_a = ("candidate-a",)
+    candidate_b = ("candidate-b",)
+    proof = prove_transition(
+        candidate_a,
+        candidate_a,
+        (candidate_a, candidate_a),
+        lambda _: True,
+    )
+
+    with pytest.raises(ValueError, match="Proof candidate identity mismatch"):
+        admit(candidate_b, proof)
