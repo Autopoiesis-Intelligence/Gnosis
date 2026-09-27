@@ -3,6 +3,7 @@ import pytest
 from core.admission import admit
 from core.commit import commit
 from core.proof import ProofObligation
+import hashlib
 from core.safety import SafetyGate
 from core.state import Psi
 
