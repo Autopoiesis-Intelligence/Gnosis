@@ -1,3 +1,6 @@
+import hashlib
+import pytest
+
 from core.admission import admit
 from core.proof import ProofObligation, prove_fundamental_transition, prove_transition
 
@@ -33,14 +36,16 @@ def test_evolutionary_admission_requires_viability():
 
 
 def test_forged_non_fundamental_proof_cannot_bypass_viability():
+    candidate = object()
     proof = ProofObligation(
         passed=True,
         invariant=True,
         viable=False,
         evidence={},
+        candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
     )
 
-    admission = admit(object(), proof)
+    admission = admit(candidate, proof)
 
     assert admission.accepted is False
 
