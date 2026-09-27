@@ -184,7 +184,7 @@ def test_persisted_evidence_does_not_create_admission_after_restart(tmp_path):
     from core.admission import admit
     from core.proof import ProofObligation
     from core.state import State
-        import hashlib
+    import hashlib
 
     proof = ProofObligation(
         passed=False,
