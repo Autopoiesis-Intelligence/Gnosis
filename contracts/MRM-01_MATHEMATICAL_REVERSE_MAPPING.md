@@ -225,3 +225,8 @@ CI is GREEN on `9135093f`: post-COMMIT failure leaves the durable history/proven
 ### Stage-8 durable restart/replay gate — 100% VERIFIED
 
 The complete adversarial persistence/restart authorization contract is verified by the GREEN Tests, Architecture Gate, and Gnozis Port CI on `ecf74f5f`. The verified chain covers pre-COMMIT rollback, post-COMMIT durability, restart recovery, authorization replay rejection, durable authorization tamper rejection, durable history/provenance/audit tamper rejection, and observational recovery. Recovery does not create or consume authority.
+
+
+### R2-MATH↔RUNTIME — Admission/Commit mapping: 40%
+
+Formal `Admission`/`SemanticCommit` is mapped to the runtime boundary: `PsiTransition` is a pure candidate-producing operator; `prove_transition` creates proof obligations; `admit` filters candidates; `CanonicalExecutor` owns durable SemanticCommit. The formal model therefore assigns commit authority only after admission, while transition/evolution remains non-authoritative.
