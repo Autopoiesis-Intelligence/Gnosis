@@ -17,6 +17,7 @@ def test_canonical_commit_rejects_unadmitted_candidate():
         invariant=False,
         viable=False,
         evidence={"adversarial": True},
+        candidate_digest=hashlib.sha256(repr(rejected).encode("utf-8")).hexdigest(),
     )
     admission = Admission(
         accepted=False,
@@ -37,6 +38,7 @@ def test_canonical_commit_accepts_admitted_psi():
         invariant=True,
         viable=True,
         evidence={"test": True},
+        candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
     )
     admission = Admission(
         accepted=True,
@@ -56,6 +58,7 @@ def test_canonical_commit_rejects_legacy_state_even_if_admitted():
         invariant=True,
         viable=True,
         evidence={"legacy-adversarial": True},
+        candidate_digest=hashlib.sha256(repr(legacy_candidate.to_psi()).encode("utf-8")).hexdigest(),
     )
     admission = Admission(
         accepted=True,
