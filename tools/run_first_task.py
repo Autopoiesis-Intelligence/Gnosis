@@ -49,7 +49,7 @@ def run(output: Path, database: Path) -> dict:
     if recovered.state != expected or recovered.applied != 1:
         raise RuntimeError("runtime recovery invariant failed")
     evidence = {"schema":"gnozis-runtime-evidence-v1","task_id":result.task_id,
-        "content_digest":result.content_digest,"execution_input_identity":execution_input_identity(execution_input),\n        "initial_state_digest":state_digest(psi),
+        "content_digest":result.content_digest,\n        "execution_input_identity": execution_input_identity(execution_input),\n        "initial_state_digest":state_digest(psi),
         "result_state_digest":state_digest(result.execution.psi),"history_records":1,
         "provenance_records":1,"audit_records":1,
         "authorization":information.authorization.status.value,
