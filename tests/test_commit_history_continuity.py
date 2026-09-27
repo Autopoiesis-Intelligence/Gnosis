@@ -4,6 +4,7 @@ from core.admission import Admission
 from core.commit import commit
 from core.history import AppendOnlyHistory
 from core.proof import ProofObligation
+import hashlib
 from core.state import Psi
 
 
@@ -13,6 +14,7 @@ def accepted(candidate):
         invariant=True,
         viable=True,
         evidence={"test": True},
+        candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
     )
     return Admission(True, candidate, proof)
 
