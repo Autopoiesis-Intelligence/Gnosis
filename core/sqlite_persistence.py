@@ -174,6 +174,10 @@ class SQLiteHistoryStore:
         elif record.sequence != 0:
             raise ValueError("genesis commit must have sequence zero")
 
+        # A new commit may extend durable evidence only from a verified base.
+        # Cardinality equality alone is insufficient: hashes/bindings may be corrupted
+        # while all tables still contain the same number of rows.
+        self.verify_cross_table_consistency()
         audits = self.load_audit()
         provenances = self.load_provenance()
         if len(audits) != len(existing.records) or len(provenances) != len(existing.records):
