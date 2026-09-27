@@ -134,3 +134,57 @@ def test_end_to_end_crash_restart_retry_has_single_durable_commit(tmp_path: Path
     assert len(restarted.load().records) == 1
     assert len(restarted.load_provenance()) == 1
     assert len(restarted.load_audit()) == 1
+
+
+def test_end_to_end_authorized_execution_rejects_durable_head_substitution(tmp_path: Path):
+    from core.authorized_execution import AuthorizedExecution
+    from core.execution import CanonicalExecutor
+    from core.execution_contract import execution_input_from_psi
+    from core.external_execution_request import ExternalExecutionRequest
+    from core.external_operation import ExternalOperation
+    from core.history import AppendOnlyHistory
+    from core.information_contract import Authorization, AuthorizationStatus, Information
+    from core.psi_transition import PsiTransition
+    from core.sqlite_persistence import SQLiteHistoryStore
+    from core.state import Psi
+    from core.task_processing import Task, TaskProcessor
+
+    database = tmp_path / "head-substitution.sqlite"
+    run(tmp_path / "first.json", database)
+
+    # The durable store is authoritative for the committed head. A caller that
+    # supplies a different in-memory Psi must be rejected before the transition
+    # can produce a new candidate.
+    supplied = Psi(x=("foreign-start",), relations=())
+    task = Task.create("head-substitution-task", "must-not-run")
+    info = Information(
+        "head-substitution-information", "runtime", task.task_id,
+        "head-substitution-execution",
+        Authorization("runtime", "task-processing", "transform", "core",
+                      AuthorizationStatus.ALLOWED),
+        payload=task.content,
+    )
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=task.content_digest, purpose="head-substitution-task",
+    )
+    executor = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="runtime-task-v1",
+        durable_store=SQLiteHistoryStore(database),
+    )
+
+    with pytest.raises(ValueError, match="previous Psi does not match history head"):
+        TaskProcessor(AuthorizedExecution(executor)).process(
+            task, info, supplied,
+            PsiTransition(lambda x, relations: (_ for _ in ()).throw(
+                AssertionError("foreign transition was reached")
+            )),
+            execution_input_from_psi(
+                supplied, input_type="task", content_digest=task.content_digest
+            ),
+            request,
+        )
+
+    durable = SQLiteHistoryStore(database).load()
+    assert len(durable.records) == 1
