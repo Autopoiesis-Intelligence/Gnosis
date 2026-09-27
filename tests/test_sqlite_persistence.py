@@ -452,3 +452,30 @@ def test_authorization_consumption_cannot_be_replayed_across_transitions(tmp_pat
             authorization_digest="auth-replay",
             authorization_state_digest="s0",
         )
+
+
+def test_commit_fails_closed_when_genesis_authorization_state_is_tampered(tmp_path):
+    path = tmp_path / "tampered-genesis-authorization.db"
+    store = SQLiteHistoryStore(path)
+    first = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source-0",))
+    store.commit_once_with_audit(
+        first, provenance, "current", "s0",
+        authorization_digest="auth-genesis",
+        authorization_state_digest="genesis",
+    )
+
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE authorization_consumption SET state_digest = ? WHERE sequence = 0",
+            ("tampered-genesis",),
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError, match="durable authorization state binding mismatch"):
+        SQLiteHistoryStore(path).commit_once_with_audit(
+            rec(1, "s0", "s1"),
+            Provenance("s1", "e1", "k1", ("source-1",)),
+            "s0",
+            "s1",
+        )
