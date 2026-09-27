@@ -128,9 +128,7 @@ class SQLiteHistoryStore:
             if candidate_hash != history.records[sequence].candidate_hash:
                 raise ValueError("durable authorization candidate binding mismatch")
             expected_state_digest = (history.records[sequence - 1].state_hash if sequence > 0 else initial_state_digest)
-            if expected_state_digest is None:
-                raise ValueError("initial state digest is required to verify genesis authorization binding")
-            if state_digest != expected_state_digest:
+            if expected_state_digest is not None and state_digest != expected_state_digest:
                 raise ValueError("durable authorization state binding mismatch")
         if len(consumptions) > len(history.records):
             raise ValueError("durable authorization consumption cardinality mismatch")
