@@ -782,3 +782,75 @@ def test_recovery_is_observational_and_does_not_create_or_consume_authority(tmp_
         store.load_authorization_consumption(),
     )
     assert after == before
+
+
+def test_end_to_end_restart_tamper_replay_fails_closed(tmp_path):
+    database = tmp_path / "restart-tamper-replay.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="e2e-replay-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="e2e-replay",
+    )
+    AuthorizedExecution(
+        CanonicalExecutor(
+            history=AppendOnlyHistory(),
+            kernel_version="e2e-v1",
+            durable_store=SQLiteHistoryStore(database),
+        )
+    ).step(
+        info, genesis,
+        PsiTransition(lambda x, relations: (x + ("committed",), relations)),
+        execution_input, request,
+    )
+
+    import sqlite3
+    with sqlite3.connect(database) as conn:
+        conn.execute(
+            "UPDATE audit_history SET transition_hash = ? WHERE sequence = 0",
+            ("forged-transition",),
+        )
+        conn.commit()
+
+    with pytest.raises(ValueError):
+        recover_psi(
+            genesis,
+            SQLiteHistoryStore(database),
+            lambda state, record: Psi(
+                x=state.x + ("committed",), relations=state.relations
+            ),
+        )
+
+    # Repair the evidence, restart, then the original authorization must still be rejected.
+    with sqlite3.connect(database) as conn:
+        conn.execute(
+            "UPDATE audit_history SET transition_hash = ? WHERE sequence = 0",
+            (transition_digest(SQLiteHistoryStore(database).load().records[0]),),
+        )
+        conn.commit()
+
+    recovered = recover_psi(
+        genesis,
+        SQLiteHistoryStore(database),
+        lambda state, record: Psi(
+            x=state.x + ("committed",), relations=state.relations
+        ),
+    )
+    assert recovered.state.x == ("genesis", "committed")
+
+    restarted = CanonicalExecutor(
+        history=AppendOnlyHistory(),
+        kernel_version="e2e-v1",
+        durable_store=SQLiteHistoryStore(database),
+    )
+    with pytest.raises(ValueError, match="already been consumed"):
+        AuthorizedExecution(restarted).step(
+            info, genesis,
+            PsiTransition(lambda x, relations: (x + ("replay",), relations)),
+            execution_input, request,
+        )
