@@ -268,36 +268,3 @@ class SQLiteHistoryStore:
             "history-only durable commit path is disabled; use commit_once_with_audit()"
         )
 
-    def _commit_history_only(self, record: TransitionRecord, current, next_value) -> CommitResult:
-        existing = self.load()
-        if existing.records:
-            head = existing.head
-            if record.sequence < head.sequence:
-                raise ValueError("commit sequence is stale")
-            if record.sequence == head.sequence:
-                if record.state_hash == head.state_hash:
-                    return CommitResult(current, existing, False)
-                raise ValueError("commit conflicts with existing head")
-        elif record.sequence != 0:
-            raise ValueError("genesis commit must have sequence zero")
-        if existing.head is not None and record.previous_hash != existing.head.state_hash:
-            raise ValueError("history chain is broken")
-        self._fail("before_transaction")
-        with sqlite3.connect(self.path) as conn:
-            conn.execute("BEGIN IMMEDIATE")
-            try:
-                self._fail("before_insert")
-                conn.execute("""INSERT INTO transition_history
-                    (sequence, previous_hash, state_hash, kernel_version,
-                     candidate_hash, admitted, evidence_hash)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (record.sequence, record.previous_hash, record.state_hash,
-                     record.kernel_version, record.candidate_hash,
-                     int(record.admitted), record.evidence_hash))
-                self._fail("after_insert_before_commit")
-                conn.commit()
-            except Exception:
-                conn.rollback()
-                raise
-        self._fail("after_commit")
-        return CommitResult(next_value, self.load(), True)
