@@ -235,3 +235,41 @@ def test_full_authority_path_closes_after_restart(tmp_path):
     assert reopened.load_audit() == store.load_audit()
     assert reopened.load_provenance() == store.load_provenance()
     assert reopened.load_authorization_consumption() == store.load_authorization_consumption()
+
+
+@pytest.mark.parametrize(
+    "failure_point",
+    [
+        "before_transaction",
+        "before_insert",
+        "after_history_before_audit",
+        "after_history_before_provenance",
+        "after_provenance_before_audit",
+        "after_authorization_before_audit",
+        "after_audit_before_commit",
+    ],
+)
+def test_all_precommit_failure_points_leave_every_durable_surface_unchanged(tmp_path, failure_point):
+    path = tmp_path / f"failure-{failure_point}.db"
+
+    def fail(point):
+        if point == failure_point:
+            raise RuntimeError(f"injected:{point}")
+
+    store = SQLiteHistoryStore(path, failure_injector=fail)
+    with pytest.raises(RuntimeError, match="injected"):
+        store.commit_once_with_audit(
+            rec(),
+            prov(),
+            None,
+            "state",
+            authorization_digest="auth-failure",
+            authorization_state_digest="state-0",
+        )
+
+    reopened = SQLiteHistoryStore(path)
+    assert reopened.load().records == ()
+    assert reopened.load_audit() == ()
+    assert reopened.load_provenance() == ()
+    assert reopened.load_authorization_consumption() == ()
+    reopened.verify_cross_table_consistency()
