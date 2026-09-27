@@ -715,7 +715,7 @@ def test_restart_fails_closed_on_tampered_authorization_binding(tmp_path, tamper
     [
         "UPDATE transition_history SET candidate_hash = ? WHERE sequence = 0",
         "UPDATE provenance_history SET candidate_hash = ? WHERE sequence = 0",
-        "UPDATE audit_history SET candidate_hash = ? WHERE sequence = 0",
+        "UPDATE audit_history SET transition_hash = ? WHERE sequence = 0",
     ],
 )
 def test_restart_fails_closed_on_tampered_durable_evidence(tmp_path, tamper_sql):
