@@ -2,7 +2,7 @@ import pytest
 
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
-from core.execution_contract import execution_input_from_psi
+from core.execution_contract import execution_input_from_psi, state_digest
 from core.external_execution_request import ExternalExecutionRequest
 from core.external_operation import ExternalOperation
 from core.history import AppendOnlyHistory
@@ -461,7 +461,7 @@ def test_restart_rejects_authorization_with_tampered_state_binding(tmp_path):
         conn.commit()
 
     with pytest.raises(ValueError, match="durable authorization state binding mismatch"):
-        SQLiteHistoryStore(database).verify_cross_table_consistency()
+        SQLiteHistoryStore(database).verify_cross_table_consistency(initial_state_digest=state_digest(genesis))
 
 
 def test_authorized_commit_failure_rolls_back_consumption_and_transition(tmp_path):
