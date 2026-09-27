@@ -220,3 +220,8 @@ CI is GREEN on `e753179a`: the pre-COMMIT failure matrix passes. Every injected 
 ### Stage-8 post-COMMIT durability — 70% pending CI
 
 CI is GREEN on `9135093f`: post-COMMIT failure leaves the durable history/provenance/audit/authorization set intact and authorization remains consumed. Added the final restart bridge test: after a post-COMMIT injected failure, recovery reconstructs the committed Ψ and a fresh executor rejects replay of the same authorization. This is the direct durable-restart adversarial path.
+
+
+### Stage-8 durable restart/replay gate — 100% VERIFIED
+
+The complete adversarial persistence/restart authorization contract is verified by the GREEN Tests, Architecture Gate, and Gnozis Port CI on `ecf74f5f`. The verified chain covers pre-COMMIT rollback, post-COMMIT durability, restart recovery, authorization replay rejection, durable authorization tamper rejection, durable history/provenance/audit tamper rejection, and observational recovery. Recovery does not create or consume authority.
