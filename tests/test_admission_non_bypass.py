@@ -12,7 +12,8 @@ def _digest(candidate):
 
 
 def test_canonical_evolution_cannot_select_when_all_proofs_fail(monkeypatch):
-    def reject_all(candidate, *_args, **_kwargs):
+    def reject_all(*args, **_kwargs):
+        candidate = args[1]
         from core.proof import ProofObligation
         return ProofObligation(
             passed=False,
