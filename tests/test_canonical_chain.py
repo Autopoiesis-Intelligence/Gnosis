@@ -195,3 +195,34 @@ def test_semantic_commit_rejects_proof_candidate_identity_substitution_before_du
     assert store.load().records == ()
     assert store.load_audit() == ()
     assert store.load_provenance() == ()
+
+
+def test_identity_validated_candidate_is_atomic_at_durable_commit_boundary(tmp_path):
+    from core.sqlite_persistence import SQLiteHistoryStore
+
+    database = tmp_path / "identity-atomicity-composition.sqlite"
+
+    def fail(point):
+        if point == "after_provenance_before_audit":
+            raise RuntimeError("injected:identity-atomicity")
+
+    store = SQLiteHistoryStore(database, failure_injector=fail)
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    proof = prove_fundamental_transition(current, candidate, lambda _: True)
+    admission = admit(candidate, proof)
+
+    with pytest.raises(RuntimeError, match="injected:identity-atomicity"):
+        commit_admitted_psi(
+            AppendOnlyHistory(),
+            current,
+            admission,
+            kernel_version="test-v1",
+            durable_store=store,
+        )
+
+    assert store.load().records == ()
+    assert store.load_audit() == ()
+    assert store.load_provenance() == ()
+    assert store.load_authorization_consumption() == ()
+    store.verify_cross_table_consistency()
