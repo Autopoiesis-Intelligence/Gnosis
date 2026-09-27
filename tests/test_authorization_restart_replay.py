@@ -654,3 +654,57 @@ def test_authorized_commit_after_commit_failure_is_durable(tmp_path):
     durable.verify_cross_table_consistency(initial_state_digest=state_digest(genesis))
     with pytest.raises(ValueError, match="already been consumed"):
         durable.assert_authorization_unused(request.authorization_digest())
+
+
+@pytest.mark.parametrize(
+    "tamper_sql, expected",
+    [
+        (
+            "UPDATE authorization_consumption SET candidate_hash = ? WHERE authorization_digest = ?",
+            "durable authorization candidate binding mismatch",
+        ),
+        (
+            "UPDATE authorization_consumption SET state_digest = ? WHERE authorization_digest = ?",
+            "durable authorization state binding mismatch",
+        ),
+    ],
+)
+def test_restart_fails_closed_on_tampered_authorization_binding(tmp_path, tamper_sql, expected):
+    database = tmp_path / "authorization-binding-tamper.sqlite"
+    genesis = Psi(x=("genesis",), relations=())
+    info = make_info()
+    execution_input = execution_input_from_psi(
+        genesis, input_type="external-information", content_digest="tamper-binding-digest"
+    )
+    request = ExternalExecutionRequest.from_information(
+        info,
+        operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest,
+        purpose="tamper-binding",
+    )
+    store = SQLiteHistoryStore(database)
+    AuthorizedExecution(
+        CanonicalExecutor(
+            history=AppendOnlyHistory(),
+            kernel_version="tamper-binding-v1",
+            durable_store=store,
+        )
+    ).step(
+        info, genesis,
+        PsiTransition(lambda x, relations: (x + ("committed",), relations)),
+        execution_input, request,
+    )
+
+    import sqlite3
+    with sqlite3.connect(database) as conn:
+        conn.execute(tamper_sql, ("forged-binding", request.authorization_digest()))
+        conn.commit()
+
+    with pytest.raises(ValueError, match=expected):
+        recover_psi(
+            genesis,
+            SQLiteHistoryStore(database),
+            lambda state, record: Psi(
+                x=state.x + ("committed",), relations=state.relations
+            ),
+        )
