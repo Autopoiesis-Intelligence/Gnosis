@@ -7,13 +7,13 @@ import hashlib
 from core.state import Psi
 
 
-def proof(passed):
+def proof(candidate, passed):
     return ProofObligation(
         passed=passed,
         invariant=passed,
         viable=passed,
         evidence={"test": True},
-        candidate_digest=hashlib.sha256(repr(candidate.to_psi()).encode("utf-8")).hexdigest(),
+        candidate_digest=hashlib.sha256(repr(candidate).encode("utf-8")).hexdigest(),
     )
 
 
@@ -21,7 +21,7 @@ def test_only_admitted_psi_can_cross_semantic_commit():
     current = Psi(x=("a",), relations=())
     candidate = Psi(x=("b",), relations=())
 
-    result = commit(current, admit(candidate, proof(True)), kernel_version="test-kernel")
+    result = commit(current, admit(candidate, proof(candidate, True)), kernel_version="test-kernel")
     assert result.apply(__import__('core.history', fromlist=['AppendOnlyHistory']).AppendOnlyHistory())[0] == candidate
 
 
@@ -29,7 +29,7 @@ def test_rejected_candidate_cannot_cross_semantic_commit():
     current = Psi(x=("a",), relations=())
     candidate = Psi(x=("b",), relations=())
 
-    result = commit(current, admit(candidate, proof(False)), kernel_version="test-kernel")
+    result = commit(current, admit(candidate, proof(candidate, False)), kernel_version="test-kernel")
     with pytest.raises(ValueError, match="not admitted"):
         result.apply(__import__('core.history', fromlist=['AppendOnlyHistory']).AppendOnlyHistory())
 
