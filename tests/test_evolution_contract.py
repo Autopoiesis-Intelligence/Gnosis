@@ -749,3 +749,79 @@ def test_unapproved_opportunity_cannot_authorize_execution():
     plan = OpportunityPlanRecord(OpportunityPlan("opp-no", ("core-no",), "objective"))
     with pytest.raises(ValueError, match="approved"):
         authorize_approved_opportunity(scope, plan, core, "exec")
+
+
+def test_scoped_authorization_requires_current_approved_plan_and_matching_scopes():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityPlan, OpportunityPlanRecord,
+        OpportunityPlanState, OpportunityScope, ScopedExecutionAuthorization,
+        validate_scoped_execution_authorization,
+    )
+    scope = OpportunityScope(
+        "opp-valid", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    core = CoreAdmission(
+        "core-valid", CoreOrigin.EXTERNAL, "network-1", "physics",
+        "owner-scoped", "auth", "verify",
+    )
+    plan = OpportunityPlanRecord(
+        OpportunityPlan("opp-valid", ("core-valid",), "objective")
+    ).advance(OpportunityPlanState.APPROVED)
+    auth = ScopedExecutionAuthorization(
+        "opp-valid", "core-valid", "physics", "owner-scoped", "exec"
+    )
+    validate_scoped_execution_authorization(auth, scope, core, plan)
+
+
+def test_scoped_authorization_rejects_revoked_or_unapproved_plan():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityPlan, OpportunityPlanRecord,
+        OpportunityPlanState, OpportunityScope, ScopedExecutionAuthorization,
+        validate_scoped_execution_authorization,
+    )
+    scope = OpportunityScope(
+        "opp-invalid", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    core = CoreAdmission(
+        "core-invalid", CoreOrigin.EXTERNAL, "network-1", "physics",
+        "owner-scoped", "auth", "verify",
+    )
+    auth = ScopedExecutionAuthorization(
+        "opp-invalid", "core-invalid", "physics", "owner-scoped", "exec"
+    )
+    plan = OpportunityPlanRecord(
+        OpportunityPlan("opp-invalid", ("core-invalid",), "objective")
+    )
+    with pytest.raises(ValueError, match="no longer approved"):
+        validate_scoped_execution_authorization(auth, scope, core, plan)
+
+
+def test_scoped_authorization_rejects_changed_privacy_scope():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityPlan, OpportunityPlanRecord,
+        OpportunityPlanState, OpportunityScope, ScopedExecutionAuthorization,
+        validate_scoped_execution_authorization,
+    )
+    scope = OpportunityScope(
+        "opp-scope-change", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    core = CoreAdmission(
+        "core-scope-change", CoreOrigin.EXTERNAL, "network-1", "physics",
+        "owner-scoped", "auth", "verify",
+    )
+    plan = OpportunityPlanRecord(
+        OpportunityPlan("opp-scope-change", ("core-scope-change",), "objective")
+    ).advance(OpportunityPlanState.APPROVED)
+    stale_auth = ScopedExecutionAuthorization(
+        "opp-scope-change", "core-scope-change", "physics", "public", "exec"
+    )
+    with pytest.raises(ValueError, match="privacy"):
+        validate_scoped_execution_authorization(
+            stale_auth, scope, core, plan
+        )
