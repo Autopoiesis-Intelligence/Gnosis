@@ -569,6 +569,30 @@ class SQLiteHistoryStore:
         )
         return snapshot, snapshot.active_entries()
 
+
+    def bind_rehydrated_network_execution(
+        self, network_id: str, capability_scope: str, operation: str,
+        authorization_digest: str
+    ):
+        from .evolution_contract import (
+            NetworkExecutionRequest, bind_network_execution,
+        )
+        snapshot, active_entries = self.rehydrate_network_registry_from_state(network_id)
+        registry = __import__(
+            "core.evolution_contract", fromlist=["NetworkRegistry"]
+        ).NetworkRegistry(tuple(snapshot.entries))
+        request = NetworkExecutionRequest(
+            network_id, capability_scope, operation, authorization_digest
+        )
+        binding = bind_network_execution(registry, request)
+        if not any(
+            e.attachment.core_id == binding.core_id
+            and e.attachment.capability_scope == capability_scope
+            for e in active_entries
+        ):
+            raise ValueError("rehydrated execution route is not active")
+        return binding
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
