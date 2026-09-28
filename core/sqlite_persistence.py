@@ -546,6 +546,29 @@ class SQLiteHistoryStore:
             NetworkAttachmentState(state_value),
         )
 
+
+    def rehydrate_network_registry_from_state(self, network_id: str):
+        from .evolution_contract import NetworkRegistrySnapshot
+        with sqlite3.connect(self.path) as conn:
+            rows = conn.execute(
+                """SELECT core_id, capability_scope, attachment_state,
+                          attachment_evidence_digest, lifecycle_evidence_digest
+                   FROM network_registry_state
+                   WHERE network_id = ?
+                   ORDER BY core_id""",
+                (network_id,),
+            ).fetchall()
+        entries = []
+        for core_id, scope, state, attachment_digest, lifecycle_digest in rows:
+            entry = self.recover_network_capability_state(core_id, network_id)
+            if entry is None:
+                raise ValueError("network registry state disappeared during recovery")
+            entries.append(entry)
+        snapshot = NetworkRegistrySnapshot.from_recovered_entries(
+            network_id, tuple(entries)
+        )
+        return snapshot, snapshot.active_entries()
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
