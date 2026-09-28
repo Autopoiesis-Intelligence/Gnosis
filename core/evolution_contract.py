@@ -342,3 +342,29 @@ def validate_network_execution_binding(
     if entry.attachment.digest() != binding.attachment_digest:
         raise ValueError("execution binding attachment is stale")
     return entry
+
+
+@dataclass(frozen=True)
+class NetworkRegistrySnapshot:
+    network_id: str
+    entries: tuple[NetworkRegistryEntry, ...]
+    snapshot_digest: str
+
+    @staticmethod
+    def from_registry(network_id: str, registry: NetworkRegistry) -> "NetworkRegistrySnapshot":
+        entries = tuple(
+            e for e in registry.entries
+            if e.attachment.network_id == network_id
+        )
+        payload = "|".join(
+            f"{e.attachment.core_id}:{e.attachment.digest()}:{e.attachment_state.value}"
+            for e in entries
+        )
+        digest = hashlib.sha256(payload.encode()).hexdigest()
+        return NetworkRegistrySnapshot(network_id, entries, digest)
+
+    def active_entries(self) -> tuple[NetworkRegistryEntry, ...]:
+        return tuple(
+            e for e in self.entries
+            if e.attachment_state is NetworkAttachmentState.ATTACHED
+        )
