@@ -56,7 +56,7 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
 
 def test_kernel_contract_identity_is_bound_to_transition_record() -> None:
     psi = Psi((), ())
-    execution_input = ExecutionInput("test", "state", state_digest(psi), "content-digest")
+    execution_input = ExecutionInput("test", state_digest(psi), state_digest(psi), "content-digest")
     bridge = AuthorizedExecution(
         CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test")
     )
