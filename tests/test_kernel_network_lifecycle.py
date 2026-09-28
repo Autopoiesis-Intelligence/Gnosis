@@ -20,5 +20,23 @@ def test_full_kernel_network_lifecycle():
         workload_digest="work",
         execution_input=ExecutionInput("test", "s1", "sd1", "cd1"),
     )
+    assert lifecycle.expansion_evidence.expand is True
+    assert lifecycle.expansion_evidence.request_digest == lifecycle.expansion_request.digest()
+    assert lifecycle.expansion_evidence.snapshot_digest
     assert lifecycle.admission.kernel_id == "kernel.math.2"
     assert lifecycle.binding.kernel_id == "kernel.math.2"
+
+
+def test_lifecycle_rejects_stale_expansion_request():
+    from core.capacity_snapshot import CapacitySnapshot
+    from core.expansion_evidence import ExpansionEvidence
+    from core.network_expansion_contract import decide_expansion
+    request = ExpansionRequest("e1", "math", "work", 8, 0, "stale")
+    decision = decide_expansion(request)
+    snapshot = CapacitySnapshot("math", (), "fresh")
+    try:
+        ExpansionEvidence.create(request, snapshot, decision)
+    except ValueError as exc:
+        assert "snapshot" in str(exc)
+        return
+    raise AssertionError("stale expansion request must be rejected")
