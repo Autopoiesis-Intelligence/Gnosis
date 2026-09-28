@@ -215,3 +215,47 @@ def test_detached_attachment_cannot_be_revoked_again():
     )
     with pytest.raises(ValueError, match="only attached"):
         revoke_network_attachment(record, NetworkAttachmentState.REVOKED, "revoke")
+
+
+def test_detached_route_is_not_selectable():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry,
+    )
+    a = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(a, "life", NetworkAttachmentState.DETACHED)
+    )
+    with pytest.raises(ValueError, match="exactly one core"):
+        registry.require_unique_route("network-1", "physics")
+
+
+def test_existing_binding_becomes_stale_after_attachment_change():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkExecutionRequest,
+        NetworkExecutionBinding, NetworkRegistry, NetworkRegistryEntry,
+        validate_network_execution_binding,
+    )
+    a = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(a, "life"))
+    request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
+    binding = NetworkExecutionBinding(request, "core-1", a.digest())
+    registry = NetworkRegistry((
+        NetworkRegistryEntry(a, "life", NetworkAttachmentState.REVOKED),
+    ))
+    with pytest.raises(ValueError, match="exactly one core"):
+        validate_network_execution_binding(registry, binding)
+
+
+def test_binding_cannot_cross_active_core_route():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkExecutionBinding,
+        NetworkRegistry, NetworkRegistryEntry, validate_network_execution_binding,
+    )
+    a1 = NetworkAttachment("core-1", "network-1", "physics", "attach-1")
+    a2 = NetworkAttachment("core-2", "network-1", "physics", "attach-2")
+    request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
+    binding = NetworkExecutionBinding(request, "core-1", a1.digest())
+    registry = NetworkRegistry().register(NetworkRegistryEntry(a2, "life-2"))
+    with pytest.raises(ValueError, match="exactly one core"):
+        validate_network_execution_binding(registry, binding)
