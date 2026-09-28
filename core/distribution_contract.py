@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 
+from core.kernel_registry import KernelRegistry
+
 
 @dataclass(frozen=True)
 class KernelCapacity:
@@ -32,7 +34,9 @@ class DistributionDecision:
 def decide_distribution(*, decision_id: str, capability: str, workload_digest: str, capacities: tuple[KernelCapacity, ...]) -> DistributionDecision:
     if not decision_id or not capability or not workload_digest:
         raise ValueError("distribution inputs are required")
-    if not capacities or any(not item.valid() for item in capacities):
+    if registry is not None:
+        capacities = registry.capacities_for(capability)
+    if capacities is None or not capacities or any(not item.valid() for item in capacities):
         raise ValueError("invalid kernel capacity")
     ordered = tuple(sorted(capacities, key=lambda item: (-item.available_units, item.kernel_id)))
     selected = ordered[0]
