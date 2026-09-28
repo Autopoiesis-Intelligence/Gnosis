@@ -928,3 +928,15 @@ def test_opportunity_plan_lifecycle_survives_restart(tmp_path):
     restored = SQLiteHistoryStore(path).load_opportunity_plan("opp-persist")
     assert restored.plan == record.plan
     assert restored.state is OpportunityPlanState.APPROVED
+
+
+def test_scoped_execution_authorization_survives_restart(tmp_path):
+    from core.evolution_contract import ScopedExecutionAuthorization
+    path = tmp_path / "scoped-auth.db"
+    auth = ScopedExecutionAuthorization(
+        "opp-1", "core-1", "physics", "owner-scoped", "auth-digest"
+    )
+    store = SQLiteHistoryStore(path)
+    store.persist_scoped_execution_authorization(auth)
+    restored = SQLiteHistoryStore(path).load_scoped_execution_authorization("auth-digest")
+    assert restored == auth
