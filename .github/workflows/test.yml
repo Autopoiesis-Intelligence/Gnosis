@@ -36,6 +36,9 @@ jobs:
           path: runtime-evidence/
           if-no-files-found: error
 
+      - name: Run kernel execution contract tests
+        run: python -m pytest -q tests/test_kernel_execution_contract.py
+
       - name: Run first-task milestone tests
         run: |
           python -m pytest -q tests/test_task_processing.py tests/test_recovery_causal_triple.py tests/test_atomic_audit_persistence.py tests/test_canonical_durable_boundary.py 2>&1 | tee milestone-output.txt
