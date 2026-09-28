@@ -793,3 +793,40 @@ def test_rehydrated_dispatch_rejects_missing_capability(tmp_path):
         store.bind_rehydrated_network_execution(
             "network-1", "chemistry", "simulate", "auth"
         )
+
+
+def test_core_creation_lifecycle_survives_restart(tmp_path):
+    from core.evolution_contract import (
+        CoreCreationLifecycle, CoreCreationReason, CoreLifecycle,
+        CoreLifecycleRecord, EvolutionNeedSignal, NetworkRegistry,
+        core_creation_proposal_from_resolution, resolve_need_against_network,
+        advance_core_creation_lifecycle,
+    )
+    path = tmp_path / "core-lifecycle.db"
+    signal = EvolutionNeedSignal(
+        "need-durable", "parent", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    resolution = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    proposal = core_creation_proposal_from_resolution(
+        signal, resolution, "request-durable",
+        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth"
+    )
+    lifecycle = CoreCreationLifecycle(
+        proposal,
+        CoreLifecycleRecord(
+            "core-new", "parent", CoreLifecycle.PROPOSED,
+            "network-1", "proposal-evidence"
+        ),
+    )
+    authorized = advance_core_creation_lifecycle(
+        lifecycle, CoreLifecycle.AUTHORIZED, "authorization-evidence"
+    )
+    store = SQLiteHistoryStore(path)
+    store.persist_core_lifecycle(authorized)
+    restored = SQLiteHistoryStore(path).load_core_lifecycle("core-new")
+    assert restored.need_digest == signal.digest()
+    assert restored.record.state is CoreLifecycle.AUTHORIZED
+    assert restored.proposal.authorization_digest == "auth"
