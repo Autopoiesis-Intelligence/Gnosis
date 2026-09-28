@@ -595,3 +595,37 @@ def test_capability_transition_history_survives_restart(tmp_path):
         "core-1", "network-1", "physics", "simulation",
         "evidence-1", "auth-1", "attachment-1",
     )]
+
+
+def test_capability_transition_and_registry_state_commit_together(tmp_path):
+    from core.evolution_contract import (
+        AuthorizedCapabilityTransition, CapabilityTransition,
+        NetworkAttachment, NetworkAttachmentState, NetworkExecutionBinding,
+        NetworkExecutionRequest, NetworkRegistryEntry,
+        transition_core_capability,
+    )
+    path = tmp_path / "capability-atomic.db"
+    previous = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    next_entry, transition = transition_core_capability(
+        previous, "simulation", "evidence", "auth"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth"),
+        "core-1", previous.attachment.digest(),
+    )
+    authorized = AuthorizedCapabilityTransition(transition, binding)
+    SQLiteHistoryStore(path).commit_capability_transition_atomically(
+        authorized, previous, next_entry
+    )
+    store = SQLiteHistoryStore(path)
+    history = store.load_capability_transitions("core-1", "network-1")
+    assert history[0][2:4] == ("physics", "simulation")
+    with sqlite3.connect(path) as conn:
+        row = conn.execute(
+            "SELECT capability_scope, attachment_state FROM network_registry_state "
+            "WHERE network_id = ? AND core_id = ?", ("network-1", "core-1")
+        ).fetchone()
+    assert row == ("simulation", "attached")
