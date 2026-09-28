@@ -531,3 +531,42 @@ def test_network_registry_snapshot_persists_and_excludes_no_entries_from_other_n
     row = reopened.load_network_registry_snapshot("network-1")
     assert row is not None
     assert row[0] == snapshot.snapshot_digest
+
+
+def test_network_registry_rehydrates_after_restart(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "network-rehydrate.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(attachment, "life", NetworkAttachmentState.ATTACHED)
+    )
+    snapshot = NetworkRegistrySnapshot.from_registry("network-1", registry)
+    store.save_network_registry_snapshot(snapshot)
+    reopened = SQLiteHistoryStore(path)
+    restored = reopened.rehydrate_network_registry("network-1")
+    assert restored.require_unique_route("network-1", "physics").attachment.core_id == "core-1"
+
+
+def test_network_registry_rehydrate_fails_on_digest_tampering(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+        NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "network-rehydrate-tamper.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(attachment, "life"))
+    snapshot = NetworkRegistrySnapshot.from_registry("network-1", registry)
+    store.save_network_registry_snapshot(snapshot)
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE network_registry_snapshots SET payload = ? WHERE network_id = ?",
+            (repr((("core-tampered", "network-1", "physics", "attach", "attached", "life"),)), "network-1")
+        )
+        conn.commit()
+    with pytest.raises(ValueError, match="digest mismatch"):
+        SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
