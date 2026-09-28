@@ -747,3 +747,49 @@ def test_rehydrate_network_registry_excludes_detached_state(tmp_path):
     snapshot, active = store.rehydrate_network_registry_from_state("network-1")
     assert len(snapshot.entries) == 1
     assert active == ()
+
+
+def test_rehydrated_active_route_can_bind_execution_directly(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry,
+        AuthorizedCapabilityTransition, NetworkExecutionBinding,
+        NetworkExecutionRequest, transition_core_capability,
+    )
+    path = tmp_path / "rehydrated-dispatch.db"
+    previous = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "simulation", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    from core.evolution_contract import NetworkRegistrySnapshot
+    store = SQLiteHistoryStore(path)
+    snapshot = NetworkRegistrySnapshot.from_registry(
+        "network-1",
+        __import__("core.evolution_contract", fromlist=["NetworkRegistry"]).NetworkRegistry((previous,))
+    )
+    store.save_network_registry_snapshot(snapshot)
+    binding = store.bind_rehydrated_network_execution(
+        "network-1", "simulation", "simulate", "auth"
+    )
+    assert binding.core_id == "core-1"
+
+
+def test_rehydrated_dispatch_rejects_missing_capability(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "rehydrated-dispatch-missing.db"
+    entry = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "simulation", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    store = SQLiteHistoryStore(path)
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry(
+            "network-1", NetworkRegistry((entry,))
+        )
+    )
+    with pytest.raises(ValueError, match="exactly one core"):
+        store.bind_rehydrated_network_execution(
+            "network-1", "chemistry", "simulate", "auth"
+        )
