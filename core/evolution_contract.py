@@ -148,6 +148,32 @@ def resolve_need_against_network(
     )
 
 
+def core_creation_proposal_from_resolution(
+    signal: EvolutionNeedSignal,
+    resolution: NeedResolution,
+    request_id: str,
+    reason: CoreCreationReason,
+    scope: str,
+    authorization_digest: str,
+) -> CoreCreationProposal:
+    if resolution.need_digest != signal.digest():
+        raise ValueError("need resolution does not match signal")
+    if resolution.action != "create":
+        raise ValueError("core creation requires a create resolution")
+    if resolution.capability_scope != signal.required_capability:
+        raise ValueError("resolution capability does not match need")
+    if resolution.network_id == "" or scope == "":
+        raise ValueError("network and scope are required")
+    return core_creation_proposal_from_need(
+        signal=signal,
+        request_id=request_id,
+        capability=resolution.capability_scope,
+        reason=reason,
+        scope=scope,
+        authorization_digest=authorization_digest,
+    )
+
+
 @dataclass(frozen=True)
 class CoreCreationProposal:
     request: CoreCreationRequest
