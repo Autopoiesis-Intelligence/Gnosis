@@ -237,3 +237,64 @@ def test_rehydrated_detached_core_cannot_bind_execution(tmp_path):
             restored,
             NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
         )
+
+
+def test_rehydrated_active_route_reaches_authorized_execution(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot, bind_network_execution,
+    )
+    from core.sqlite_persistence import SQLiteHistoryStore
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="test"
+    )
+    path = tmp_path / "network-e2e.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(attachment, "life"))
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry("network-1", registry)
+    )
+    restored = SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
+    binding = bind_network_execution(
+        restored,
+        NetworkExecutionRequest(
+            "network-1", "physics", "simulate", request.authorization_digest()
+        ),
+    )
+    result = bridge.step(
+        info, psi,
+        PsiTransition(lambda x, relations: (x + 1, relations)),
+        execution_input, request,
+        network_binding=binding, allowed_capability="physics",
+    )
+    assert result.psi.x == 1
+
+
+def test_rehydrated_revoked_route_cannot_reach_authorized_execution(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot,
+        bind_network_execution,
+    )
+    from core.sqlite_persistence import SQLiteHistoryStore
+    path = tmp_path / "network-e2e-revoked.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(attachment, "life", NetworkAttachmentState.REVOKED)
+    )
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry("network-1", registry)
+    )
+    restored = SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
+    with pytest.raises(ValueError, match="exactly one core"):
+        bind_network_execution(
+            restored,
+            NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
+        )
