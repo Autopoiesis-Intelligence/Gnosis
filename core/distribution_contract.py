@@ -33,7 +33,7 @@ class DistributionDecision:
         return hashlib.sha256(payload).hexdigest()
 
 
-def decide_distribution(*, decision_id: str, capability: str, workload_digest: str, capacities: tuple[KernelCapacity, ...]) -> DistributionDecision:
+def decide_distribution(*, decision_id: str, capability: str, workload_digest: str, capacities: tuple[KernelCapacity, ...] | None = None, registry: "KernelRegistry | None" = None) -> DistributionDecision:
     if not decision_id or not capability or not workload_digest:
         raise ValueError("distribution inputs are required")
     if registry is not None:
