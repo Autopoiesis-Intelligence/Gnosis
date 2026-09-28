@@ -7,7 +7,7 @@ from core.execution import CanonicalExecutor
 from core.execution_contract import ExecutionInput
 from core.external_execution_request import ExternalExecutionRequest
 from core.history import AppendOnlyHistory
-from core.information_contract import Information
+from core.information_contract import Authorization, AuthorizationStatus, Information
 from core.kernel_execution_contract import KernelExecutionContract
 from core.psi_transition import PsiTransition
 from core.state import Psi
@@ -24,8 +24,16 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
     )
     info = Information(
         information_id="info",
-        content_digest="content-digest",
-        authorization_status="authorized",
+        source="test-source",
+        content_reference="content-digest",
+        provenance_ref="test-provenance",
+        authorization=Authorization(
+            source="test-source",
+            purpose="test",
+            operation="execute",
+            destination="core",
+            status=AuthorizationStatus.ALLOWED,
+        ),
     )
     contract = KernelExecutionContract(
         kernel_id="kernel.math.1",
