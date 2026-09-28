@@ -324,3 +324,49 @@ def test_same_capability_on_two_active_cores_is_ambiguous():
             registry,
             NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
         )
+
+
+def test_attached_core_can_change_capability_with_evidence():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry,
+        transition_core_capability,
+    )
+    entry = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life",
+        NetworkAttachmentState.ATTACHED,
+    )
+    updated, transition = transition_core_capability(
+        entry, "simulation", "transition-evidence", "auth"
+    )
+    assert updated.attachment.capability_scope == "simulation"
+    assert transition.previous_scope == "physics"
+    assert transition.next_scope == "simulation"
+
+
+def test_detached_core_cannot_change_capability():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry,
+        transition_core_capability,
+    )
+    entry = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life",
+        NetworkAttachmentState.DETACHED,
+    )
+    with pytest.raises(ValueError, match="only attached"):
+        transition_core_capability(entry, "simulation", "evidence", "auth")
+
+
+def test_capability_transition_requires_actual_change():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry,
+        transition_core_capability,
+    )
+    entry = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life",
+        NetworkAttachmentState.ATTACHED,
+    )
+    with pytest.raises(ValueError, match="must change"):
+        transition_core_capability(entry, "physics", "evidence", "auth")
