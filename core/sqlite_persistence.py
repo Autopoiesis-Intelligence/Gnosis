@@ -340,6 +340,63 @@ class SQLiteHistoryStore:
             raise ValueError("durable triple cardinality mismatch")
         return CommitResult(next_value, durable, True)
 
+    def commit_evolution_with_audit(
+        self,
+        record: TransitionRecord,
+        provenance: Provenance,
+        evolution_outcome: EvolutionOutcomeRecord,
+        current,
+        next_value,
+        authorization_digest: str | None = None,
+        authorization_state_digest: str | None = None,
+        distribution_binding: DistributionExecutionBinding | None = None,
+    ) -> CommitResult:
+        """Atomically persist a terminal COMMIT outcome with the canonical transition."""
+        if evolution_outcome.decision != "commit":
+            raise ValueError("canonical evolution commit requires COMMIT outcome")
+        if evolution_outcome.candidate_state_hash != record.state_hash:
+            raise ValueError("evolution outcome candidate does not match committed state")
+        if evolution_outcome.parent_state_hash != record.previous_hash:
+            raise ValueError("evolution outcome parent does not match committed predecessor")
+        if evolution_outcome.outcome_digest == "":
+            raise ValueError("evolution outcome digest is required")
+
+        outcome_history = self.load_evolution_outcomes()
+        if outcome_history.records:
+            head = outcome_history.head
+            if evolution_outcome.sequence != head.sequence + 1:
+                raise ValueError("evolution outcome sequence is not contiguous")
+            if evolution_outcome.previous_outcome_digest != head.outcome_digest:
+                raise ValueError("evolution outcome predecessor mismatch")
+        elif evolution_outcome.sequence != 0 or evolution_outcome.previous_outcome_digest:
+            raise ValueError("evolution outcome genesis binding mismatch")
+
+        result = self.commit_once_with_audit(
+            record, provenance, current, next_value,
+            authorization_digest=authorization_digest,
+            authorization_state_digest=authorization_state_digest,
+            distribution_binding=distribution_binding,
+        )
+        if not result.committed:
+            raise ValueError("evolution outcome cannot be appended to a non-new canonical commit")
+
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                conn.execute("""INSERT INTO evolution_outcome_history
+                    (sequence, previous_outcome_digest, outcome_digest, patch_id,
+                     parent_state_hash, candidate_state_hash, decision, evidence_digest)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (evolution_outcome.sequence, evolution_outcome.previous_outcome_digest,
+                     evolution_outcome.outcome_digest, evolution_outcome.patch_id,
+                     evolution_outcome.parent_state_hash, evolution_outcome.candidate_state_hash,
+                     evolution_outcome.decision, evolution_outcome.evidence_digest))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return result
+
     def commit_once(self, record: TransitionRecord, current, next_value) -> CommitResult:
         """Fail closed: history-only durable writes are not a canonical commit path."""
         raise ValueError(
