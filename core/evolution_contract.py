@@ -185,3 +185,37 @@ class CoreLifecycleRecord:
         if not all((self.core_id, self.parent_core_id,
                     self.capability_scope, self.evidence_digest)):
             raise ValueError("core lifecycle identity is required")
+
+
+@dataclass(frozen=True)
+class NetworkAttachment:
+    core_id: str
+    network_id: str
+    capability_scope: str
+    attachment_evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.core_id, self.network_id, self.capability_scope,
+                    self.attachment_evidence_digest)):
+            raise ValueError("network attachment identity is required")
+
+    def digest(self) -> str:
+        return hashlib.sha256("|".join((
+            self.core_id, self.network_id, self.capability_scope,
+            self.attachment_evidence_digest,
+        )).encode()).hexdigest()
+
+
+def attach_verified_core(
+    lifecycle: CoreLifecycleRecord,
+    network_id: str,
+    attachment_evidence_digest: str,
+) -> NetworkAttachment:
+    if lifecycle.state is not CoreLifecycle.VERIFIED:
+        raise ValueError("only VERIFIED cores may attach to network")
+    return NetworkAttachment(
+        core_id=lifecycle.core_id,
+        network_id=network_id,
+        capability_scope=lifecycle.capability_scope,
+        attachment_evidence_digest=attachment_evidence_digest,
+    )
