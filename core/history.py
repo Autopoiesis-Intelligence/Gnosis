@@ -14,6 +14,8 @@ class TransitionRecord:
     candidate_hash: str
     admitted: bool
     evidence_hash: str = ""
+    kernel_execution_identity: str = ""
+    evidence_binding_digest: str = ""
 
     def __post_init__(self) -> None:
         if self.sequence < 0:
