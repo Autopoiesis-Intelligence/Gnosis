@@ -570,6 +570,28 @@ class SQLiteHistoryStore:
         return snapshot, snapshot.active_entries()
 
 
+
+    def bind_admitted_network_execution(
+        self, network_id: str, capability_scope: str, operation: str,
+        authorization_digest: str,
+    ):
+        with sqlite3.connect(self.path) as conn:
+            rows = conn.execute(
+                """SELECT core_id FROM core_admission
+                   WHERE network_id = ? AND capability_scope = ?
+                     AND admission_state = 'active'""",
+                (network_id, capability_scope),
+            ).fetchall()
+        if len(rows) != 1:
+            raise ValueError("exactly one active admitted core is required")
+        core_id = rows[0][0]
+        binding = self.bind_rehydrated_network_execution(
+            network_id, capability_scope, operation, authorization_digest
+        )
+        if binding.core_id != core_id:
+            raise ValueError("admission and network route disagree")
+        return binding
+
     def bind_rehydrated_network_execution(
         self, network_id: str, capability_scope: str, operation: str,
         authorization_digest: str
