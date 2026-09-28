@@ -512,3 +512,22 @@ def test_evolution_replay_integrity_after_restart(tmp_path):
     reopened.verify_evolution_outcomes()
     reopened.verify_evolution_cross_table_consistency()
     assert reopened.load_evolution_outcomes().head == outcome
+
+
+def test_network_registry_snapshot_persists_and_excludes_no_entries_from_other_networks(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "network-registry.db"
+    store = SQLiteHistoryStore(path)
+    a1 = NetworkAttachment("core-1", "network-1", "physics", "attach-1")
+    a2 = NetworkAttachment("core-2", "network-2", "physics", "attach-2")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(a1, "life-1"))
+    registry = registry.register(NetworkRegistryEntry(a2, "life-2", NetworkAttachmentState.REVOKED))
+    snapshot = NetworkRegistrySnapshot.from_registry("network-1", registry)
+    store.save_network_registry_snapshot(snapshot)
+    reopened = SQLiteHistoryStore(path)
+    row = reopened.load_network_registry_snapshot("network-1")
+    assert row is not None
+    assert row[0] == snapshot.snapshot_digest
