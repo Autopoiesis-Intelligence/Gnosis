@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from enum import Enum
+from .evolution_canary import CanaryObservation
 
 
 class EvolutionDecision(str, Enum):
@@ -23,6 +24,7 @@ class EvolutionEvaluation:
     observed_effect_digest: str
     verification_digest: str
     decision: EvolutionDecision
+    canary_digest: str = ""
 
     def __post_init__(self) -> None:
         if not all((
@@ -44,5 +46,6 @@ class EvolutionEvaluation:
             self.observed_effect_digest,
             self.verification_digest,
             self.decision.value,
+            self.canary_digest,
         )).encode()
         return hashlib.sha256(payload).hexdigest()
