@@ -418,3 +418,58 @@ def test_capability_transition_rejects_foreign_core():
     )
     with pytest.raises(ValueError, match="core"):
         AuthorizedCapabilityTransition(transition, binding)
+
+
+def test_need_resolution_reuses_existing_specialized_core():
+    from core.evolution_contract import (
+        EvolutionNeedSignal, NetworkAttachment, NetworkAttachmentState,
+        NetworkRegistry, NetworkRegistryEntry, resolve_need_against_network,
+    )
+    signal = EvolutionNeedSignal(
+        "need-1", "core-parent", "state", "physics",
+        "analytics", "evidence", "research",
+    )
+    registry = NetworkRegistry().register(NetworkRegistryEntry(
+        NetworkAttachment("core-physics", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    ))
+    result = resolve_need_against_network(
+        signal, "network-1", "physics", registry
+    )
+    assert (result.action, result.target_core_id) == ("reuse", "core-physics")
+
+
+def test_need_resolution_requests_new_core_when_capability_is_absent():
+    from core.evolution_contract import (
+        EvolutionNeedSignal, NetworkRegistry, resolve_need_against_network,
+    )
+    signal = EvolutionNeedSignal(
+        "need-2", "core-parent", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    result = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    assert (result.action, result.target_core_id) == ("create", None)
+
+
+def test_need_resolution_rejects_ambiguous_existing_capability():
+    from core.evolution_contract import (
+        EvolutionNeedSignal, NetworkAttachment, NetworkAttachmentState,
+        NetworkRegistry, NetworkRegistryEntry, resolve_need_against_network,
+    )
+    signal = EvolutionNeedSignal(
+        "need-3", "core-parent", "state", "physics",
+        "analytics", "evidence", "research",
+    )
+    registry = NetworkRegistry().register(NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "a"),
+        "life-1", NetworkAttachmentState.ATTACHED,
+    )).register(NetworkRegistryEntry(
+        NetworkAttachment("core-2", "network-1", "physics", "b"),
+        "life-2", NetworkAttachmentState.ATTACHED,
+    ))
+    with pytest.raises(ValueError, match="ambiguous"):
+        resolve_need_against_network(
+            signal, "network-1", "physics", registry
+        )
