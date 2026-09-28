@@ -110,7 +110,7 @@ def test_execution_rejects_kernel_mismatch_with_distribution():
         verify_kernel_execution_contract(
             contract,
             execution_input,
-            allowed_kernel_id="kernel-1",
+            allowed_kernel_id="kernel.math.1",
             allowed_capability="math",
             distribution_decision=decision,
         )
@@ -125,7 +125,7 @@ def test_execution_accepts_matching_distribution():
     execution_input = make_input()
     decision = DistributionDecision(
         decision_id="dist-1",
-        selected_kernel_id="kernel-1",
+        selected_kernel_id="kernel.math.1",
         capability="math",
         workload_digest="work",
         capacity_snapshot_digest="capacity",
@@ -133,7 +133,7 @@ def test_execution_accepts_matching_distribution():
     verify_kernel_execution_contract(
         contract,
         execution_input,
-        allowed_kernel_id="kernel-1",
+        allowed_kernel_id="kernel.math.1",
         allowed_capability="math",
         distribution_decision=decision,
     )
