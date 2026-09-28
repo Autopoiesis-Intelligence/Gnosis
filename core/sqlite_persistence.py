@@ -593,6 +593,22 @@ class SQLiteHistoryStore:
             raise ValueError("rehydrated execution route is not active")
         return binding
 
+
+    def execute_rehydrated_network_request(
+        self, info, psi, transition, execution_input, request,
+        network_id: str, capability_scope: str, operation: str,
+        bridge,
+    ):
+        binding = self.bind_rehydrated_network_execution(
+            network_id, capability_scope, operation,
+            request.authorization_digest(),
+        )
+        return bridge.step(
+            info, psi, transition, execution_input, request,
+            network_binding=binding,
+            allowed_capability=capability_scope,
+        )
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
