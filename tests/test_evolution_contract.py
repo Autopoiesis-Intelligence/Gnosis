@@ -473,3 +473,66 @@ def test_need_resolution_rejects_ambiguous_existing_capability():
         resolve_need_against_network(
             signal, "network-1", "physics", registry
         )
+
+
+def test_core_creation_proposal_requires_create_resolution():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, NetworkRegistry,
+        resolve_need_against_network, core_creation_proposal_from_resolution,
+    )
+    signal = EvolutionNeedSignal(
+        "need-create", "parent", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    resolution = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    proposal = core_creation_proposal_from_resolution(
+        signal, resolution, "request-1",
+        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-1"
+    )
+    assert proposal.request.need_digest == signal.digest()
+    assert proposal.request.capability == "chemistry"
+
+
+def test_core_creation_proposal_rejects_reuse_resolution():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, NetworkAttachment,
+        NetworkAttachmentState, NetworkRegistry, NetworkRegistryEntry,
+        resolve_need_against_network, core_creation_proposal_from_resolution,
+    )
+    signal = EvolutionNeedSignal(
+        "need-reuse", "parent", "state", "physics",
+        "analytics", "evidence", "research",
+    )
+    registry = NetworkRegistry().register(NetworkRegistryEntry(
+        NetworkAttachment("core-physics", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    ))
+    resolution = resolve_need_against_network(
+        signal, "network-1", "physics", registry
+    )
+    with pytest.raises(ValueError, match="create resolution"):
+        core_creation_proposal_from_resolution(
+            signal, resolution, "request-2",
+            CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-2"
+        )
+
+
+def test_core_creation_proposal_rejects_foreign_resolution():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, NetworkRegistry,
+        NeedResolution, core_creation_proposal_from_resolution,
+    )
+    signal = EvolutionNeedSignal(
+        "need-a", "parent", "state", "physics",
+        "analytics", "evidence", "research",
+    )
+    foreign = NeedResolution(
+        "foreign-digest", "network-1", "physics", "create", None
+    )
+    with pytest.raises(ValueError, match="does not match signal"):
+        core_creation_proposal_from_resolution(
+            signal, foreign, "request-3",
+            CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-3"
+        )
