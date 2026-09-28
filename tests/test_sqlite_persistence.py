@@ -461,3 +461,40 @@ def test_tampering_kernel_execution_identity_breaks_durable_audit(tmp_path):
         conn.commit()
     with pytest.raises(ValueError, match="durable transition binding mismatch"):
         SQLiteHistoryStore(path).verify_cross_table_consistency()
+
+
+def test_evolution_commit_rolls_back_outcome_when_transaction_fails(tmp_path):
+    path = tmp_path / "evolution-atomic-failure.db"
+    store = SQLiteHistoryStore(path)
+    record = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    from core.history import EvolutionOutcomeRecord
+    outcome = EvolutionOutcomeRecord(
+        0, "", "outcome-0", "patch-0", "genesis", "s0",
+        "commit", "evidence-0",
+    )
+    store._fail_next = "after_audit_before_commit"
+    with pytest.raises(Exception):
+        store.commit_evolution_with_audit(
+            record, provenance, outcome, "current", "s0"
+        )
+    assert store.load().records == ()
+    assert store.load_evolution_outcomes().records == ()
+
+
+def test_evolution_commit_persists_outcome_and_state_together(tmp_path):
+    path = tmp_path / "evolution-atomic-success.db"
+    store = SQLiteHistoryStore(path)
+    record = rec(0, "genesis", "s0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    from core.history import EvolutionOutcomeRecord
+    outcome = EvolutionOutcomeRecord(
+        0, "", "outcome-0", "patch-0", "genesis", "s0",
+        "commit", "evidence-0",
+    )
+    result = store.commit_evolution_with_audit(
+        record, provenance, outcome, "current", "s0"
+    )
+    assert result.committed
+    assert len(store.load().records) == 1
+    assert store.load_evolution_outcomes().head == outcome
