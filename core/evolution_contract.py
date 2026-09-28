@@ -109,6 +109,46 @@ def candidate_from_need(
 
 
 @dataclass(frozen=True)
+class NeedResolution:
+    need_digest: str
+    network_id: str
+    capability_scope: str
+    action: str
+    target_core_id: str | None
+
+    def __post_init__(self) -> None:
+        if self.action not in ("reuse", "create"):
+            raise ValueError("need resolution action is invalid")
+        if not self.need_digest or not self.network_id or not self.capability_scope:
+            raise ValueError("need resolution identity is required")
+        if self.action == "reuse" and not self.target_core_id:
+            raise ValueError("reuse requires an active target core")
+
+
+def resolve_need_against_network(
+    signal: EvolutionNeedSignal,
+    network_id: str,
+    capability_scope: str,
+    registry: NetworkRegistry,
+) -> NeedResolution:
+    matches = registry.lookup(network_id, capability_scope)
+    active = tuple(
+        e for e in matches
+        if e.attachment_state is NetworkAttachmentState.ATTACHED
+    )
+    if len(active) == 1:
+        return NeedResolution(
+            signal.digest(), network_id, capability_scope,
+            "reuse", active[0].attachment.core_id,
+        )
+    if len(active) > 1:
+        raise ValueError("need resolution is ambiguous")
+    return NeedResolution(
+        signal.digest(), network_id, capability_scope, "create", None
+    )
+
+
+@dataclass(frozen=True)
 class CoreCreationProposal:
     request: CoreCreationRequest
     authorization_digest: str
