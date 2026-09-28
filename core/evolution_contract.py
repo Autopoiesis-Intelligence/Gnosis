@@ -225,6 +225,7 @@ def attach_verified_core(
 class NetworkRegistryEntry:
     attachment: NetworkAttachment
     lifecycle_evidence_digest: str
+    attachment_state: NetworkAttachmentState = NetworkAttachmentState.ATTACHED
 
     def __post_init__(self) -> None:
         if not self.lifecycle_evidence_digest:
@@ -252,7 +253,11 @@ class NetworkRegistry:
     def require_unique_route(
         self, network_id: str, capability_scope: str
     ) -> NetworkRegistryEntry:
-        matches = self.lookup(network_id, capability_scope)
+        matches = tuple(
+            e for e in self.lookup(network_id, capability_scope)
+            if getattr(e, "attachment_state", NetworkAttachmentState.ATTACHED)
+               is NetworkAttachmentState.ATTACHED
+        )
         if len(matches) != 1:
             raise ValueError("network route must resolve to exactly one core")
         return matches[0]
@@ -323,3 +328,17 @@ def revoke_network_attachment(
     if state not in (NetworkAttachmentState.DETACHED, NetworkAttachmentState.REVOKED):
         raise ValueError("attachment must transition to detached or revoked")
     return NetworkAttachmentRecord(record.attachment, state, evidence_digest)
+
+
+def validate_network_execution_binding(
+    registry: NetworkRegistry,
+    binding: NetworkExecutionBinding,
+) -> NetworkRegistryEntry:
+    entry = registry.require_unique_route(
+        binding.request.network_id, binding.request.capability_scope
+    )
+    if entry.attachment.core_id != binding.core_id:
+        raise ValueError("execution binding core is no longer the active network route")
+    if entry.attachment.digest() != binding.attachment_digest:
+        raise ValueError("execution binding attachment is stale")
+    return entry
