@@ -473,8 +473,8 @@ def test_evolution_commit_rolls_back_outcome_when_transaction_fails(tmp_path):
         0, "", "outcome-0", "patch-0", "genesis", "s0",
         "commit", "evidence-0",
     )
-    store._fail_next = "after_audit_before_commit"
-    with pytest.raises(Exception):
+    store.failure_injector = lambda point: (_ for _ in ()).throw(RuntimeError("injected failure")) if point == "after_audit_before_commit" else None
+    with pytest.raises(RuntimeError, match="injected failure"):
         store.commit_evolution_with_audit(
             record, provenance, outcome, "current", "s0"
         )
