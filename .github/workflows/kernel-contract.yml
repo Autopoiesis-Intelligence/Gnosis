@@ -1,0 +1,27 @@
+name: Kernel Execution Contract
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "core/kernel_execution_contract.py"
+      - "core/execution_contract.py"
+      - "tests/test_kernel_execution_contract.py"
+  pull_request:
+    paths:
+      - "core/kernel_execution_contract.py"
+      - "core/execution_contract.py"
+      - "tests/test_kernel_execution_contract.py"
+
+jobs:
+  kernel-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+      - name: Run kernel contract tests
+        run: python -m pytest -q tests/test_kernel_execution_contract.py
