@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from core.execution_contract import ExecutionInput
+from core.distribution_contract import DistributionDecision
 from core.kernel_execution_contract import (
     KernelExecutionContract,
     verify_kernel_execution_contract,
