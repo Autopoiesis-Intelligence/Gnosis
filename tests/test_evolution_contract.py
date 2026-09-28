@@ -69,3 +69,33 @@ def test_core_creation_proposal_requires_authorization():
             signal, "request-1", "specialized capability",
             CoreCreationReason.SPECIALIZATION, "domain-x", ""
         )
+
+
+def test_specialized_core_lifecycle_is_deterministic():
+    from core.evolution_contract import CoreLifecycle, validate_core_lifecycle_transition
+    chain = [
+        CoreLifecycle.PROPOSED, CoreLifecycle.AUTHORIZED,
+        CoreLifecycle.INSTANTIATED, CoreLifecycle.VERIFIED,
+        CoreLifecycle.NETWORK_ATTACHED,
+    ]
+    for current, requested in zip(chain, chain[1:]):
+        validate_core_lifecycle_transition(current, requested)
+
+
+def test_specialized_core_cannot_attach_before_verification():
+    from core.evolution_contract import CoreLifecycle, validate_core_lifecycle_transition
+    for current in (
+        CoreLifecycle.PROPOSED, CoreLifecycle.AUTHORIZED, CoreLifecycle.INSTANTIATED,
+    ):
+        with pytest.raises(ValueError, match="invalid core lifecycle transition"):
+            validate_core_lifecycle_transition(
+                current, CoreLifecycle.NETWORK_ATTACHED
+            )
+
+
+def test_network_attached_is_terminal_for_this_lifecycle():
+    from core.evolution_contract import CoreLifecycle, validate_core_lifecycle_transition
+    with pytest.raises(ValueError, match="invalid core lifecycle transition"):
+        validate_core_lifecycle_transition(
+            CoreLifecycle.NETWORK_ATTACHED, CoreLifecycle.VERIFIED
+        )
