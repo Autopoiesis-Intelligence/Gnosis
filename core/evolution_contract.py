@@ -363,6 +363,15 @@ class NetworkRegistrySnapshot:
         digest = hashlib.sha256(payload.encode()).hexdigest()
         return NetworkRegistrySnapshot(network_id, entries, digest)
 
+    @staticmethod
+    def from_recovered_entries(network_id: str, entries: tuple[NetworkRegistryEntry, ...]) -> "NetworkRegistrySnapshot":
+        registry = NetworkRegistry(entries)
+        snapshot = NetworkRegistrySnapshot.from_registry(network_id, registry)
+        for entry in snapshot.entries:
+            if entry.attachment.network_id != network_id:
+                raise ValueError("recovered entry belongs to a different network")
+        return snapshot
+
     def active_entries(self) -> tuple[NetworkRegistryEntry, ...]:
         return tuple(
             e for e in self.entries
