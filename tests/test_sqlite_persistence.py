@@ -915,3 +915,16 @@ def test_opportunity_scope_survives_restart(tmp_path):
     store.persist_opportunity_scope(scope)
     restored = SQLiteHistoryStore(path).load_opportunity_scope("opp-durable")
     assert restored == scope
+
+
+def test_opportunity_plan_lifecycle_survives_restart(tmp_path):
+    from core.evolution_contract import OpportunityPlan, OpportunityPlanRecord, OpportunityPlanState
+    path = tmp_path / "plan.db"
+    store = SQLiteHistoryStore(path)
+    record = OpportunityPlanRecord(
+        OpportunityPlan("opp-persist", ("core-a", "core-b"), "client objective")
+    ).advance(OpportunityPlanState.APPROVED)
+    store.persist_opportunity_plan(record)
+    restored = SQLiteHistoryStore(path).load_opportunity_plan("opp-persist")
+    assert restored.plan == record.plan
+    assert restored.state is OpportunityPlanState.APPROVED
