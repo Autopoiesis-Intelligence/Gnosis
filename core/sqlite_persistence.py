@@ -49,14 +49,16 @@ class SQLiteHistoryStore:
     def load(self) -> AppendOnlyHistory:
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute("""SELECT sequence, previous_hash, state_hash,
-                kernel_version, candidate_hash, admitted, evidence_hash
+                kernel_version, candidate_hash, admitted, evidence_hash,
+                kernel_execution_identity, evidence_binding_digest
                 FROM transition_history ORDER BY sequence""").fetchall()
         history = AppendOnlyHistory()
         for row in rows:
             history = history.append(TransitionRecord(
                 sequence=row[0], previous_hash=row[1], state_hash=row[2],
                 kernel_version=row[3], candidate_hash=row[4],
-                admitted=bool(row[5]), evidence_hash=row[6]))
+                admitted=bool(row[5]), evidence_hash=row[6],
+                kernel_execution_identity=row[7], evidence_binding_digest=row[8]))
         return history
 
     def verify_cross_table_consistency(self, *, initial_state_digest: str | None = None) -> None:
@@ -215,11 +217,13 @@ class SQLiteHistoryStore:
                     conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
                 conn.execute("""INSERT INTO transition_history
                     (sequence, previous_hash, state_hash, kernel_version,
-                     candidate_hash, admitted, evidence_hash)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                     candidate_hash, admitted, evidence_hash,
+                     kernel_execution_identity, evidence_binding_digest)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (record.sequence, record.previous_hash, record.state_hash,
                      record.kernel_version, record.candidate_hash,
-                     int(record.admitted), record.evidence_hash))
+                     int(record.admitted), record.evidence_hash,
+                     record.kernel_execution_identity, record.evidence_binding_digest))
                 self._fail("after_history_before_audit")
                 self._fail("after_history_before_provenance")
                 conn.execute("""INSERT INTO provenance_history
