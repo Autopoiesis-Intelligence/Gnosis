@@ -50,3 +50,24 @@ def validate_canary_transition(current: CanaryDecision, requested: CanaryDecisio
         raise ValueError(
             f"invalid canary transition: {current.value} -> {requested.value}"
         )
+
+
+@dataclass(frozen=True)
+class CanaryRollback:
+    patch_id: str
+    parent_state_hash: str
+    candidate_state_hash: str
+    reason_digest: str
+    evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.patch_id, self.parent_state_hash, self.candidate_state_hash,
+                    self.reason_digest, self.evidence_digest)):
+            raise ValueError("rollback evidence identity is required")
+
+    def digest(self) -> str:
+        payload = "|".join((
+            self.patch_id, self.parent_state_hash, self.candidate_state_hash,
+            self.reason_digest, self.evidence_digest,
+        )).encode()
+        return hashlib.sha256(payload).hexdigest()
