@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from enum import Enum
-from .evolution_canary import CanaryObservation
+from .evolution_canary import CanaryDecision, CanaryObservation, validate_canary_transition
 
 
 class EvolutionDecision(str, Enum):
@@ -36,6 +36,14 @@ class EvolutionEvaluation:
             self.verification_digest,
         )):
             raise ValueError("evolution evaluation identity is required")
+
+    def validate(self) -> None:
+        if self.decision is EvolutionDecision.COMMIT:
+            if not self.canary_digest:
+                raise ValueError("COMMIT evaluation requires canary evidence")
+        elif self.decision is EvolutionDecision.CANARY:
+            if self.canary_digest:
+                raise ValueError("CANARY evaluation cannot claim terminal canary evidence")
 
     def digest(self) -> str:
         payload = "|".join((
