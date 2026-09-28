@@ -123,3 +123,35 @@ def test_unverified_core_cannot_attach_to_network():
                                      "specialized", "evidence")
         with pytest.raises(ValueError, match="VERIFIED"):
             attach_verified_core(record, "network-1", "attach-evidence")
+
+
+def test_network_registry_routes_by_capability_scope():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+    )
+    a = NetworkAttachment("core-1", "network-1", "physics", "attach-evidence")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(a, "lifecycle-evidence"))
+    assert registry.require_unique_route("network-1", "physics").attachment.core_id == "core-1"
+
+
+def test_network_registry_rejects_duplicate_core_registration():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+    )
+    a = NetworkAttachment("core-1", "network-1", "physics", "attach-evidence")
+    entry = NetworkRegistryEntry(a, "lifecycle-evidence")
+    registry = NetworkRegistry().register(entry)
+    with pytest.raises(ValueError, match="already registered"):
+        registry.register(entry)
+
+
+def test_network_registry_rejects_ambiguous_route():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+    )
+    registry = NetworkRegistry()
+    for core_id in ("core-1", "core-2"):
+        a = NetworkAttachment(core_id, "network-1", "physics", "evidence-"+core_id)
+        registry = registry.register(NetworkRegistryEntry(a, "lifecycle-"+core_id))
+    with pytest.raises(ValueError, match="exactly one core"):
+        registry.require_unique_route("network-1", "physics")
