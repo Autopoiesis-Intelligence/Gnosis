@@ -43,3 +43,45 @@ class AppendOnlyHistory:
     @property
     def head(self) -> TransitionRecord | None:
         return self.records[-1] if self.records else None
+
+
+@dataclass(frozen=True)
+class EvolutionOutcomeRecord:
+    sequence: int
+    previous_outcome_digest: str
+    outcome_digest: str
+    patch_id: str
+    parent_state_hash: str
+    candidate_state_hash: str
+    decision: str
+    evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if self.sequence < 0:
+            raise ValueError("sequence must be non-negative")
+        if not all((self.patch_id, self.parent_state_hash,
+                    self.candidate_state_hash, self.decision,
+                    self.evidence_digest, self.outcome_digest)):
+            raise ValueError("evolution outcome history identity is required")
+        if self.decision == "observe":
+            raise ValueError("history may contain only terminal evolution outcomes")
+
+
+@dataclass(frozen=True)
+class EvolutionOutcomeHistory:
+    records: tuple[EvolutionOutcomeRecord, ...] = ()
+
+    def append(self, record: EvolutionOutcomeRecord) -> "EvolutionOutcomeHistory":
+        if self.records:
+            previous = self.records[-1]
+            if record.sequence != previous.sequence + 1:
+                raise ValueError("evolution outcome sequence must be contiguous")
+            if record.previous_outcome_digest != previous.outcome_digest:
+                raise ValueError("evolution outcome chain is broken")
+        elif record.sequence != 0:
+            raise ValueError("evolution outcome genesis must have sequence zero")
+        return EvolutionOutcomeHistory(self.records + (record,))
+
+    @property
+    def head(self) -> EvolutionOutcomeRecord | None:
+        return self.records[-1] if self.records else None
