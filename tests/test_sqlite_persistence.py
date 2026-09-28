@@ -858,3 +858,45 @@ def test_revoked_core_admission_stays_revoked_after_restart(tmp_path):
     store.revoke_core_admission("external-2")
     restored = SQLiteHistoryStore(path).load_core_admission("external-2")
     assert restored[1] == "revoked"
+
+
+def test_revoked_external_core_cannot_receive_network_binding(tmp_path):
+    from core.evolution_contract import CoreAdmission, CoreOrigin
+    path = tmp_path / "admission-routing.db"
+    store = SQLiteHistoryStore(path)
+    store.persist_core_admission(CoreAdmission(
+        "external-route", CoreOrigin.EXTERNAL, "network-1",
+        "physics", "owner-scoped", "auth", "verify",
+    ))
+    store.revoke_core_admission("external-route")
+    with pytest.raises(ValueError, match="exactly one active admitted core"):
+        store.bind_admitted_network_execution(
+            "network-1", "physics", "simulate", "auth"
+        )
+
+
+def test_active_admitted_core_can_receive_network_binding(tmp_path):
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, NetworkAttachment,
+        NetworkAttachmentState, NetworkRegistry, NetworkRegistryEntry,
+        NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "admission-routing-active.db"
+    store = SQLiteHistoryStore(path)
+    store.persist_core_admission(CoreAdmission(
+        "external-route-active", CoreOrigin.EXTERNAL, "network-1",
+        "physics", "owner-scoped", "auth", "verify",
+    ))
+    store.save_network_registry_snapshot(NetworkRegistrySnapshot.from_registry(
+        "network-1",
+        NetworkRegistry().register(NetworkRegistryEntry(
+            NetworkAttachment(
+                "external-route-active", "network-1", "physics", "attach"
+            ),
+            "life", NetworkAttachmentState.ATTACHED,
+        ))
+    ))
+    binding = store.bind_admitted_network_execution(
+        "network-1", "physics", "simulate", "auth"
+    )
+    assert binding.core_id == "external-route-active"
