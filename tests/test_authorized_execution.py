@@ -333,3 +333,32 @@ def test_restart_to_authorized_execution_full_path(tmp_path):
         "network-1", "physics", "simulate", bridge,
     )
     assert result.psi.x == 1
+
+
+def test_authorized_execution_rejects_partial_opportunity_binding():
+    from core.authorized_execution import AuthorizedExecution
+    from core.execution import CanonicalExecutor
+    from core.history import AppendOnlyHistory
+    from core.execution_contract import ExecutionInput
+    from core.external_execution_request import ExternalExecutionRequest, ExternalOperation
+    from core.information_contract import Information
+    from core.psi_transition import PsiTransition
+    from core.state import Psi
+
+    bridge = AuthorizedExecution(CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test"))
+    with pytest.raises(ValueError, match="complete binding"):
+        bridge.step(
+            Information("info", "content", "authorized"),
+            Psi(("x",), ()),
+            PsiTransition(lambda psi: psi),
+            ExecutionInput("test", "state", "digest", "content"),
+            ExternalExecutionRequest(
+                operation=ExternalOperation.REQUEST,
+                information_id="info",
+                content_digest="content",
+                capability_scope="physics",
+                privacy_scope="owner-scoped",
+                authorization="auth",
+            ),
+            scoped_authorization=object(),
+        )
