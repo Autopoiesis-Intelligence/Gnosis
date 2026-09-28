@@ -71,3 +71,34 @@ class CanaryRollback:
             self.reason_digest, self.evidence_digest,
         )).encode()
         return hashlib.sha256(payload).hexdigest()
+
+
+@dataclass(frozen=True)
+class EvolutionOutcome:
+    patch_id: str
+    parent_state_hash: str
+    candidate_state_hash: str
+    decision: CanaryDecision
+    evidence_digest: str
+    outcome_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.patch_id, self.parent_state_hash, self.candidate_state_hash,
+                    self.evidence_digest, self.outcome_digest)):
+            raise ValueError("evolution outcome identity is required")
+        if self.decision is CanaryDecision.OBSERVE:
+            raise ValueError("evolution outcome must be terminal")
+
+    @classmethod
+    def from_commit(cls, observation: CanaryObservation) -> "EvolutionOutcome":
+        if observation.decision is not CanaryDecision.COMMIT or not observation.verified():
+            raise ValueError("commit outcome requires verified canary")
+        return cls(observation.patch_id, observation.parent_state_hash,
+                   observation.candidate_state_hash, observation.decision,
+                   observation.verification_digest, observation.digest())
+
+    @classmethod
+    def from_rollback(cls, rollback: CanaryRollback) -> "EvolutionOutcome":
+        return cls(rollback.patch_id, rollback.parent_state_hash,
+                   rollback.candidate_state_hash, CanaryDecision.ROLLBACK,
+                   rollback.evidence_digest, rollback.digest())
