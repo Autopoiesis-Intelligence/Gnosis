@@ -145,3 +145,51 @@ def test_replay_request_with_same_identity_but_stale_execution_state_is_rejected
     )
     with pytest.raises(ValueError, match="state_id"):
         bridge.step(info, changed, transition, stale_input, request)
+
+
+def test_network_binding_is_checked_at_authorized_execution_boundary():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkRegistry,
+        NetworkRegistryEntry, bind_network_execution,
+    )
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="test"
+    )
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(attachment, "life"))
+    network_request = NetworkExecutionRequest(
+        "network-1", "physics", "simulate", request.authorization_digest()
+    )
+    binding = bind_network_execution(registry, network_request)
+    transition = PsiTransition(lambda x, relations: (x + 1, relations))
+    result = bridge.step(
+        info, psi, transition, execution_input, request,
+        network_binding=binding, allowed_capability="physics",
+    )
+    assert result.psi.x == 1
+
+
+def test_network_binding_cannot_cross_authorization_boundary():
+    from core.evolution_contract import NetworkExecutionRequest, NetworkExecutionBinding
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="test"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "simulate", "foreign-auth"),
+        "core-1", "attachment",
+    )
+    with pytest.raises(ValueError, match="authorization"):
+        bridge.step(
+            info, psi, PsiTransition(lambda x, relations: (x + 1, relations)),
+            execution_input, request, network_binding=binding,
+        )
