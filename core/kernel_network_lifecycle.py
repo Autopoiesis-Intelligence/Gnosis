@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from core.distribution_execution_binding import DistributionExecutionBinding, bind_distribution_to_execution
+from core.capacity_snapshot import CapacitySnapshot
+from core.expansion_evidence import ExpansionEvidence
 from core.execution_contract import ExecutionInput
 from core.kernel_admission_contract import KernelAdmission, admit_kernel
 from core.kernel_distribution_network import KernelDistributionNetwork
@@ -18,6 +20,7 @@ from core.network_expansion_contract import ExpansionRequest, decide_expansion
 @dataclass(frozen=True)
 class KernelLifecycle:
     expansion_request: ExpansionRequest
+    expansion_evidence: ExpansionEvidence
     admission: KernelAdmission
     binding: DistributionExecutionBinding
 
@@ -32,10 +35,12 @@ def expand_and_route(
     workload_digest: str,
     execution_input: ExecutionInput,
 ) -> KernelLifecycle:
+    snapshot = CapacitySnapshot.from_registry(registry, expansion_request.capability)
     expansion = decide_expansion(expansion_request)
+    evidence = ExpansionEvidence.create(expansion_request, snapshot, expansion)
     if not expansion.expand:
         raise ValueError("kernel expansion is not required")
-    if provisioning_request.expansion_request_digest != expansion.request_digest:
+    if provisioning_request.expansion_request_digest != evidence.request_digest:
         raise ValueError("provisioning request is not bound to expansion decision")
 
     provisioning = decide_provisioning(provisioning_request)
@@ -55,4 +60,4 @@ def expand_and_route(
         max_capacity=provisioning_request.required_capacity_units,
     )
     binding = bind_distribution_to_execution(distribution, contract, execution_input)
-    return KernelLifecycle(expansion_request, admission, binding)
+    return KernelLifecycle(expansion_request, evidence, admission, binding)
