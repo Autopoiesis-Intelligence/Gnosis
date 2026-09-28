@@ -23,7 +23,14 @@ class SQLiteHistoryStore:
                 sequence INTEGER PRIMARY KEY, previous_hash TEXT NOT NULL,
                 state_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
                 candidate_hash TEXT NOT NULL, admitted INTEGER NOT NULL CHECK (admitted = 1),
-                evidence_hash TEXT NOT NULL)""")
+                evidence_hash TEXT NOT NULL,
+                kernel_execution_identity TEXT NOT NULL DEFAULT '',
+                evidence_binding_digest TEXT NOT NULL DEFAULT '')""")
+            columns = {row[1] for row in conn.execute("PRAGMA table_info(transition_history)").fetchall()}
+            if "kernel_execution_identity" not in columns:
+                conn.execute("ALTER TABLE transition_history ADD COLUMN kernel_execution_identity TEXT NOT NULL DEFAULT ''")
+            if "evidence_binding_digest" not in columns:
+                conn.execute("ALTER TABLE transition_history ADD COLUMN evidence_binding_digest TEXT NOT NULL DEFAULT ''")
             conn.execute("""CREATE TABLE IF NOT EXISTS audit_history (
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
@@ -32,8 +39,6 @@ class SQLiteHistoryStore:
                 authorization_digest TEXT PRIMARY KEY, sequence INTEGER NOT NULL,
                 state_digest TEXT NOT NULL, candidate_hash TEXT NOT NULL,
                 consumed_event TEXT NOT NULL)""")
-            conn.execute("""CREATE TABLE IF NOT EXISTS durable_metadata (
-                key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS durable_metadata (
                 key TEXT PRIMARY KEY, value TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS provenance_history (
@@ -113,11 +118,6 @@ class SQLiteHistoryStore:
             ).fetchone()
         if row is not None:
             raise ValueError("authorization has already been consumed")
-
-    def _load_initial_state_digest(self) -> str | None:
-        with sqlite3.connect(self.path) as conn:
-            row = conn.execute("SELECT value FROM durable_metadata WHERE key = 'initial_state_digest'").fetchone()
-        return row[0] if row is not None else None
 
     def _load_initial_state_digest(self) -> str | None:
         with sqlite3.connect(self.path) as conn:
