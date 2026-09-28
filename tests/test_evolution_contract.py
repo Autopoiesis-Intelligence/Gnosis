@@ -689,3 +689,24 @@ def test_opportunity_plan_rejects_duplicate_candidates():
     from core.evolution_contract import OpportunityPlan
     with pytest.raises(ValueError, match="unique"):
         OpportunityPlan("opp", ("core-a", "core-a"), "reason")
+
+
+def test_opportunity_plan_lifecycle_requires_approval_before_execution():
+    from core.evolution_contract import OpportunityPlan, OpportunityPlanRecord, OpportunityPlanState
+    record = OpportunityPlanRecord(OpportunityPlan("opp-life", ("core-a",), "reason"))
+    approved = record.advance(OpportunityPlanState.APPROVED)
+    executed = approved.advance(OpportunityPlanState.EXECUTED)
+    assert record.state is OpportunityPlanState.PROPOSED
+    assert approved.state is OpportunityPlanState.APPROVED
+    assert executed.state is OpportunityPlanState.EXECUTED
+    with pytest.raises(ValueError, match="invalid"):
+        record.advance(OpportunityPlanState.EXECUTED)
+
+
+def test_opportunity_plan_rejection_is_terminal():
+    from core.evolution_contract import OpportunityPlan, OpportunityPlanRecord, OpportunityPlanState
+    rejected = OpportunityPlanRecord(
+        OpportunityPlan("opp-reject", ("core-a",), "reason")
+    ).advance(OpportunityPlanState.REJECTED)
+    with pytest.raises(ValueError, match="invalid"):
+        rejected.advance(OpportunityPlanState.APPROVED)
