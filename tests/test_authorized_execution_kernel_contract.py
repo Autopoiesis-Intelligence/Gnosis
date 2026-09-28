@@ -17,6 +17,7 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
     bridge = AuthorizedExecution(CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test"))
     execution_input = ExecutionInput("test", "state", "state-digest", "content-digest")
     request = ExternalExecutionRequest(
+        operation="execute",
         information_id="info",
         content_digest="content-digest",
         purpose="test",
