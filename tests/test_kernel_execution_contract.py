@@ -93,3 +93,46 @@ def test_required_fields_fail_closed(field: str, value: str) -> None:
     values[field] = value
     with pytest.raises(ValueError):
         KernelExecutionContract(**values)
+
+
+def test_execution_rejects_kernel_mismatch_with_distribution():
+    contract = make_contract()
+    execution_input = make_input()
+    decision = DistributionDecision(
+        decision_id="dist-1",
+        selected_kernel_id="other-kernel",
+        capability="math",
+        workload_digest="work",
+        capacity_snapshot_digest="capacity",
+    )
+    try:
+        verify_kernel_execution_contract(
+            contract,
+            execution_input,
+            allowed_kernel_id="kernel-1",
+            allowed_capability="math",
+            distribution_decision=decision,
+        )
+    except ValueError as exc:
+        assert "does not match distribution decision" in str(exc)
+        return
+    raise AssertionError("kernel mismatch must be rejected")
+
+
+def test_execution_accepts_matching_distribution():
+    contract = make_contract()
+    execution_input = make_input()
+    decision = DistributionDecision(
+        decision_id="dist-1",
+        selected_kernel_id="kernel-1",
+        capability="math",
+        workload_digest="work",
+        capacity_snapshot_digest="capacity",
+    )
+    verify_kernel_execution_contract(
+        contract,
+        execution_input,
+        allowed_kernel_id="kernel-1",
+        allowed_capability="math",
+        distribution_decision=decision,
+    )
