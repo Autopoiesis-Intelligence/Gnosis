@@ -11,6 +11,13 @@ class CanaryDecision(str, Enum):
     ROLLBACK = "rollback"
 
 
+_ALLOWED_TRANSITIONS = {
+    CanaryDecision.OBSERVE: frozenset((CanaryDecision.COMMIT, CanaryDecision.ROLLBACK)),
+    CanaryDecision.COMMIT: frozenset(),
+    CanaryDecision.ROLLBACK: frozenset(),
+}
+
+
 @dataclass(frozen=True)
 class CanaryObservation:
     patch_id: str
@@ -32,3 +39,11 @@ class CanaryObservation:
             self.decision.value,
         )).encode()
         return hashlib.sha256(payload).hexdigest()
+
+
+def validate_canary_transition(current: CanaryDecision, requested: CanaryDecision) -> None:
+    """Allow only terminal transitions from an observed canary."""
+    if requested not in _ALLOWED_TRANSITIONS[current]:
+        raise ValueError(
+            f"invalid canary transition: {current.value} -> {requested.value}"
+        )
