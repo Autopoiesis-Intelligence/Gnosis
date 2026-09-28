@@ -514,6 +514,38 @@ class SQLiteHistoryStore:
             )
             conn.commit()
 
+
+    def recover_network_capability_state(self, core_id: str, network_id: str):
+        from .evolution_contract import (
+            NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry
+        )
+        with sqlite3.connect(self.path) as conn:
+            state = conn.execute(
+                """SELECT capability_scope, attachment_state,
+                          attachment_evidence_digest, lifecycle_evidence_digest
+                   FROM network_registry_state
+                   WHERE network_id = ? AND core_id = ?""",
+                (network_id, core_id),
+            ).fetchone()
+            history = conn.execute(
+                """SELECT previous_scope, next_scope
+                   FROM capability_transition_history
+                   WHERE network_id = ? AND core_id = ?
+                   ORDER BY sequence""",
+                (network_id, core_id),
+            ).fetchall()
+        if state is None:
+            return None
+        scope, state_value, attachment_digest, lifecycle_digest = state
+        expected_scope = history[-1][1] if history else None
+        if expected_scope is not None and expected_scope != scope:
+            raise ValueError("network capability state diverges from transition history")
+        return NetworkRegistryEntry(
+            NetworkAttachment(core_id, network_id, scope, attachment_digest),
+            lifecycle_digest,
+            NetworkAttachmentState(state_value),
+        )
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
