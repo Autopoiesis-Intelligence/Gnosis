@@ -900,3 +900,18 @@ def test_active_admitted_core_can_receive_network_binding(tmp_path):
         "network-1", "physics", "simulate", "auth"
     )
     assert binding.core_id == "external-route-active"
+
+
+def test_opportunity_scope_survives_restart(tmp_path):
+    from core.evolution_contract import CoreOrigin, OpportunityScope
+    path = tmp_path / "opportunity.db"
+    scope = OpportunityScope(
+        "opp-durable", "client-1", "partner-1", "network-1", "materials",
+        frozenset({"physics", "chemistry"}),
+        frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL, CoreOrigin.DERIVED}),
+    )
+    store = SQLiteHistoryStore(path)
+    store.persist_opportunity_scope(scope)
+    restored = SQLiteHistoryStore(path).load_opportunity_scope("opp-durable")
+    assert restored == scope
