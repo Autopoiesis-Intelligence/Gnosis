@@ -710,3 +710,42 @@ def test_opportunity_plan_rejection_is_terminal():
     ).advance(OpportunityPlanState.REJECTED)
     with pytest.raises(ValueError, match="invalid"):
         rejected.advance(OpportunityPlanState.APPROVED)
+
+
+def test_approved_opportunity_creates_scoped_execution_authorization():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityPlan, OpportunityPlanRecord,
+        OpportunityPlanState, OpportunityScope, authorize_approved_opportunity,
+    )
+    scope = OpportunityScope(
+        "opp-auth", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    core = CoreAdmission(
+        "core-auth", CoreOrigin.EXTERNAL, "network-1", "physics",
+        "owner-scoped", "core-auth", "verify",
+    )
+    plan = OpportunityPlanRecord(
+        OpportunityPlan("opp-auth", ("core-auth",), "client objective")
+    ).advance(OpportunityPlanState.APPROVED)
+    auth = authorize_approved_opportunity(scope, plan, core, "exec-auth")
+    assert auth.opportunity_id == "opp-auth"
+    assert auth.core_id == "core-auth"
+    assert auth.capability_scope == "physics"
+
+
+def test_unapproved_opportunity_cannot_authorize_execution():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityPlan, OpportunityPlanRecord,
+        OpportunityScope, authorize_approved_opportunity,
+    )
+    scope = OpportunityScope(
+        "opp-no", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    core = CoreAdmission("core-no", CoreOrigin.EXTERNAL, "network-1", "physics", "owner-scoped", "a", "v")
+    plan = OpportunityPlanRecord(OpportunityPlan("opp-no", ("core-no",), "objective"))
+    with pytest.raises(ValueError, match="approved"):
+        authorize_approved_opportunity(scope, plan, core, "exec")
