@@ -262,6 +262,20 @@ class OpportunityScope:
             raise ValueError("opportunity requires allowed core origins")
 
 
+def discover_opportunity_candidates(
+    scope: OpportunityScope,
+    admissions: tuple[CoreAdmission, ...],
+) -> tuple[CoreAdmission, ...]:
+    candidates = tuple(
+        admission for admission in admissions
+        if admission.network_id == scope.network_id
+        and admission.capability_scope in scope.allowed_capabilities
+        and admission.privacy_scope in scope.allowed_privacy_scopes
+        and admission.origin in scope.allowed_core_origins
+    )
+    return tuple(sorted(candidates, key=lambda item: item.core_id))
+
+
 class CoreOrigin(str, Enum):
     INTERNAL = "internal"
     EXTERNAL = "external"
