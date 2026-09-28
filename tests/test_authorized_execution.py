@@ -298,3 +298,38 @@ def test_rehydrated_revoked_route_cannot_reach_authorized_execution(tmp_path):
             restored,
             NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
         )
+
+
+def test_restart_to_authorized_execution_full_path(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+        NetworkRegistrySnapshot,
+    )
+    from core.sqlite_persistence import SQLiteHistoryStore
+    psi = make_psi()
+    bridge = AuthorizedExecution(make_executor())
+    info = make_information(AuthorizationStatus.ALLOWED)
+    execution_input = make_input(psi)
+    request = ExternalExecutionRequest.from_information(
+        info, operation=ExternalOperation.REQUEST,
+        content_digest=execution_input.content_digest, purpose="restart-e2e"
+    )
+    path = tmp_path / "restart-authorized-e2e.db"
+    store = SQLiteHistoryStore(path)
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(
+            NetworkAttachment("core-1", "network-1", "physics", "attach"),
+            "life",
+        )
+    )
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry("network-1", registry)
+    )
+    reopened = SQLiteHistoryStore(path)
+    result = reopened.execute_rehydrated_network_request(
+        info, psi,
+        PsiTransition(lambda x, relations: (x + 1, relations)),
+        execution_input, request,
+        "network-1", "physics", "simulate", bridge,
+    )
+    assert result.psi.x == 1
