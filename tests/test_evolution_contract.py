@@ -370,3 +370,51 @@ def test_capability_transition_requires_actual_change():
     )
     with pytest.raises(ValueError, match="must change"):
         transition_core_capability(entry, "physics", "evidence", "auth")
+
+
+def test_capability_transition_requires_matching_execution_authorization():
+    from core.evolution_contract import (
+        AuthorizedCapabilityTransition, CapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    transition = CapabilityTransition(
+        "core-1", "network-1", "physics", "simulation", "evidence", "auth-1"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth-1"),
+        "core-1", "attachment",
+    )
+    authorized = AuthorizedCapabilityTransition(transition, binding)
+    assert authorized.transition.next_scope == "simulation"
+
+
+def test_capability_transition_rejects_foreign_authorization():
+    from core.evolution_contract import (
+        AuthorizedCapabilityTransition, CapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    transition = CapabilityTransition(
+        "core-1", "network-1", "physics", "simulation", "evidence", "auth-1"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth-2"),
+        "core-1", "attachment",
+    )
+    with pytest.raises(ValueError, match="authorization"):
+        AuthorizedCapabilityTransition(transition, binding)
+
+
+def test_capability_transition_rejects_foreign_core():
+    from core.evolution_contract import (
+        AuthorizedCapabilityTransition, CapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    transition = CapabilityTransition(
+        "core-1", "network-1", "physics", "simulation", "evidence", "auth"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth"),
+        "core-2", "attachment",
+    )
+    with pytest.raises(ValueError, match="core"):
+        AuthorizedCapabilityTransition(transition, binding)
