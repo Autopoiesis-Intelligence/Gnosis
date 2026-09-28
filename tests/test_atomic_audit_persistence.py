@@ -122,7 +122,7 @@ def test_chain_continuity_mutation_fails_closed(tmp_path, mutation):
         elif mutation == "duplicate_sequence":
             with pytest.raises(sqlite3.IntegrityError):
                 conn.execute(
-                    "INSERT INTO transition_history VALUES (2, 's1', 's2', 'k1', 's2', 1, 'e2')"
+                    "INSERT INTO transition_history (sequence, previous_hash, state_hash, kernel_version, candidate_hash, admitted, evidence_hash, kernel_execution_identity, evidence_binding_digest) VALUES (2, 's1', 's2', 'k1', 's2', 1, 'e2', '', '')"
                 )
             return
         elif mutation == "rewrite_previous_hash":
