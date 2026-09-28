@@ -462,6 +462,58 @@ class SQLiteHistoryStore:
                 (core_id, network_id),
             ).fetchall()
 
+
+    def commit_capability_transition_atomically(
+        self, authorized_transition, previous_entry, next_entry
+    ) -> None:
+        transition = authorized_transition.transition
+        binding = authorized_transition.execution_binding
+        if previous_entry.attachment.core_id != transition.core_id:
+            raise ValueError("previous registry entry does not match transition core")
+        if previous_entry.attachment.capability_scope != transition.previous_scope:
+            raise ValueError("previous registry scope does not match transition")
+        if next_entry.attachment.capability_scope != transition.next_scope:
+            raise ValueError("next registry scope does not match transition")
+        if binding.core_id != transition.core_id:
+            raise ValueError("execution binding core does not match transition")
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS network_registry_state (
+                network_id TEXT NOT NULL, core_id TEXT NOT NULL,
+                capability_scope TEXT NOT NULL, attachment_state TEXT NOT NULL,
+                attachment_evidence_digest TEXT NOT NULL,
+                lifecycle_evidence_digest TEXT NOT NULL,
+                PRIMARY KEY (network_id, core_id))
+            """)
+            conn.execute("""CREATE TABLE IF NOT EXISTS capability_transition_history (
+                sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                core_id TEXT NOT NULL, network_id TEXT NOT NULL,
+                previous_scope TEXT NOT NULL, next_scope TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL, authorization_digest TEXT NOT NULL,
+                execution_attachment_digest TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO network_registry_state
+                (network_id, core_id, capability_scope, attachment_state,
+                 attachment_evidence_digest, lifecycle_evidence_digest)
+                VALUES (?, ?, ?, ?, ?, ?)""",
+                (next_entry.attachment.network_id, next_entry.attachment.core_id,
+                 next_entry.attachment.capability_scope,
+                 next_entry.attachment_state.value,
+                 next_entry.attachment.attachment_evidence_digest,
+                 next_entry.lifecycle_evidence_digest),
+            )
+            conn.execute(
+                """INSERT INTO capability_transition_history
+                (core_id, network_id, previous_scope, next_scope,
+                 evidence_digest, authorization_digest, execution_attachment_digest)
+                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (transition.core_id, transition.network_id,
+                 transition.previous_scope, transition.next_scope,
+                 transition.evidence_digest, transition.authorization_digest,
+                 binding.attachment_digest),
+            )
+            conn.commit()
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
