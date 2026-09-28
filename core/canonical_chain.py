@@ -106,19 +106,6 @@ def commit_admitted_psi(
             evolution_evaluation_digest=(evolution_evaluation.digest() if evolution_evaluation else ""),
             kernel_execution_identity=kernel_execution_identity,
             evidence_binding_digest=evidence_binding_digest)
-    kernel_execution_identity = ""
-    evidence_binding_digest = ""
-    if kernel_contract is not None:
-        if execution_input is None:
-            raise ValueError("execution_input is required with kernel_contract")
-        identity = KernelExecutionIdentity.from_contract(kernel_contract, execution_input)
-        kernel_execution_identity = identity.execution_identity
-        evidence_binding_digest = identity.evidence_binding_digest(evidence_hash)
-        record = TransitionRecord(sequence=sequence, previous_hash=previous_hash,
-            state_hash=next_hash, kernel_version=kernel_version,
-            candidate_hash=next_hash, admitted=True, evidence_hash=evidence_hash,
-            kernel_execution_identity=kernel_execution_identity,
-            evidence_binding_digest=evidence_binding_digest)
     provenance = Provenance(candidate_hash=next_hash,
         evidence_hash=evidence_hash, kernel_version=kernel_version)
     return admit_transition(history, record, provenance, previous, canonical.psi,
