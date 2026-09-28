@@ -240,6 +240,44 @@ def validate_core_lifecycle_transition(
 
 
 @dataclass(frozen=True)
+class CoreCreationLifecycle:
+    proposal: CoreCreationProposal
+    record: CoreLifecycleRecord
+
+    def __post_init__(self) -> None:
+        if self.record.parent_core_id != self.proposal.request.parent_core_id:
+            raise ValueError("lifecycle parent does not match creation proposal")
+        if self.record.capability_scope != self.proposal.capability_scope:
+            raise ValueError("lifecycle capability does not match proposal")
+        if self.proposal.request.need_digest == "":
+            raise ValueError("creation proposal must retain need digest")
+
+    @property
+    def need_digest(self) -> str:
+        return self.proposal.request.need_digest
+
+
+def advance_core_creation_lifecycle(
+    current: CoreCreationLifecycle,
+    requested: CoreLifecycle,
+    evidence_digest: str,
+) -> CoreCreationLifecycle:
+    validate_core_lifecycle_transition(current.record.state, requested)
+    if not evidence_digest:
+        raise ValueError("lifecycle evidence is required")
+    return CoreCreationLifecycle(
+        current.proposal,
+        CoreLifecycleRecord(
+            core_id=current.record.core_id,
+            parent_core_id=current.record.parent_core_id,
+            state=requested,
+            capability_scope=current.record.capability_scope,
+            evidence_digest=evidence_digest,
+        ),
+    )
+
+
+@dataclass(frozen=True)
 class CoreLifecycleRecord:
     core_id: str
     parent_core_id: str
