@@ -43,6 +43,21 @@ class KernelExecutionIdentity:
             execution_input_digest=input_digest,
         )
 
+    def evidence_binding_digest(self, evidence_hash: str) -> str:
+        if not evidence_hash.strip():
+            raise ValueError("evidence_hash is required")
+        payload = "|".join(
+            (
+                self.execution_identity,
+                self.kernel_id,
+                self.capability,
+                self.distribution_decision_id,
+                self.execution_input_digest,
+                evidence_hash,
+            )
+        ).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
     def complete(self) -> bool:
         return all(
             (
