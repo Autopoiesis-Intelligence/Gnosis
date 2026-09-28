@@ -694,3 +694,56 @@ def test_recover_network_capability_fails_closed_on_history_divergence(tmp_path)
         SQLiteHistoryStore(path).recover_network_capability_state(
             "core-1", "network-1"
         )
+
+
+def test_rehydrate_network_registry_from_durable_state_rebuilds_active_routes(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry,
+        AuthorizedCapabilityTransition, NetworkExecutionBinding,
+        NetworkExecutionRequest, transition_core_capability,
+    )
+    path = tmp_path / "network-state-rebuild.db"
+    previous = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    next_entry, transition = transition_core_capability(
+        previous, "simulation", "evidence", "auth"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth"),
+        "core-1", previous.attachment.digest(),
+    )
+    SQLiteHistoryStore(path).commit_capability_transition_atomically(
+        AuthorizedCapabilityTransition(transition, binding), previous, next_entry
+    )
+    snapshot, active = SQLiteHistoryStore(path).rehydrate_network_registry_from_state(
+        "network-1"
+    )
+    assert snapshot.network_id == "network-1"
+    assert len(active) == 1
+    assert active[0].attachment.capability_scope == "simulation"
+
+
+def test_rehydrate_network_registry_excludes_detached_state(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState,
+        NetworkRegistryEntry, NetworkRegistrySnapshot,
+    )
+    path = tmp_path / "network-state-detached.db"
+    store = SQLiteHistoryStore(path)
+    with sqlite3.connect(path) as conn:
+        conn.execute("""CREATE TABLE network_registry_state (
+            network_id TEXT NOT NULL, core_id TEXT NOT NULL,
+            capability_scope TEXT NOT NULL, attachment_state TEXT NOT NULL,
+            attachment_evidence_digest TEXT NOT NULL,
+            lifecycle_evidence_digest TEXT NOT NULL,
+            PRIMARY KEY (network_id, core_id))""")
+        conn.execute(
+            "INSERT INTO network_registry_state VALUES (?, ?, ?, ?, ?, ?)",
+            ("network-1", "core-1", "physics", "detached", "attach", "life"),
+        )
+        conn.commit()
+    snapshot, active = store.rehydrate_network_registry_from_state("network-1")
+    assert len(snapshot.entries) == 1
+    assert active == ()
