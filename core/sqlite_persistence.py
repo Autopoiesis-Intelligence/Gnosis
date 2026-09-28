@@ -7,6 +7,7 @@ from .audit_chain import AuditRecord, audit_for_commit, transition_digest, prove
 from .commit_contract import CommitResult
 from .history import AppendOnlyHistory, TransitionRecord
 from .provenance import Provenance
+from .distribution_execution_binding import DistributionExecutionBinding
 FailureInjector = Callable[[str], None]
 
 class SQLiteHistoryStore:
@@ -45,6 +46,7 @@ class SQLiteHistoryStore:
                 sequence INTEGER PRIMARY KEY, candidate_hash TEXT NOT NULL,
                 evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
                 source_ids TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS distribution_execution_binding (sequence INTEGER PRIMARY KEY, decision_id TEXT NOT NULL, decision_digest TEXT NOT NULL, kernel_id TEXT NOT NULL, execution_identity TEXT NOT NULL)""")
             conn.commit()
 
     def _fail(self, point: str) -> None:
@@ -72,6 +74,7 @@ class SQLiteHistoryStore:
         audits = self.load_audit()
         provenances = self.load_provenance()
         consumptions = self.load_authorization_consumption()
+        bindings = self.load_distribution_execution_bindings()
         if not (len(history.records) == len(audits) == len(provenances)):
             raise ValueError("durable evidence cardinality mismatch")
         for i, (record, audit, proof) in enumerate(zip(history.records, audits, provenances)):
@@ -93,12 +96,23 @@ class SQLiteHistoryStore:
                 raise ValueError("durable transition binding mismatch")
             if audit.provenance_hash != provenance_digest(proof):
                 raise ValueError("durable provenance binding mismatch")
+        for sequence, decision_id, decision_digest, kernel_id, execution_identity in bindings:
+            if sequence < 0 or sequence >= len(history.records):
+                raise ValueError("durable distribution binding sequence mismatch")
+            if history.records[sequence].kernel_execution_identity != execution_identity:
+                raise ValueError("durable distribution execution identity mismatch")
+            if not decision_id or not decision_digest or not kernel_id:
+                raise ValueError("durable distribution binding is incomplete")
         self.verify_authorization_consumption(initial_state_digest=initial_state_digest)
         for digest, sequence, state_digest, candidate_hash, event in consumptions:
             if sequence < 0 or sequence >= len(history.records):
                 raise ValueError("durable authorization sequence binding mismatch")
             if candidate_hash != history.records[sequence].candidate_hash:
                 raise ValueError("durable authorization candidate binding mismatch")
+
+    def load_distribution_execution_bindings(self) -> tuple[tuple, ...]:
+        with sqlite3.connect(self.path) as conn:
+            return tuple(conn.execute("SELECT sequence, decision_id, decision_digest, kernel_id, execution_identity FROM distribution_execution_binding ORDER BY sequence").fetchall())
 
     def load_authorization_consumption(self) -> tuple[tuple[str, int, str], ...]:
         with sqlite3.connect(self.path) as conn:
@@ -178,6 +192,7 @@ class SQLiteHistoryStore:
         self, record: TransitionRecord, provenance: Provenance,
         current, next_value, authorization_digest: str | None = None,
         authorization_state_digest: str | None = None,
+        distribution_binding: DistributionExecutionBinding | None = None,
     ) -> CommitResult:
         """Atomically commit History + canonical Audit or commit neither."""
         existing = self.load()
@@ -215,6 +230,10 @@ class SQLiteHistoryStore:
                     conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
                 if record.sequence == 0 and authorization_digest is not None:
                     conn.execute("INSERT OR IGNORE INTO durable_metadata(key, value) VALUES (?, ?)", ("initial_state_digest", authorization_state_digest or record.previous_hash))
+                if distribution_binding is not None:
+                    if distribution_binding.execution_identity != record.kernel_execution_identity:
+                        raise ValueError("distribution binding execution identity mismatch")
+                    conn.execute("INSERT INTO distribution_execution_binding (sequence, decision_id, decision_digest, kernel_id, execution_identity) VALUES (?, ?, ?, ?, ?)", (record.sequence, distribution_binding.decision_id, distribution_binding.decision_digest, distribution_binding.kernel_id, distribution_binding.execution_identity))
                 conn.execute("""INSERT INTO transition_history
                     (sequence, previous_hash, state_hash, kernel_version,
                      candidate_hash, admitted, evidence_hash,
