@@ -26,12 +26,15 @@ class SQLiteHistoryStore:
                 candidate_hash TEXT NOT NULL, admitted INTEGER NOT NULL CHECK (admitted = 1),
                 evidence_hash TEXT NOT NULL,
                 kernel_execution_identity TEXT NOT NULL DEFAULT '',
-                evidence_binding_digest TEXT NOT NULL DEFAULT '')""")
+                evidence_binding_digest TEXT NOT NULL DEFAULT '',
+                evolution_evaluation_digest TEXT NOT NULL DEFAULT '')""")
             columns = {row[1] for row in conn.execute("PRAGMA table_info(transition_history)").fetchall()}
             if "kernel_execution_identity" not in columns:
                 conn.execute("ALTER TABLE transition_history ADD COLUMN kernel_execution_identity TEXT NOT NULL DEFAULT ''")
             if "evidence_binding_digest" not in columns:
                 conn.execute("ALTER TABLE transition_history ADD COLUMN evidence_binding_digest TEXT NOT NULL DEFAULT ''")
+            if "evolution_evaluation_digest" not in columns:
+                conn.execute("ALTER TABLE transition_history ADD COLUMN evolution_evaluation_digest TEXT NOT NULL DEFAULT ''")
             conn.execute("""CREATE TABLE IF NOT EXISTS audit_history (
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
@@ -57,7 +60,7 @@ class SQLiteHistoryStore:
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute("""SELECT sequence, previous_hash, state_hash,
                 kernel_version, candidate_hash, admitted, evidence_hash,
-                kernel_execution_identity, evidence_binding_digest
+                kernel_execution_identity, evidence_binding_digest, evolution_evaluation_digest
                 FROM transition_history ORDER BY sequence""").fetchall()
         history = AppendOnlyHistory()
         for row in rows:
@@ -65,7 +68,7 @@ class SQLiteHistoryStore:
                 sequence=row[0], previous_hash=row[1], state_hash=row[2],
                 kernel_version=row[3], candidate_hash=row[4],
                 admitted=bool(row[5]), evidence_hash=row[6],
-                kernel_execution_identity=row[7], evidence_binding_digest=row[8]))
+                kernel_execution_identity=row[7], evidence_binding_digest=row[8], evolution_evaluation_digest=row[9]))
         return history
 
     def verify_cross_table_consistency(self, *, initial_state_digest: str | None = None) -> None:
@@ -237,12 +240,12 @@ class SQLiteHistoryStore:
                 conn.execute("""INSERT INTO transition_history
                     (sequence, previous_hash, state_hash, kernel_version,
                      candidate_hash, admitted, evidence_hash,
-                     kernel_execution_identity, evidence_binding_digest)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                     kernel_execution_identity, evidence_binding_digest, evolution_evaluation_digest)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (record.sequence, record.previous_hash, record.state_hash,
                      record.kernel_version, record.candidate_hash,
                      int(record.admitted), record.evidence_hash,
-                     record.kernel_execution_identity, record.evidence_binding_digest))
+                     record.kernel_execution_identity, record.evidence_binding_digest, record.evolution_evaluation_digest))
                 self._fail("after_history_before_audit")
                 self._fail("after_history_before_provenance")
                 conn.execute("""INSERT INTO provenance_history
