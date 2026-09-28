@@ -633,6 +633,54 @@ class SQLiteHistoryStore:
 
 
 
+
+    def persist_opportunity_scope(self, scope) -> None:
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS opportunity_scope (
+                opportunity_id TEXT PRIMARY KEY,
+                owner_id TEXT NOT NULL,
+                partner_id TEXT NOT NULL,
+                network_id TEXT NOT NULL,
+                interest_scope TEXT NOT NULL,
+                allowed_capabilities TEXT NOT NULL,
+                allowed_privacy_scopes TEXT NOT NULL,
+                allowed_core_origins TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO opportunity_scope
+                (opportunity_id, owner_id, partner_id, network_id, interest_scope,
+                 allowed_capabilities, allowed_privacy_scopes, allowed_core_origins)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    scope.opportunity_id, scope.owner_id, scope.partner_id,
+                    scope.network_id, scope.interest_scope,
+                    "|".join(sorted(scope.allowed_capabilities)),
+                    "|".join(sorted(scope.allowed_privacy_scopes)),
+                    "|".join(sorted(o.value for o in scope.allowed_core_origins)),
+                ),
+            )
+            conn.commit()
+
+    def load_opportunity_scope(self, opportunity_id: str):
+        from .evolution_contract import CoreOrigin, OpportunityScope
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                """SELECT owner_id, partner_id, network_id, interest_scope,
+                          allowed_capabilities, allowed_privacy_scopes,
+                          allowed_core_origins
+                   FROM opportunity_scope WHERE opportunity_id = ?""",
+                (opportunity_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        owner, partner, network, interest, capabilities, privacy, origins = row
+        return OpportunityScope(
+            opportunity_id, owner, partner, network, interest,
+            frozenset(filter(None, capabilities.split("|"))),
+            frozenset(filter(None, privacy.split("|"))),
+            frozenset(CoreOrigin(v) for v in origins.split("|") if v),
+        )
+
     def persist_core_admission(self, admission) -> None:
         from .evolution_contract import validate_core_admission
         validate_core_admission(
