@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from enum import Enum
-from .evolution_canary import CanaryDecision, CanaryObservation, validate_canary_transition
+from .evolution_canary import CanaryDecision, CanaryObservation, CanaryRollback, validate_canary_transition
 
 
 class EvolutionDecision(str, Enum):
@@ -68,6 +68,30 @@ class EvolutionEvaluation:
         )
         evaluation.validate()
         return evaluation
+
+    @classmethod
+    def from_canary_rollback(
+        cls,
+        patch_id: str,
+        parent_state_hash: str,
+        candidate_state_hash: str,
+        rollback: CanaryRollback,
+    ) -> "EvolutionEvaluation":
+        if rollback.patch_id != patch_id:
+            raise ValueError("rollback patch identity mismatch")
+        if rollback.parent_state_hash != parent_state_hash:
+            raise ValueError("rollback parent state mismatch")
+        if rollback.candidate_state_hash != candidate_state_hash:
+            raise ValueError("rollback candidate state mismatch")
+        return cls(
+            patch_id=patch_id,
+            parent_state_hash=parent_state_hash,
+            candidate_state_hash=candidate_state_hash,
+            expected_effect_digest=rollback.reason_digest,
+            observed_effect_digest=rollback.evidence_digest,
+            verification_digest=rollback.digest(),
+            decision=EvolutionDecision.ROLLBACK,
+        )
 
     def validate(self) -> None:
         if self.decision is EvolutionDecision.COMMIT:
