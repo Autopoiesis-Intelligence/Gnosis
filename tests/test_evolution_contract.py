@@ -594,3 +594,39 @@ def test_core_creation_lifecycle_rejects_wrong_parent():
                 "network-1", "proposal-evidence"
             ),
         )
+
+
+def test_core_admission_supports_internal_external_and_derived_origins():
+    from core.evolution_contract import CoreAdmission, CoreOrigin, validate_core_admission
+    allowed_capabilities = frozenset({"physics", "chemistry"})
+    allowed_privacy = frozenset({"public", "owner-scoped"})
+    for origin in CoreOrigin:
+        admission = CoreAdmission(
+            f"core-{origin.value}", origin, "network-1", "physics",
+            "owner-scoped", "auth", "verified",
+        )
+        validate_core_admission(admission, allowed_capabilities, allowed_privacy)
+
+
+def test_core_admission_rejects_out_of_scope_capability():
+    from core.evolution_contract import CoreAdmission, CoreOrigin, validate_core_admission
+    admission = CoreAdmission(
+        "core-external", CoreOrigin.EXTERNAL, "network-1", "finance",
+        "owner-scoped", "auth", "verified",
+    )
+    with pytest.raises(ValueError, match="capability"):
+        validate_core_admission(
+            admission, frozenset({"physics"}), frozenset({"owner-scoped"})
+        )
+
+
+def test_core_admission_rejects_out_of_scope_privacy():
+    from core.evolution_contract import CoreAdmission, CoreOrigin, validate_core_admission
+    admission = CoreAdmission(
+        "core-external", CoreOrigin.EXTERNAL, "network-1", "physics",
+        "private-all-users", "auth", "verified",
+    )
+    with pytest.raises(ValueError, match="privacy"):
+        validate_core_admission(
+            admission, frozenset({"physics"}), frozenset({"owner-scoped"})
+        )
