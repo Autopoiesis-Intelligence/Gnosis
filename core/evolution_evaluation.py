@@ -37,6 +37,36 @@ class EvolutionEvaluation:
         )):
             raise ValueError("evolution evaluation identity is required")
 
+    @classmethod
+    def from_canary_commit(
+        cls,
+        patch_id: str,
+        parent_state_hash: str,
+        candidate_state_hash: str,
+        expected_effect_digest: str,
+        observation: CanaryObservation,
+    ) -> "EvolutionEvaluation":
+        if observation.decision is not CanaryDecision.COMMIT:
+            raise ValueError("canary must be terminal COMMIT")
+        if observation.patch_id != patch_id:
+            raise ValueError("canary patch identity mismatch")
+        if observation.parent_state_hash != parent_state_hash:
+            raise ValueError("canary parent state mismatch")
+        if observation.candidate_state_hash != candidate_state_hash:
+            raise ValueError("canary candidate state mismatch")
+        evaluation = cls(
+            patch_id=patch_id,
+            parent_state_hash=parent_state_hash,
+            candidate_state_hash=candidate_state_hash,
+            expected_effect_digest=expected_effect_digest,
+            observed_effect_digest=observation.observed_effect_digest,
+            verification_digest=observation.verification_digest,
+            decision=EvolutionDecision.COMMIT,
+            canary_digest=observation.digest(),
+        )
+        evaluation.validate()
+        return evaluation
+
     def validate(self) -> None:
         if self.decision is EvolutionDecision.COMMIT:
             if not self.canary_digest:
