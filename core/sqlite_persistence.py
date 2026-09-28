@@ -138,6 +138,32 @@ class SQLiteHistoryStore:
             ).fetchone()
         return row
 
+    def rehydrate_network_registry(self, network_id: str):
+        from .evolution_contract import (
+            NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+            NetworkRegistryEntry, NetworkRegistrySnapshot,
+        )
+        row = self.load_network_registry_snapshot(network_id)
+        if row is None:
+            return NetworkRegistry()
+        expected_digest, payload = row
+        import ast
+        raw_entries = ast.literal_eval(payload)
+        entries = []
+        for item in raw_entries:
+            core_id, saved_network_id, capability, attachment_evidence, state, lifecycle = item
+            if saved_network_id != network_id:
+                raise ValueError("network snapshot contains foreign network entry")
+            attachment = NetworkAttachment(core_id, saved_network_id, capability, attachment_evidence)
+            entries.append(NetworkRegistryEntry(
+                attachment, lifecycle, NetworkAttachmentState(state)
+            ))
+        registry = NetworkRegistry(tuple(entries))
+        actual = NetworkRegistrySnapshot.from_registry(network_id, registry).snapshot_digest
+        if actual != expected_digest:
+            raise ValueError("network registry snapshot digest mismatch")
+        return registry
+
     def verify_evolution_outcomes(self) -> None:
         history = self.load_evolution_outcomes()
         for i, record in enumerate(history.records):
