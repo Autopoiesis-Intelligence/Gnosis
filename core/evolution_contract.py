@@ -263,6 +263,40 @@ class OpportunityScope:
 
 
 @dataclass(frozen=True)
+@dataclass(frozen=True)
+class ScopedExecutionAuthorization:
+    opportunity_id: str
+    core_id: str
+    capability_scope: str
+    privacy_scope: str
+    authorization_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.opportunity_id, self.core_id, self.capability_scope,
+                    self.privacy_scope, self.authorization_digest)):
+            raise ValueError("scoped execution authorization requires complete identity")
+
+
+def authorize_approved_opportunity(
+    scope: OpportunityScope,
+    plan_record: OpportunityPlanRecord,
+    core: CoreAdmission,
+    authorization_digest: str,
+) -> ScopedExecutionAuthorization:
+    if plan_record.state is not OpportunityPlanState.APPROVED:
+        raise ValueError("opportunity plan must be approved")
+    if core.core_id not in plan_record.plan.candidate_core_ids:
+        raise ValueError("core is not selected by opportunity plan")
+    validate_core_for_opportunity(core, scope)
+    return ScopedExecutionAuthorization(
+        scope.opportunity_id,
+        core.core_id,
+        core.capability_scope,
+        core.privacy_scope,
+        authorization_digest,
+    )
+
+
 class OpportunityPlanState(str, Enum):
     PROPOSED = "proposed"
     APPROVED = "approved"
