@@ -277,6 +277,27 @@ class ScopedExecutionAuthorization:
             raise ValueError("scoped execution authorization requires complete identity")
 
 
+def validate_scoped_execution_authorization(
+    authorization: ScopedExecutionAuthorization,
+    scope: OpportunityScope,
+    admission: CoreAdmission,
+    plan_record: OpportunityPlanRecord,
+) -> None:
+    if plan_record.state is not OpportunityPlanState.APPROVED:
+        raise ValueError("opportunity plan is no longer approved")
+    if authorization.opportunity_id != scope.opportunity_id:
+        raise ValueError("authorization opportunity does not match scope")
+    if authorization.core_id != admission.core_id:
+        raise ValueError("authorization core does not match admission")
+    if authorization.capability_scope != admission.capability_scope:
+        raise ValueError("authorization capability does not match admission")
+    if authorization.privacy_scope != admission.privacy_scope:
+        raise ValueError("authorization privacy does not match admission")
+    if admission.core_id not in plan_record.plan.candidate_core_ids:
+        raise ValueError("authorized core is not selected by current plan")
+    validate_core_for_opportunity(admission, scope)
+
+
 def authorize_approved_opportunity(
     scope: OpportunityScope,
     plan_record: OpportunityPlanRecord,
