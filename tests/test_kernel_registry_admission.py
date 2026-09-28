@@ -35,3 +35,17 @@ def test_registry_descriptor_retains_kernel_provenance():
     assert descriptor.product_hash == kernel.product_hash
     assert descriptor.parent_core_hash == kernel.parent_core_hash
     assert descriptor.kernel_identity_hash == kernel.kernel_identity_hash
+
+
+def test_registry_rejects_tampered_kernel_identity():
+    from dataclasses import replace
+    kernel = _admission()
+    registry = admit_into_registry(KernelRegistry(()), kernel)
+    descriptor = registry.candidates("math")[0]
+    tampered = replace(descriptor, kernel_identity_hash="tampered")
+    try:
+        tampered.verify_provenance()
+    except ValueError as exc:
+        assert "provenance" in str(exc)
+        return
+    raise AssertionError("tampered kernel identity must be rejected")
