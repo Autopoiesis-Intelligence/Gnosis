@@ -136,3 +136,19 @@ def test_execution_accepts_matching_distribution():
         allowed_capability="math",
         distribution_decision=decision,
     )
+
+
+def test_identity_changes_when_distribution_decision_digest_changes():
+    contract = make_contract()
+    execution_input = make_input()
+    decision_a = DistributionDecision(
+        decision_id="dist-1", selected_kernel_id="kernel-1",
+        capability="math", workload_digest="work-a",
+        capacity_snapshot_digest="capacity-a",
+    )
+    decision_b = DistributionDecision(
+        decision_id="dist-1", selected_kernel_id="kernel-1",
+        capability="math", workload_digest="work-b",
+        capacity_snapshot_digest="capacity-a",
+    )
+    assert contract.identity(execution_input, decision_a) != contract.identity(execution_input, decision_b)
