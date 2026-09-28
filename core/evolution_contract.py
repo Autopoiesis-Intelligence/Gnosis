@@ -239,6 +239,42 @@ def validate_core_lifecycle_transition(
         )
 
 
+class CoreOrigin(str, Enum):
+    INTERNAL = "internal"
+    EXTERNAL = "external"
+    DERIVED = "derived"
+
+
+@dataclass(frozen=True)
+class CoreAdmission:
+    core_id: str
+    origin: CoreOrigin
+    network_id: str
+    capability_scope: str
+    privacy_scope: str
+    authorization_digest: str
+    verification_digest: str
+
+    def __post_init__(self) -> None:
+        if not self.core_id or not self.network_id:
+            raise ValueError("core and network identity are required")
+        if not self.capability_scope or not self.privacy_scope:
+            raise ValueError("capability and privacy scopes are required")
+        if not self.authorization_digest or not self.verification_digest:
+            raise ValueError("admission requires authorization and verification")
+
+
+def validate_core_admission(
+    admission: CoreAdmission,
+    allowed_capabilities: frozenset[str],
+    allowed_privacy_scopes: frozenset[str],
+) -> None:
+    if admission.capability_scope not in allowed_capabilities:
+        raise ValueError("core capability is outside admission scope")
+    if admission.privacy_scope not in allowed_privacy_scopes:
+        raise ValueError("core privacy scope is outside admission scope")
+
+
 @dataclass(frozen=True)
 class CoreCreationLifecycle:
     proposal: CoreCreationProposal
