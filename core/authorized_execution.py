@@ -11,6 +11,7 @@ from .execution import CanonicalExecutor, ExecutionResult
 from .execution_contract import ExecutionInput
 from .external_execution_request import ExternalExecutionRequest
 from .information_contract import Information
+from .evolution_contract import NetworkExecutionBinding
 from .kernel_execution_contract import KernelExecutionContract, verify_kernel_execution_contract
 from .psi_transition import PsiTransition
 from .state import Psi
@@ -32,6 +33,7 @@ class AuthorizedExecution:
         kernel_contract: KernelExecutionContract | None = None,
         allowed_kernel_id: str | None = None,
         allowed_capability: str | None = None,
+        network_binding: NetworkExecutionBinding | None = None,
     ) -> ExecutionResult:
         """Authorize external information before canonical execution."""
         if not isinstance(information, Information):
@@ -40,6 +42,13 @@ class AuthorizedExecution:
             raise TypeError("request must be ExternalExecutionRequest.")
 
         information.require_authorized()
+        if network_binding is not None:
+            if network_binding.request.authorization_digest != request.authorization_digest():
+                raise ValueError("network binding authorization does not match execution request")
+            if allowed_capability is not None and network_binding.request.capability_scope != allowed_capability:
+                raise ValueError("network binding capability does not match authorized capability")
+            if not network_binding.core_id:
+                raise ValueError("network execution binding requires core identity")
         if kernel_contract is not None:
             if allowed_kernel_id is None or allowed_capability is None:
                 raise ValueError("kernel authorization policy is required.")
