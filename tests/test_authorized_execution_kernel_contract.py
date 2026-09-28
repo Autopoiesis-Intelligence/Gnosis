@@ -4,7 +4,7 @@ import pytest
 
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
-from core.execution_contract import ExecutionInput, state_digest
+from core.execution_contract import ExecutionInput, execution_input_from_psi
 from core.external_execution_request import ExternalExecutionRequest
 from core.external_operation import ExternalOperation
 from core.history import AppendOnlyHistory
@@ -56,7 +56,7 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
 
 def test_kernel_contract_identity_is_bound_to_transition_record() -> None:
     psi = Psi((), ())
-    execution_input = ExecutionInput("test", state_digest(psi), state_digest(psi), "content-digest")
+    execution_input = execution_input_from_psi(psi, input_type="test", content_digest="content-digest")
     bridge = AuthorizedExecution(
         CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test")
     )
@@ -74,7 +74,7 @@ def test_kernel_contract_identity_is_bound_to_transition_record() -> None:
         authorization=Authorization(
             source="test-source",
             purpose="test",
-            operation="execute",
+            operation=ExternalOperation.REQUEST,
             destination="core",
             status=AuthorizationStatus.ALLOWED,
         ),
