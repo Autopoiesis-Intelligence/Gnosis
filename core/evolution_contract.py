@@ -144,3 +144,44 @@ def core_creation_proposal_from_need(
         authorization_digest=authorization_digest,
         capability_scope=scope,
     )
+
+
+class CoreLifecycle(str, Enum):
+    PROPOSED = "proposed"
+    AUTHORIZED = "authorized"
+    INSTANTIATED = "instantiated"
+    VERIFIED = "verified"
+    NETWORK_ATTACHED = "network_attached"
+
+
+_ALLOWED_CORE_LIFECYCLE = {
+    CoreLifecycle.PROPOSED: frozenset((CoreLifecycle.AUTHORIZED,)),
+    CoreLifecycle.AUTHORIZED: frozenset((CoreLifecycle.INSTANTIATED,)),
+    CoreLifecycle.INSTANTIATED: frozenset((CoreLifecycle.VERIFIED,)),
+    CoreLifecycle.VERIFIED: frozenset((CoreLifecycle.NETWORK_ATTACHED,)),
+    CoreLifecycle.NETWORK_ATTACHED: frozenset(),
+}
+
+
+def validate_core_lifecycle_transition(
+    current: CoreLifecycle, requested: CoreLifecycle
+) -> None:
+    if requested not in _ALLOWED_CORE_LIFECYCLE[current]:
+        raise ValueError(
+            f"invalid core lifecycle transition: "
+            f"{current.value} -> {requested.value}"
+        )
+
+
+@dataclass(frozen=True)
+class CoreLifecycleRecord:
+    core_id: str
+    parent_core_id: str
+    state: CoreLifecycle
+    capability_scope: str
+    evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.core_id, self.parent_core_id,
+                    self.capability_scope, self.evidence_digest)):
+            raise ValueError("core lifecycle identity is required")
