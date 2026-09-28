@@ -97,6 +97,20 @@ class SQLiteHistoryStore:
                 raise
         return self.load_evolution_outcomes()
 
+    def verify_evolution_cross_table_consistency(self) -> None:
+        """Verify committed evolution outcomes are bound to canonical transitions."""
+        outcomes = self.load_evolution_outcomes()
+        transitions = self.load()
+        for outcome in outcomes.records:
+            if outcome.decision != "commit":
+                continue
+            matches = [r for r in transitions.records
+                       if r.evolution_evaluation_digest == outcome.outcome_digest
+                       and r.state_hash == outcome.candidate_state_hash
+                       and r.previous_hash == outcome.parent_state_hash]
+            if len(matches) != 1:
+                raise ValueError("evolution outcome has no unique canonical binding")
+
     def verify_evolution_outcomes(self) -> None:
         history = self.load_evolution_outcomes()
         for i, record in enumerate(history.records):
