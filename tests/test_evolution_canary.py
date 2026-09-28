@@ -63,3 +63,15 @@ def test_commit_evaluation_rejects_non_commit_canary():
         EvolutionEvaluation.from_canary_commit(
             "p1", "parent", "candidate", "expected", o
         )
+
+
+def test_rollback_requires_reason_and_evidence():
+    from core.evolution_canary import CanaryRollback
+    r = CanaryRollback("p1", "parent", "candidate", "reason", "evidence")
+    assert r.digest()
+
+
+def test_rollback_cannot_be_empty_evidence():
+    from core.evolution_canary import CanaryRollback
+    with pytest.raises(ValueError, match="rollback evidence identity"):
+        CanaryRollback("p1", "parent", "candidate", "reason", "")
