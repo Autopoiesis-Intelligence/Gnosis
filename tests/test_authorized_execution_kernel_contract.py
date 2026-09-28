@@ -6,6 +6,7 @@ from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
 from core.execution_contract import ExecutionInput, state_digest
 from core.external_execution_request import ExternalExecutionRequest
+from core.external_operation import ExternalOperation
 from core.history import AppendOnlyHistory
 from core.information_contract import Authorization, AuthorizationStatus, Information
 from core.kernel_execution_contract import KernelExecutionContract
@@ -17,7 +18,7 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
     bridge = AuthorizedExecution(CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test"))
     execution_input = ExecutionInput("test", "state", "state-digest", "content-digest")
     request = ExternalExecutionRequest(
-        operation="execute",
+        operation=ExternalOperation.EXECUTE,
         information_id="info",
         content_digest="content-digest",
         purpose="test",
