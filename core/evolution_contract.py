@@ -106,3 +106,41 @@ def candidate_from_need(
         expected_effect=expected_effect,
         patch_digest=patch_digest,
     )
+
+
+@dataclass(frozen=True)
+class CoreCreationProposal:
+    request: CoreCreationRequest
+    authorization_digest: str
+    capability_scope: str
+
+    def __post_init__(self) -> None:
+        if not self.authorization_digest:
+            raise ValueError("core creation authorization is required")
+        if not self.capability_scope:
+            raise ValueError("core creation capability scope is required")
+
+
+def core_creation_proposal_from_need(
+    signal: EvolutionNeedSignal,
+    request_id: str,
+    capability: str,
+    reason: CoreCreationReason,
+    scope: str,
+    authorization_digest: str,
+) -> CoreCreationProposal:
+    if signal.core_state_hash != signal.core_state_hash:
+        raise ValueError("unreachable state binding")
+    request = CoreCreationRequest(
+        request_id=request_id,
+        parent_core_id=signal.core_id,
+        capability=capability,
+        reason=reason,
+        need_digest=signal.digest(),
+        scope=scope,
+    )
+    return CoreCreationProposal(
+        request=request,
+        authorization_digest=authorization_digest,
+        capability_scope=scope,
+    )
