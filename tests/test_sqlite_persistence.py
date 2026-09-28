@@ -435,3 +435,29 @@ def test_kernel_execution_provenance_survives_restart(tmp_path):
     assert recovered[0].kernel_execution_identity == "exec-id-1"
     assert recovered[0].evidence_binding_digest == "binding-1"
     reopened.verify_cross_table_consistency()
+
+
+def test_tampering_kernel_execution_identity_breaks_durable_audit(tmp_path):
+    path = tmp_path / "tamper-kernel-identity.db"
+    record = TransitionRecord(
+        sequence=0,
+        previous_hash="genesis",
+        state_hash="s0",
+        kernel_version="k1",
+        candidate_hash="s0",
+        admitted=True,
+        evidence_hash="e1",
+        kernel_execution_identity="exec-id-1",
+        evidence_binding_digest="binding-1",
+    )
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    store = SQLiteHistoryStore(path)
+    store.commit_once_with_audit(record, provenance, "current", "next")
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE transition_history SET kernel_execution_identity = ? WHERE sequence = 0",
+            ("tampered",),
+        )
+        conn.commit()
+    with pytest.raises(ValueError, match="durable transition binding mismatch"):
+        SQLiteHistoryStore(path).verify_cross_table_consistency()
