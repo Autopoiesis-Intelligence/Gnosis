@@ -630,3 +630,38 @@ def test_core_admission_rejects_out_of_scope_privacy():
         validate_core_admission(
             admission, frozenset({"physics"}), frozenset({"owner-scoped"})
         )
+
+
+def test_opportunity_candidate_discovery_is_scoped_and_deterministic():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityScope,
+        discover_opportunity_candidates,
+    )
+    scope = OpportunityScope(
+        "opp-discover", "client", "partner", "network-1", "materials",
+        frozenset({"physics", "chemistry"}),
+        frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL, CoreOrigin.DERIVED}),
+    )
+    admissions = (
+        CoreAdmission("z-core", CoreOrigin.EXTERNAL, "network-1", "physics", "owner-scoped", "a", "v"),
+        CoreAdmission("a-core", CoreOrigin.DERIVED, "network-1", "chemistry", "owner-scoped", "a", "v"),
+        CoreAdmission("foreign-network", CoreOrigin.EXTERNAL, "network-2", "physics", "owner-scoped", "a", "v"),
+        CoreAdmission("wrong-privacy", CoreOrigin.EXTERNAL, "network-1", "physics", "public", "a", "v"),
+        CoreAdmission("wrong-capability", CoreOrigin.EXTERNAL, "network-1", "finance", "owner-scoped", "a", "v"),
+    )
+    result = discover_opportunity_candidates(scope, admissions)
+    assert tuple(a.core_id for a in result) == ("a-core", "z-core")
+
+
+def test_opportunity_candidate_discovery_returns_empty_without_match():
+    from core.evolution_contract import CoreAdmission, CoreOrigin, OpportunityScope, discover_opportunity_candidates
+    scope = OpportunityScope(
+        "opp-empty", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    admissions = (
+        CoreAdmission("chem", CoreOrigin.EXTERNAL, "network-1", "chemistry", "owner-scoped", "a", "v"),
+    )
+    assert discover_opportunity_candidates(scope, admissions) == ()
