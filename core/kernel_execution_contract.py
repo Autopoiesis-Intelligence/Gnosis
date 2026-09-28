@@ -32,13 +32,19 @@ class KernelExecutionContract:
         if self.resource_budget < 0:
             raise ValueError("resource_budget must be non-negative.")
 
-    def identity(self, execution_input: ExecutionInput) -> str:
-        """Bind kernel identity to the exact execution input."""
+    def identity(self, execution_input: ExecutionInput, distribution_decision: DistributionDecision | None = None) -> str:
+        """Bind kernel identity to exact input and optional distribution decision."""
+        decision_digest = ""
+        if distribution_decision is not None:
+            if distribution_decision.decision_id != self.distribution_decision_id:
+                raise ValueError("execution distribution decision does not match contract.")
+            decision_digest = distribution_decision.digest()
         payload = "\x1f".join(
             (
                 self.kernel_id,
                 self.capability,
                 self.distribution_decision_id,
+                decision_digest,
                 self.scope,
                 str(self.resource_budget),
                 execution_input.input_type,
