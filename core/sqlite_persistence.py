@@ -634,6 +634,53 @@ class SQLiteHistoryStore:
 
 
 
+
+    def persist_opportunity_plan(self, record) -> None:
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS opportunity_plan (
+                opportunity_id TEXT PRIMARY KEY,
+                candidate_core_ids TEXT NOT NULL,
+                rationale TEXT NOT NULL,
+                approval_required INTEGER NOT NULL,
+                state TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO opportunity_plan
+                (opportunity_id, candidate_core_ids, rationale,
+                 approval_required, state)
+                VALUES (?, ?, ?, ?, ?)""",
+                (
+                    record.plan.opportunity_id,
+                    "|".join(record.plan.candidate_core_ids),
+                    record.plan.rationale,
+                    int(record.plan.approval_required),
+                    record.state.value,
+                ),
+            )
+            conn.commit()
+
+    def load_opportunity_plan(self, opportunity_id: str):
+        from .evolution_contract import (
+            OpportunityPlan, OpportunityPlanRecord, OpportunityPlanState,
+        )
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                """SELECT candidate_core_ids, rationale,
+                          approval_required, state
+                   FROM opportunity_plan WHERE opportunity_id = ?""",
+                (opportunity_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        candidates, rationale, approval_required, state = row
+        plan = OpportunityPlan(
+            opportunity_id,
+            tuple(filter(None, candidates.split("|"))),
+            rationale,
+            bool(approval_required),
+        )
+        return OpportunityPlanRecord(plan, OpportunityPlanState(state))
+
     def persist_opportunity_scope(self, scope) -> None:
         with sqlite3.connect(self.path) as conn:
             conn.execute("""CREATE TABLE IF NOT EXISTS opportunity_scope (
