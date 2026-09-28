@@ -64,3 +64,20 @@ def test_capability_change_changes_execution_identity() -> None:
         make_contract(capability="physics"), execution_input
     )
     assert left != right
+
+
+def test_evidence_binding_is_deterministic() -> None:
+    identity = KernelExecutionIdentity.from_contract(make_contract(), make_input())
+    assert identity.evidence_binding_digest("evidence-1") == identity.evidence_binding_digest("evidence-1")
+
+
+def test_different_evidence_changes_binding_digest() -> None:
+    identity = KernelExecutionIdentity.from_contract(make_contract(), make_input())
+    assert identity.evidence_binding_digest("evidence-1") != identity.evidence_binding_digest("evidence-2")
+
+
+def test_evidence_binding_requires_evidence_hash() -> None:
+    identity = KernelExecutionIdentity.from_contract(make_contract(), make_input())
+    import pytest
+    with pytest.raises(ValueError, match="evidence_hash is required"):
+        identity.evidence_binding_digest(" ")
