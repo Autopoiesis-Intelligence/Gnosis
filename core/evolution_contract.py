@@ -219,3 +219,40 @@ def attach_verified_core(
         capability_scope=lifecycle.capability_scope,
         attachment_evidence_digest=attachment_evidence_digest,
     )
+
+
+@dataclass(frozen=True)
+class NetworkRegistryEntry:
+    attachment: NetworkAttachment
+    lifecycle_evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if not self.lifecycle_evidence_digest:
+            raise ValueError("network registry evidence is required")
+
+
+@dataclass(frozen=True)
+class NetworkRegistry:
+    entries: tuple[NetworkRegistryEntry, ...] = ()
+
+    def register(self, entry: NetworkRegistryEntry) -> "NetworkRegistry":
+        if any(e.attachment.core_id == entry.attachment.core_id
+               and e.attachment.network_id == entry.attachment.network_id
+               for e in self.entries):
+            raise ValueError("core is already registered on network")
+        return NetworkRegistry(self.entries + (entry,))
+
+    def lookup(self, network_id: str, capability_scope: str) -> tuple[NetworkRegistryEntry, ...]:
+        return tuple(
+            e for e in self.entries
+            if e.attachment.network_id == network_id
+            and e.attachment.capability_scope == capability_scope
+        )
+
+    def require_unique_route(
+        self, network_id: str, capability_scope: str
+    ) -> NetworkRegistryEntry:
+        matches = self.lookup(network_id, capability_scope)
+        if len(matches) != 1:
+            raise ValueError("network route must resolve to exactly one core")
+        return matches[0]
