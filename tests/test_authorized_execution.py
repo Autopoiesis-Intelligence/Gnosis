@@ -193,3 +193,47 @@ def test_network_binding_cannot_cross_authorization_boundary():
             info, psi, PsiTransition(lambda x, relations: (x + 1, relations)),
             execution_input, request, network_binding=binding,
         )
+
+
+def test_rehydrated_network_registry_binds_execution_after_restart(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot, bind_network_execution,
+    )
+    from core.sqlite_persistence import SQLiteHistoryStore
+    path = tmp_path / "network-execution-restart.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(attachment, "life"))
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry("network-1", registry)
+    )
+    restored = SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
+    binding = bind_network_execution(
+        restored,
+        NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
+    )
+    assert binding.core_id == "core-1"
+
+
+def test_rehydrated_detached_core_cannot_bind_execution(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
+        NetworkRegistryEntry, NetworkRegistrySnapshot, bind_network_execution,
+    )
+    from core.sqlite_persistence import SQLiteHistoryStore
+    path = tmp_path / "network-execution-detached.db"
+    store = SQLiteHistoryStore(path)
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(attachment, "life", NetworkAttachmentState.DETACHED)
+    )
+    store.save_network_registry_snapshot(
+        NetworkRegistrySnapshot.from_registry("network-1", registry)
+    )
+    restored = SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
+    with pytest.raises(ValueError, match="exactly one core"):
+        bind_network_execution(
+            restored,
+            NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
+        )
