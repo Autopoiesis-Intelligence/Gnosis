@@ -48,6 +48,8 @@ class EvolutionEvaluation:
     ) -> "EvolutionEvaluation":
         if observation.decision is not CanaryDecision.COMMIT:
             raise ValueError("canary must be terminal COMMIT")
+        if not observation.verified():
+            raise ValueError("canary verification evidence is required")
         if observation.patch_id != patch_id:
             raise ValueError("canary patch identity mismatch")
         if observation.parent_state_hash != parent_state_hash:
