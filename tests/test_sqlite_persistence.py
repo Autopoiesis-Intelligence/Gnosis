@@ -570,3 +570,28 @@ def test_network_registry_rehydrate_fails_on_digest_tampering(tmp_path):
         conn.commit()
     with pytest.raises(ValueError, match="digest mismatch"):
         SQLiteHistoryStore(path).rehydrate_network_registry("network-1")
+
+
+def test_capability_transition_history_survives_restart(tmp_path):
+    from core.evolution_contract import (
+        AuthorizedCapabilityTransition, CapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    path = tmp_path / "capability-history.db"
+    transition = CapabilityTransition(
+        "core-1", "network-1", "physics", "simulation",
+        "evidence-1", "auth-1",
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth-1"),
+        "core-1", "attachment-1",
+    )
+    authorized = AuthorizedCapabilityTransition(transition, binding)
+    SQLiteHistoryStore(path).persist_capability_transition(authorized)
+    history = SQLiteHistoryStore(path).load_capability_transitions(
+        "core-1", "network-1"
+    )
+    assert history == [(
+        "core-1", "network-1", "physics", "simulation",
+        "evidence-1", "auth-1", "attachment-1",
+    )]
