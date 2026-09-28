@@ -32,6 +32,9 @@ class CanaryObservation:
                     self.observed_effect_digest, self.verification_digest)):
             raise ValueError("canary observation identity is required")
 
+    def verified(self) -> bool:
+        return bool(self.observed_effect_digest and self.verification_digest)
+
     def digest(self) -> str:
         payload = "|".join((
             self.patch_id, self.parent_state_hash, self.candidate_state_hash,
