@@ -635,6 +635,46 @@ class SQLiteHistoryStore:
 
 
 
+
+    def persist_scoped_execution_authorization(self, authorization) -> None:
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS scoped_execution_authorization (
+                authorization_digest TEXT PRIMARY KEY,
+                opportunity_id TEXT NOT NULL,
+                core_id TEXT NOT NULL,
+                capability_scope TEXT NOT NULL,
+                privacy_scope TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO scoped_execution_authorization
+                (authorization_digest, opportunity_id, core_id,
+                 capability_scope, privacy_scope)
+                VALUES (?, ?, ?, ?, ?)""",
+                (
+                    authorization.authorization_digest,
+                    authorization.opportunity_id,
+                    authorization.core_id,
+                    authorization.capability_scope,
+                    authorization.privacy_scope,
+                ),
+            )
+            conn.commit()
+
+    def load_scoped_execution_authorization(self, authorization_digest: str):
+        from .evolution_contract import ScopedExecutionAuthorization
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                """SELECT opportunity_id, core_id, capability_scope, privacy_scope
+                   FROM scoped_execution_authorization
+                   WHERE authorization_digest = ?""",
+                (authorization_digest,),
+            ).fetchone()
+        if row is None:
+            return None
+        return ScopedExecutionAuthorization(
+            row[0], row[1], row[2], row[3], authorization_digest
+        )
+
     def persist_opportunity_plan(self, record) -> None:
         with sqlite3.connect(self.path) as conn:
             conn.execute("""CREATE TABLE IF NOT EXISTS opportunity_plan (
