@@ -239,6 +239,29 @@ def validate_core_lifecycle_transition(
         )
 
 
+@dataclass(frozen=True)
+class OpportunityScope:
+    opportunity_id: str
+    owner_id: str
+    partner_id: str
+    network_id: str
+    interest_scope: str
+    allowed_capabilities: frozenset[str]
+    allowed_privacy_scopes: frozenset[str]
+    allowed_core_origins: frozenset["CoreOrigin"]
+
+    def __post_init__(self) -> None:
+        if not all((self.opportunity_id, self.owner_id, self.partner_id,
+                    self.network_id, self.interest_scope)):
+            raise ValueError("opportunity scope identity is required")
+        if not self.allowed_capabilities:
+            raise ValueError("opportunity requires at least one capability")
+        if not self.allowed_privacy_scopes:
+            raise ValueError("opportunity requires privacy scopes")
+        if not self.allowed_core_origins:
+            raise ValueError("opportunity requires allowed core origins")
+
+
 class CoreOrigin(str, Enum):
     INTERNAL = "internal"
     EXTERNAL = "external"
