@@ -4,7 +4,7 @@ import pytest
 
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
-from core.execution_contract import ExecutionInput
+from core.execution_contract import ExecutionInput, state_digest
 from core.external_execution_request import ExternalExecutionRequest
 from core.history import AppendOnlyHistory
 from core.information_contract import Authorization, AuthorizationStatus, Information
@@ -51,3 +51,50 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
             allowed_kernel_id="kernel.physics.1",
             allowed_capability="math",
         )
+
+
+def test_kernel_contract_identity_is_bound_to_transition_record() -> None:
+    psi = Psi((), ())
+    execution_input = ExecutionInput("test", "state", state_digest(psi), "content-digest")
+    bridge = AuthorizedExecution(
+        CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test")
+    )
+    request = ExternalExecutionRequest(
+        operation="execute",
+        information_id="info",
+        content_digest="content-digest",
+        purpose="test",
+    )
+    info = Information(
+        information_id="info",
+        source="test-source",
+        content_reference="content-digest",
+        provenance_ref="test-provenance",
+        authorization=Authorization(
+            source="test-source",
+            purpose="test",
+            operation="execute",
+            destination="core",
+            status=AuthorizationStatus.ALLOWED,
+        ),
+    )
+    contract = KernelExecutionContract(
+        kernel_id="kernel.math.1",
+        capability="math",
+        distribution_decision_id="dist-1",
+        scope="test",
+        resource_budget=1,
+    )
+
+    result = bridge.step(
+        info, psi, PsiTransition(lambda x, r: (x, r)),
+        execution_input, request,
+        kernel_contract=contract,
+        allowed_kernel_id="kernel.math.1",
+        allowed_capability="math",
+    )
+
+    record = result.history.head
+    assert record is not None
+    assert record.kernel_execution_identity == contract.identity(execution_input)
+    assert record.evidence_binding_digest
