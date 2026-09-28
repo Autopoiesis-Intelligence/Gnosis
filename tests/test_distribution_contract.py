@@ -40,3 +40,21 @@ def test_distribution_rejects_invalid_capacity():
     except ValueError:
         return
     raise AssertionError("invalid capacity must be rejected")
+
+
+def test_distribution_uses_registry_capability_boundary():
+    from core.kernel_registry import KernelDescriptor, KernelRegistry
+
+    registry = KernelRegistry(
+        (
+            KernelDescriptor("math", ("math",), KernelCapacity("math", 3, 10)),
+            KernelDescriptor("physics", ("physics",), KernelCapacity("physics", 9, 10)),
+        )
+    )
+    decision = decide_distribution(
+        decision_id="dist-registry",
+        capability="physics",
+        workload_digest="work",
+        registry=registry,
+    )
+    assert decision.selected_kernel_id == "physics"
