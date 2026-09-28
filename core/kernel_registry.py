@@ -50,3 +50,6 @@ class KernelRegistry:
 
     def capacities_for(self, capability: str) -> tuple[KernelCapacity, ...]:
         return tuple(kernel.capacity for kernel in self.candidates(capability))
+
+    def candidates_for_kernel(self, kernel_id: str) -> tuple[KernelDescriptor, ...]:
+        return tuple(kernel for kernel in self._kernels if kernel.kernel_id == kernel_id)
