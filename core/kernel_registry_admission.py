@@ -22,6 +22,7 @@ def descriptor_from_admission(admission: KernelAdmission) -> KernelDescriptor:
         parent_core_id=admission.parent_core_id,
         parent_core_hash=admission.parent_core_hash,
         kernel_identity_hash=admission.kernel_identity_hash,
+        provisioning_request_digest=admission.provisioning_request_digest,
     )
 
 
