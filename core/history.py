@@ -1,8 +1,6 @@
 """Append-only causal history contracts."""
 from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import Any
 
 
 @dataclass(frozen=True)
@@ -16,6 +14,7 @@ class TransitionRecord:
     evidence_hash: str = ""
     kernel_execution_identity: str = ""
     evidence_binding_digest: str = ""
+    evolution_evaluation_digest: str = ""
 
     def __post_init__(self) -> None:
         if self.sequence < 0:
