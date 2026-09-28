@@ -15,6 +15,7 @@ from .kernel_execution_contract import KernelExecutionContract
 from .kernel_provenance import KernelExecutionIdentity
 from .safety import SafetyGate
 from .state import Psi
+from .evolution_evaluation import EvolutionDecision, EvolutionEvaluation
 
 @dataclass(frozen=True)
 class CanonicalAdmission:
@@ -67,8 +68,18 @@ def commit_admitted_psi(
     authorization_state_digest=None,
     kernel_contract: KernelExecutionContract | None = None,
     execution_input=None,
+    evolution_evaluation: EvolutionEvaluation | None = None,
 ) -> CommitResult[Psi]:
     candidate = require_admitted(admission)
+    if evolution_evaluation is not None:
+        if evolution_evaluation.patch_id == "":
+            raise ValueError("evolution evaluation patch identity is required")
+        if evolution_evaluation.parent_state_hash != _state_hash(previous):
+            raise ValueError("evolution evaluation parent state mismatch")
+        if evolution_evaluation.candidate_state_hash != _state_hash(candidate):
+            raise ValueError("evolution evaluation candidate state mismatch")
+        if evolution_evaluation.decision is not EvolutionDecision.COMMIT:
+            raise ValueError("only a verified COMMIT evaluation may enter the commit path")
     canonical = canonicalize_psi(candidate)
     head = history.head
     if head is not None and _state_hash(previous) != head.state_hash:
@@ -79,7 +90,8 @@ def commit_admitted_psi(
     evidence_hash = _evidence_hash(admission)
     record = TransitionRecord(sequence=sequence, previous_hash=previous_hash,
         state_hash=next_hash, kernel_version=kernel_version,
-        candidate_hash=next_hash, admitted=True, evidence_hash=evidence_hash)
+        candidate_hash=next_hash, admitted=True, evidence_hash=evidence_hash,
+        evolution_evaluation_digest=(evolution_evaluation.digest() if evolution_evaluation else ""))
     kernel_execution_identity = ""
     evidence_binding_digest = ""
     if kernel_contract is not None:
@@ -91,6 +103,7 @@ def commit_admitted_psi(
         record = TransitionRecord(sequence=sequence, previous_hash=previous_hash,
             state_hash=next_hash, kernel_version=kernel_version,
             candidate_hash=next_hash, admitted=True, evidence_hash=evidence_hash,
+            evolution_evaluation_digest=(evolution_evaluation.digest() if evolution_evaluation else ""),
             kernel_execution_identity=kernel_execution_identity,
             evidence_binding_digest=evidence_binding_digest)
     kernel_execution_identity = ""
