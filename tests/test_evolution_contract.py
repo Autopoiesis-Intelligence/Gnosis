@@ -155,3 +155,31 @@ def test_network_registry_rejects_ambiguous_route():
         registry = registry.register(NetworkRegistryEntry(a, "lifecycle-"+core_id))
     with pytest.raises(ValueError, match="exactly one core"):
         registry.require_unique_route("network-1", "physics")
+
+
+def test_network_execution_binds_to_unique_core_route():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkRegistry,
+        NetworkRegistryEntry, bind_network_execution,
+    )
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    registry = NetworkRegistry().register(NetworkRegistryEntry(attachment, "life"))
+    request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
+    binding = bind_network_execution(registry, request)
+    assert binding.core_id == "core-1"
+    assert binding.request.operation == "simulate"
+    assert binding.attachment_digest == attachment.digest()
+
+
+def test_network_execution_fails_on_ambiguous_route():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkExecutionRequest, NetworkRegistry,
+        NetworkRegistryEntry, bind_network_execution,
+    )
+    registry = NetworkRegistry()
+    for core_id in ("core-1", "core-2"):
+        attachment = NetworkAttachment(core_id, "network-1", "physics", "attach-"+core_id)
+        registry = registry.register(NetworkRegistryEntry(attachment, "life-"+core_id))
+    request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
+    with pytest.raises(ValueError, match="exactly one core"):
+        bind_network_execution(registry, request)
