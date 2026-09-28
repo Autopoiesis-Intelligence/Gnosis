@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable
 from .audit_chain import AuditRecord, audit_for_commit, transition_digest, provenance_digest
 from .commit_contract import CommitResult
-from .history import AppendOnlyHistory, TransitionRecord
+from .history import AppendOnlyHistory, TransitionRecord, EvolutionOutcomeHistory, EvolutionOutcomeRecord
 from .provenance import Provenance
 from .distribution_execution_binding import DistributionExecutionBinding
 FailureInjector = Callable[[str], None]
@@ -35,6 +35,11 @@ class SQLiteHistoryStore:
                 conn.execute("ALTER TABLE transition_history ADD COLUMN evidence_binding_digest TEXT NOT NULL DEFAULT ''")
             if "evolution_evaluation_digest" not in columns:
                 conn.execute("ALTER TABLE transition_history ADD COLUMN evolution_evaluation_digest TEXT NOT NULL DEFAULT ''")
+            conn.execute("""CREATE TABLE IF NOT EXISTS evolution_outcome_history (
+                sequence INTEGER PRIMARY KEY, previous_outcome_digest TEXT NOT NULL,
+                outcome_digest TEXT NOT NULL, patch_id TEXT NOT NULL,
+                parent_state_hash TEXT NOT NULL, candidate_state_hash TEXT NOT NULL,
+                decision TEXT NOT NULL, evidence_digest TEXT NOT NULL)
             conn.execute("""CREATE TABLE IF NOT EXISTS audit_history (
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
@@ -55,6 +60,53 @@ class SQLiteHistoryStore:
     def _fail(self, point: str) -> None:
         if self.failure_injector is not None:
             self.failure_injector(point)
+
+    def load_evolution_outcomes(self) -> EvolutionOutcomeHistory:
+        with sqlite3.connect(self.path) as conn:
+            rows = conn.execute("""SELECT sequence, previous_outcome_digest,
+                outcome_digest, patch_id, parent_state_hash, candidate_state_hash,
+                decision, evidence_digest FROM evolution_outcome_history
+                ORDER BY sequence""").fetchall()
+        history = EvolutionOutcomeHistory()
+        for row in rows:
+            history = history.append(EvolutionOutcomeRecord(*row))
+        return history
+
+    def append_evolution_outcome(self, record: EvolutionOutcomeRecord) -> EvolutionOutcomeHistory:
+        existing = self.load_evolution_outcomes()
+        if existing.records:
+            if record.sequence != existing.head.sequence + 1:
+                raise ValueError("evolution outcome sequence is not contiguous")
+            if record.previous_outcome_digest != existing.head.outcome_digest:
+                raise ValueError("evolution outcome predecessor mismatch")
+        elif record.sequence != 0:
+            raise ValueError("evolution outcome genesis must have sequence zero")
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                conn.execute("""INSERT INTO evolution_outcome_history
+                    (sequence, previous_outcome_digest, outcome_digest, patch_id,
+                     parent_state_hash, candidate_state_hash, decision, evidence_digest)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (record.sequence, record.previous_outcome_digest, record.outcome_digest,
+                     record.patch_id, record.parent_state_hash, record.candidate_state_hash,
+                     record.decision, record.evidence_digest))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        return self.load_evolution_outcomes()
+
+    def verify_evolution_outcomes(self) -> None:
+        history = self.load_evolution_outcomes()
+        for i, record in enumerate(history.records):
+            if record.sequence != i:
+                raise ValueError("evolution outcome sequence is not contiguous")
+            if i == 0:
+                if record.previous_outcome_digest:
+                    raise ValueError("evolution outcome genesis predecessor must be empty")
+            elif record.previous_outcome_digest != history.records[i - 1].outcome_digest:
+                raise ValueError("evolution outcome chain mismatch")
 
     def load(self) -> AppendOnlyHistory:
         with sqlite3.connect(self.path) as conn:
