@@ -609,6 +609,66 @@ class SQLiteHistoryStore:
             allowed_capability=capability_scope,
         )
 
+
+    def persist_core_lifecycle(self, lifecycle) -> None:
+        proposal = lifecycle.proposal
+        record = lifecycle.record
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS core_creation_lifecycle (
+                core_id TEXT PRIMARY KEY,
+                parent_core_id TEXT NOT NULL,
+                state TEXT NOT NULL,
+                capability_scope TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL,
+                need_digest TEXT NOT NULL,
+                authorization_digest TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO core_creation_lifecycle
+                (core_id, parent_core_id, state, capability_scope,
+                 evidence_digest, need_digest, authorization_digest)
+                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (record.core_id, record.parent_core_id, record.state.value,
+                 record.capability_scope, record.evidence_digest,
+                 proposal.request.need_digest, proposal.authorization_digest),
+            )
+            conn.commit()
+
+    def load_core_lifecycle(self, core_id: str):
+        from .evolution_contract import (
+            CoreCreationLifecycle, CoreCreationProposal, CoreCreationRequest,
+            CoreCreationReason, CoreLifecycle, CoreLifecycleRecord,
+        )
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                """SELECT parent_core_id, state, capability_scope,
+                          evidence_digest, need_digest, authorization_digest
+                   FROM core_creation_lifecycle WHERE core_id = ?""",
+                (core_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        parent, state, scope, evidence, need_digest, auth = row
+        request = CoreCreationRequest(
+            request_id=f"recovered:{core_id}",
+            parent_core_id=parent,
+            capability=scope,
+            reason=CoreCreationReason.MISSING_CAPABILITY,
+            need_digest=need_digest,
+            scope=scope,
+        )
+        proposal = CoreCreationProposal(
+            request=request,
+            authorization_digest=auth,
+            capability_scope=scope,
+        )
+        return CoreCreationLifecycle(
+            proposal,
+            CoreLifecycleRecord(
+                core_id, parent, CoreLifecycle(state), scope, evidence
+            ),
+        )
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
