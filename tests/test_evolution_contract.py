@@ -259,3 +259,68 @@ def test_binding_cannot_cross_active_core_route():
     registry = NetworkRegistry().register(NetworkRegistryEntry(a2, "life-2"))
     with pytest.raises(ValueError, match="exactly one core"):
         validate_network_execution_binding(registry, binding)
+
+
+def test_network_registry_routes_distinct_capabilities_to_distinct_cores():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+        NetworkExecutionRequest, bind_network_execution,
+    )
+    physics = NetworkAttachment("core-physics", "network-1", "physics", "attach-p")
+    history = NetworkAttachment("core-history", "network-1", "history", "attach-h")
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(physics, "life-p")
+    ).register(
+        NetworkRegistryEntry(history, "life-h")
+    )
+    physics_binding = bind_network_execution(
+        registry, NetworkExecutionRequest("network-1", "physics", "simulate", "auth-p")
+    )
+    history_binding = bind_network_execution(
+        registry, NetworkExecutionRequest("network-1", "history", "analyze", "auth-h")
+    )
+    assert physics_binding.core_id == "core-physics"
+    assert history_binding.core_id == "core-history"
+
+
+def test_capability_route_does_not_cross_to_other_core():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+        NetworkExecutionRequest, bind_network_execution,
+    )
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(
+            NetworkAttachment("core-physics", "network-1", "physics", "attach"),
+            "life-p",
+        )
+    ).register(
+        NetworkRegistryEntry(
+            NetworkAttachment("core-history", "network-1", "history", "attach"),
+            "life-h",
+        )
+    )
+    with pytest.raises(ValueError, match="exactly one core"):
+        registry.require_unique_route("network-1", "chemistry")
+
+
+def test_same_capability_on_two_active_cores_is_ambiguous():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkRegistry, NetworkRegistryEntry,
+        NetworkExecutionRequest, bind_network_execution,
+    )
+    registry = NetworkRegistry().register(
+        NetworkRegistryEntry(
+            NetworkAttachment("core-1", "network-1", "physics", "a"),
+            "life-1",
+        )
+    ).register(
+        NetworkRegistryEntry(
+            NetworkAttachment("core-2", "network-1", "physics", "b"),
+            "life-2",
+        )
+    )
+    with pytest.raises(ValueError, match="exactly one core"):
+        bind_network_execution(
+            registry,
+            NetworkExecutionRequest("network-1", "physics", "simulate", "auth"),
+        )
