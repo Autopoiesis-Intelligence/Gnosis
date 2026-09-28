@@ -8,6 +8,7 @@ from .admission import admit
 from .commit import commit
 from .execution_contract import ExecutionInput, verify_execution_input
 from .history import AppendOnlyHistory
+from .kernel_execution_contract import KernelExecutionContract
 from .sqlite_persistence import SQLiteHistoryStore
 from .proof import prove_fundamental_transition, prove_transition
 from .psi_transition import PsiTransition
@@ -42,6 +43,7 @@ class CanonicalExecutor:
         test: Tester | None = None,
         authorization_digest: str | None = None,
         authorization_state_digest: str | None = None,
+        kernel_contract: KernelExecutionContract | None = None,
     ) -> ExecutionResult:
         """Own one canonical Psi execution step with fail-closed input binding."""
         if not isinstance(psi, Psi):
@@ -85,6 +87,8 @@ class CanonicalExecutor:
             durable_store=self.durable_store,
             authorization_digest=authorization_digest,
             authorization_state_digest=authorization_state_digest,
+            kernel_contract=kernel_contract,
+            execution_input=execution_input,
         )
         self.history = committed.history
         return ExecutionResult(psi=committed.value, history=committed.history)
