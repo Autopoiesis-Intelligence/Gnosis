@@ -498,3 +498,17 @@ def test_evolution_commit_persists_outcome_and_state_together(tmp_path):
     assert result.committed
     assert len(store.load().records) == 1
     assert store.load_evolution_outcomes().head == outcome
+
+
+def test_evolution_replay_integrity_after_restart(tmp_path):
+    path = tmp_path / "evolution-replay.db"
+    store = SQLiteHistoryStore(path)
+    from core.history import EvolutionOutcomeRecord
+    outcome = EvolutionOutcomeRecord(0, "", "outcome-0", "patch-0", "genesis", "s0", "commit", "evidence-0")
+    record = TransitionRecord(0, "genesis", "s0", "k1", "s0", True, "e1", evolution_evaluation_digest="outcome-0")
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    store.commit_evolution_with_audit(record, provenance, outcome, "current", "s0")
+    reopened = SQLiteHistoryStore(path)
+    reopened.verify_evolution_outcomes()
+    reopened.verify_evolution_cross_table_consistency()
+    assert reopened.load_evolution_outcomes().head == outcome
