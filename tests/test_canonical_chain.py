@@ -226,3 +226,58 @@ def test_identity_validated_candidate_is_atomic_at_durable_commit_boundary(tmp_p
     assert store.load_provenance() == ()
     assert store.load_authorization_consumption() == ()
     store.verify_cross_table_consistency()
+
+
+def _evolution_eval(current, candidate, decision):
+    from core.evolution_evaluation import EvolutionDecision, EvolutionEvaluation
+    return EvolutionEvaluation(
+        "patch-1",
+        state_digest(current),
+        state_digest(candidate),
+        "expected",
+        "observed",
+        "verified",
+        decision,
+    )
+
+
+def test_evolution_commit_rejects_parent_state_substitution():
+    from core.evolution_evaluation import EvolutionDecision
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    other = Psi(x=("other",), relations=())
+    proof = prove_fundamental_transition(current, candidate, lambda _: True)
+    with pytest.raises(ValueError, match="parent state"):
+        commit_admitted_psi(
+            AppendOnlyHistory(), current, admit(candidate, proof),
+            kernel_version="test-v1",
+            evolution_evaluation=_evolution_eval(other, candidate, EvolutionDecision.COMMIT),
+        )
+
+
+def test_evolution_commit_rejects_candidate_state_substitution():
+    from core.evolution_evaluation import EvolutionDecision
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    other = Psi(x=("other",), relations=())
+    proof = prove_fundamental_transition(current, candidate, lambda _: True)
+    with pytest.raises(ValueError, match="candidate state"):
+        commit_admitted_psi(
+            AppendOnlyHistory(), current, admit(candidate, proof),
+            kernel_version="test-v1",
+            evolution_evaluation=_evolution_eval(current, other, EvolutionDecision.COMMIT),
+        )
+
+
+def test_evolution_commit_rejects_non_commit_decision():
+    from core.evolution_evaluation import EvolutionDecision
+    current = Psi(x=("current",), relations=())
+    candidate = Psi(x=("candidate",), relations=())
+    proof = prove_fundamental_transition(current, candidate, lambda _: True)
+    for decision in (EvolutionDecision.REJECT, EvolutionDecision.CANARY, EvolutionDecision.ROLLBACK):
+        with pytest.raises(ValueError, match="verified COMMIT"):
+            commit_admitted_psi(
+                AppendOnlyHistory(), current, admit(candidate, proof),
+                kernel_version="test-v1",
+                evolution_evaluation=_evolution_eval(current, candidate, decision),
+            )
