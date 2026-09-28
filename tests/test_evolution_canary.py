@@ -32,3 +32,34 @@ def test_canary_rejects_direct_observe_to_observe():
     from core.evolution_canary import validate_canary_transition
     with pytest.raises(ValueError, match="invalid canary transition"):
         validate_canary_transition(CanaryDecision.OBSERVE, CanaryDecision.OBSERVE)
+
+
+def test_commit_evaluation_is_derived_from_matching_canary():
+    from core.evolution_evaluation import EvolutionEvaluation
+    o = CanaryObservation("p1", "parent", "candidate", "observed", "verified",
+                          CanaryDecision.COMMIT)
+    e = EvolutionEvaluation.from_canary_commit(
+        "p1", "parent", "candidate", "expected", o
+    )
+    assert e.decision.value == "commit"
+    assert e.canary_digest == o.digest()
+
+
+def test_commit_evaluation_rejects_mismatched_canary():
+    from core.evolution_evaluation import EvolutionEvaluation
+    o = CanaryObservation("other", "parent", "candidate", "observed", "verified",
+                          CanaryDecision.COMMIT)
+    with pytest.raises(ValueError, match="patch identity"):
+        EvolutionEvaluation.from_canary_commit(
+            "p1", "parent", "candidate", "expected", o
+        )
+
+
+def test_commit_evaluation_rejects_non_commit_canary():
+    from core.evolution_evaluation import EvolutionEvaluation
+    o = CanaryObservation("p1", "parent", "candidate", "observed", "verified",
+                          CanaryDecision.ROLLBACK)
+    with pytest.raises(ValueError, match="terminal COMMIT"):
+        EvolutionEvaluation.from_canary_commit(
+            "p1", "parent", "candidate", "expected", o
+        )
