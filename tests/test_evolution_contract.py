@@ -99,3 +99,27 @@ def test_network_attached_is_terminal_for_this_lifecycle():
         validate_core_lifecycle_transition(
             CoreLifecycle.NETWORK_ATTACHED, CoreLifecycle.VERIFIED
         )
+
+
+def test_only_verified_core_can_attach_to_network():
+    from core.evolution_contract import (
+        CoreLifecycle, CoreLifecycleRecord, attach_verified_core,
+    )
+    verified = CoreLifecycleRecord("core-1", "parent-1", CoreLifecycle.VERIFIED,
+                                   "specialized", "verify-evidence")
+    attachment = attach_verified_core(verified, "network-1", "attach-evidence")
+    assert attachment.core_id == "core-1"
+    assert attachment.network_id == "network-1"
+    assert attachment.digest()
+
+
+def test_unverified_core_cannot_attach_to_network():
+    from core.evolution_contract import (
+        CoreLifecycle, CoreLifecycleRecord, attach_verified_core,
+    )
+    for state in (CoreLifecycle.PROPOSED, CoreLifecycle.AUTHORIZED,
+                  CoreLifecycle.INSTANTIATED):
+        record = CoreLifecycleRecord("core-1", "parent-1", state,
+                                     "specialized", "evidence")
+        with pytest.raises(ValueError, match="VERIFIED"):
+            attach_verified_core(record, "network-1", "attach-evidence")
