@@ -368,3 +368,53 @@ class NetworkRegistrySnapshot:
             e for e in self.entries
             if e.attachment_state is NetworkAttachmentState.ATTACHED
         )
+
+
+@dataclass(frozen=True)
+class CapabilityTransition:
+    core_id: str
+    network_id: str
+    previous_scope: str
+    next_scope: str
+    evidence_digest: str
+    authorization_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.core_id, self.network_id, self.previous_scope,
+                    self.next_scope, self.evidence_digest,
+                    self.authorization_digest)):
+            raise ValueError("capability transition evidence is required")
+        if self.previous_scope == self.next_scope:
+            raise ValueError("capability transition must change scope")
+
+
+def transition_core_capability(
+    entry: NetworkRegistryEntry,
+    next_scope: str,
+    evidence_digest: str,
+    authorization_digest: str,
+) -> tuple[NetworkRegistryEntry, CapabilityTransition]:
+    if entry.attachment_state is not NetworkAttachmentState.ATTACHED:
+        raise ValueError("only attached cores may transition capability")
+    transition = CapabilityTransition(
+        core_id=entry.attachment.core_id,
+        network_id=entry.attachment.network_id,
+        previous_scope=entry.attachment.capability_scope,
+        next_scope=next_scope,
+        evidence_digest=evidence_digest,
+        authorization_digest=authorization_digest,
+    )
+    attachment = NetworkAttachment(
+        entry.attachment.core_id,
+        entry.attachment.network_id,
+        next_scope,
+        entry.attachment.attachment_evidence_digest,
+    )
+    return (
+        NetworkRegistryEntry(
+            attachment,
+            entry.lifecycle_evidence_digest,
+            NetworkAttachmentState.ATTACHED,
+        ),
+        transition,
+    )
