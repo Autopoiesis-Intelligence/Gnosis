@@ -19,6 +19,7 @@ def test_kernel_contract_rejects_mismatched_target() -> None:
     request = ExternalExecutionRequest(
         operation="execute",
         information_id="info",
+        content_digest="content-digest",
         purpose="test",
     )
     info = Information(
