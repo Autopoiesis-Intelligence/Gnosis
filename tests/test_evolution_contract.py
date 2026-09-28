@@ -665,3 +665,27 @@ def test_opportunity_candidate_discovery_returns_empty_without_match():
         CoreAdmission("chem", CoreOrigin.EXTERNAL, "network-1", "chemistry", "owner-scoped", "a", "v"),
     )
     assert discover_opportunity_candidates(scope, admissions) == ()
+
+
+def test_opportunity_plan_contains_only_scoped_candidates():
+    from core.evolution_contract import (
+        CoreAdmission, CoreOrigin, OpportunityScope, build_opportunity_plan,
+    )
+    scope = OpportunityScope(
+        "opp-plan", "client", "partner", "network-1", "materials",
+        frozenset({"physics"}), frozenset({"owner-scoped"}),
+        frozenset({CoreOrigin.EXTERNAL}),
+    )
+    candidates = (
+        CoreAdmission("z", CoreOrigin.EXTERNAL, "network-1", "physics", "owner-scoped", "a", "v"),
+        CoreAdmission("bad", CoreOrigin.EXTERNAL, "network-1", "finance", "owner-scoped", "a", "v"),
+    )
+    plan = build_opportunity_plan(scope, candidates, "client materials objective")
+    assert plan.candidate_core_ids == ("z",)
+    assert plan.approval_required is True
+
+
+def test_opportunity_plan_rejects_duplicate_candidates():
+    from core.evolution_contract import OpportunityPlan
+    with pytest.raises(ValueError, match="unique"):
+        OpportunityPlan("opp", ("core-a", "core-a"), "reason")
