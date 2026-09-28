@@ -262,6 +262,34 @@ class OpportunityScope:
             raise ValueError("opportunity requires allowed core origins")
 
 
+@dataclass(frozen=True)
+class OpportunityPlan:
+    opportunity_id: str
+    candidate_core_ids: tuple[str, ...]
+    rationale: str
+    approval_required: bool = True
+
+    def __post_init__(self) -> None:
+        if not self.opportunity_id or not self.rationale:
+            raise ValueError("opportunity plan identity and rationale are required")
+        if not self.candidate_core_ids:
+            raise ValueError("opportunity plan requires candidates")
+        if len(set(self.candidate_core_ids)) != len(self.candidate_core_ids):
+            raise ValueError("opportunity plan candidates must be unique")
+
+
+def build_opportunity_plan(
+    scope: OpportunityScope,
+    candidates: tuple[CoreAdmission, ...],
+    rationale: str,
+) -> OpportunityPlan:
+    allowed = {item.core_id for item in discover_opportunity_candidates(scope, candidates)}
+    selected = tuple(sorted(allowed))
+    if not selected:
+        raise ValueError("no admitted core matches opportunity scope")
+    return OpportunityPlan(scope.opportunity_id, selected, rationale)
+
+
 def discover_opportunity_candidates(
     scope: OpportunityScope,
     admissions: tuple[CoreAdmission, ...],
