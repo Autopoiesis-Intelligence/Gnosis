@@ -25,3 +25,13 @@ def test_duplicate_kernel_admission_is_rejected():
         assert "already admitted" in str(exc)
         return
     raise AssertionError("duplicate kernel admission must be rejected")
+
+
+def test_registry_descriptor_retains_kernel_provenance():
+    kernel = _admission()
+    registry = admit_into_registry(KernelRegistry(()), kernel)
+    descriptor = registry.candidates("math")[0]
+    assert descriptor.product_id == kernel.product_id
+    assert descriptor.product_hash == kernel.product_hash
+    assert descriptor.parent_core_hash == kernel.parent_core_hash
+    assert descriptor.kernel_identity_hash == kernel.kernel_identity_hash
