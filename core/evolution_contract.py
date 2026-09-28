@@ -294,3 +294,32 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
+
+
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
+@dataclass(frozen=True)
+class NetworkAttachmentRecord:
+    attachment: NetworkAttachment
+    state: NetworkAttachmentState
+    state_evidence_digest: str
+
+    def __post_init__(self) -> None:
+        if not self.state_evidence_digest:
+            raise ValueError("attachment state evidence is required")
+
+
+def revoke_network_attachment(
+    record: NetworkAttachmentRecord,
+    state: NetworkAttachmentState,
+    evidence_digest: str,
+) -> NetworkAttachmentRecord:
+    if record.state is not NetworkAttachmentState.ATTACHED:
+        raise ValueError("only attached network entries may be revoked or detached")
+    if state not in (NetworkAttachmentState.DETACHED, NetworkAttachmentState.REVOKED):
+        raise ValueError("attachment must transition to detached or revoked")
+    return NetworkAttachmentRecord(record.attachment, state, evidence_digest)
