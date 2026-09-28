@@ -418,3 +418,17 @@ def transition_core_capability(
         ),
         transition,
     )
+
+
+@dataclass(frozen=True)
+class AuthorizedCapabilityTransition:
+    transition: CapabilityTransition
+    execution_binding: NetworkExecutionBinding
+
+    def __post_init__(self) -> None:
+        if self.transition.core_id != self.execution_binding.core_id:
+            raise ValueError("capability transition core does not match execution binding")
+        if self.transition.network_id != self.execution_binding.request.network_id:
+            raise ValueError("capability transition network does not match execution binding")
+        if self.transition.authorization_digest != self.execution_binding.request.authorization_digest:
+            raise ValueError("capability transition authorization does not match execution binding")
