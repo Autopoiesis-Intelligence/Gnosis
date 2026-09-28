@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from core.kernel_registry import KernelRegistry
+if TYPE_CHECKING:
+    from core.kernel_registry import KernelRegistry
 
 
 @dataclass(frozen=True)
