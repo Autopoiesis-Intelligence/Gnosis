@@ -830,3 +830,31 @@ def test_core_creation_lifecycle_survives_restart(tmp_path):
     assert restored.need_digest == signal.digest()
     assert restored.record.state is CoreLifecycle.AUTHORIZED
     assert restored.proposal.authorization_digest == "auth"
+
+
+def test_core_admission_survives_restart_with_scope(tmp_path):
+    from core.evolution_contract import CoreAdmission, CoreOrigin
+    path = tmp_path / "admission.db"
+    admission = CoreAdmission(
+        "external-1", CoreOrigin.EXTERNAL, "network-1",
+        "physics", "owner-scoped", "auth-1", "verify-1",
+    )
+    store = SQLiteHistoryStore(path)
+    store.persist_core_admission(admission)
+    restored = SQLiteHistoryStore(path).load_core_admission("external-1")
+    assert restored[0] == admission
+    assert restored[1] == "active"
+
+
+def test_revoked_core_admission_stays_revoked_after_restart(tmp_path):
+    from core.evolution_contract import CoreAdmission, CoreOrigin
+    path = tmp_path / "revoked-admission.db"
+    admission = CoreAdmission(
+        "external-2", CoreOrigin.EXTERNAL, "network-1",
+        "physics", "owner-scoped", "auth-2", "verify-2",
+    )
+    store = SQLiteHistoryStore(path)
+    store.persist_core_admission(admission)
+    store.revoke_core_admission("external-2")
+    restored = SQLiteHistoryStore(path).load_core_admission("external-2")
+    assert restored[1] == "revoked"
