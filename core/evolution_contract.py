@@ -263,7 +263,6 @@ class OpportunityScope:
 
 
 @dataclass(frozen=True)
-@dataclass(frozen=True)
 class ScopedExecutionAuthorization:
     opportunity_id: str
     core_id: str
@@ -275,6 +274,20 @@ class ScopedExecutionAuthorization:
         if not all((self.opportunity_id, self.core_id, self.capability_scope,
                     self.privacy_scope, self.authorization_digest)):
             raise ValueError("scoped execution authorization requires complete identity")
+
+
+def validate_core_for_opportunity(
+    admission: CoreAdmission,
+    scope: OpportunityScope,
+) -> None:
+    if admission.network_id != scope.network_id:
+        raise ValueError("core network is outside opportunity scope")
+    if admission.capability_scope not in scope.allowed_capabilities:
+        raise ValueError("core capability is outside opportunity scope")
+    if admission.privacy_scope not in scope.allowed_privacy_scopes:
+        raise ValueError("core privacy scope is outside opportunity privacy scope")
+    if admission.origin not in scope.allowed_core_origins:
+        raise ValueError("core origin is outside opportunity scope")
 
 
 def validate_scoped_execution_authorization(
