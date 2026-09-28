@@ -183,3 +183,35 @@ def test_network_execution_fails_on_ambiguous_route():
     request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
     with pytest.raises(ValueError, match="exactly one core"):
         bind_network_execution(registry, request)
+
+
+def test_network_attachment_can_be_detached_or_revoked():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentRecord, NetworkAttachmentState,
+        revoke_network_attachment,
+    )
+    attachment = NetworkAttachment("core-1", "network-1", "physics", "attach")
+    record = NetworkAttachmentRecord(
+        attachment, NetworkAttachmentState.ATTACHED, "attached-evidence"
+    )
+    detached = revoke_network_attachment(
+        record, NetworkAttachmentState.DETACHED, "detach-evidence"
+    )
+    assert detached.state is NetworkAttachmentState.DETACHED
+    revoked = revoke_network_attachment(
+        record, NetworkAttachmentState.REVOKED, "revoke-evidence"
+    )
+    assert revoked.state is NetworkAttachmentState.REVOKED
+
+
+def test_detached_attachment_cannot_be_revoked_again():
+    from core.evolution_contract import (
+        NetworkAttachment, NetworkAttachmentRecord, NetworkAttachmentState,
+        revoke_network_attachment,
+    )
+    record = NetworkAttachmentRecord(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        NetworkAttachmentState.DETACHED, "detach-evidence"
+    )
+    with pytest.raises(ValueError, match="only attached"):
+        revoke_network_attachment(record, NetworkAttachmentState.REVOKED, "revoke")
