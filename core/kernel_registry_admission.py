@@ -17,6 +17,11 @@ def descriptor_from_admission(admission: KernelAdmission) -> KernelDescriptor:
             admission.capacity_units,
         ),
         enabled=True,
+        product_id=admission.product_id,
+        product_hash=admission.product_hash,
+        parent_core_id=admission.parent_core_id,
+        parent_core_hash=admission.parent_core_hash,
+        kernel_identity_hash=admission.kernel_identity_hash,
     )
 
 
