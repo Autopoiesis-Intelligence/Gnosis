@@ -256,3 +256,41 @@ class NetworkRegistry:
         if len(matches) != 1:
             raise ValueError("network route must resolve to exactly one core")
         return matches[0]
+
+
+@dataclass(frozen=True)
+class NetworkExecutionRequest:
+    network_id: str
+    capability_scope: str
+    operation: str
+    authorization_digest: str
+
+    def __post_init__(self) -> None:
+        if not all((self.network_id, self.capability_scope, self.operation,
+                    self.authorization_digest)):
+            raise ValueError("network execution request identity is required")
+
+
+@dataclass(frozen=True)
+class NetworkExecutionBinding:
+    request: NetworkExecutionRequest
+    core_id: str
+    attachment_digest: str
+
+    def __post_init__(self) -> None:
+        if not self.attachment_digest:
+            raise ValueError("execution attachment binding is required")
+
+
+def bind_network_execution(
+    registry: NetworkRegistry,
+    request: NetworkExecutionRequest,
+) -> NetworkExecutionBinding:
+    entry = registry.require_unique_route(
+        request.network_id, request.capability_scope
+    )
+    return NetworkExecutionBinding(
+        request=request,
+        core_id=entry.attachment.core_id,
+        attachment_digest=entry.attachment.digest(),
+    )
