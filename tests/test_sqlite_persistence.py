@@ -629,3 +629,68 @@ def test_capability_transition_and_registry_state_commit_together(tmp_path):
             "WHERE network_id = ? AND core_id = ?", ("network-1", "core-1")
         ).fetchone()
     assert row == ("simulation", "attached")
+
+
+def test_recover_network_capability_uses_latest_transition(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachmentState, NetworkAttachment, NetworkRegistryEntry,
+        CapabilityTransition, AuthorizedCapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    path = tmp_path / "capability-recovery.db"
+    store = SQLiteHistoryStore(path)
+    previous = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    from core.evolution_contract import transition_core_capability
+    next_entry, transition = transition_core_capability(
+        previous, "simulation", "evidence", "auth"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth"),
+        "core-1", previous.attachment.digest(),
+    )
+    store.commit_capability_transition_atomically(
+        AuthorizedCapabilityTransition(transition, binding), previous, next_entry
+    )
+    restored = SQLiteHistoryStore(path).recover_network_capability_state(
+        "core-1", "network-1"
+    )
+    assert restored.attachment.capability_scope == "simulation"
+
+
+def test_recover_network_capability_fails_closed_on_history_divergence(tmp_path):
+    from core.evolution_contract import (
+        NetworkAttachmentState, NetworkAttachment, NetworkRegistryEntry,
+        CapabilityTransition, AuthorizedCapabilityTransition,
+        NetworkExecutionBinding, NetworkExecutionRequest,
+    )
+    path = tmp_path / "capability-recovery-tamper.db"
+    store = SQLiteHistoryStore(path)
+    previous = NetworkRegistryEntry(
+        NetworkAttachment("core-1", "network-1", "physics", "attach"),
+        "life", NetworkAttachmentState.ATTACHED,
+    )
+    from core.evolution_contract import transition_core_capability
+    next_entry, transition = transition_core_capability(
+        previous, "simulation", "evidence", "auth"
+    )
+    binding = NetworkExecutionBinding(
+        NetworkExecutionRequest("network-1", "physics", "evolve", "auth"),
+        "core-1", previous.attachment.digest(),
+    )
+    store.commit_capability_transition_atomically(
+        AuthorizedCapabilityTransition(transition, binding), previous, next_entry
+    )
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "UPDATE network_registry_state SET capability_scope = ? "
+            "WHERE network_id = ? AND core_id = ?",
+            ("tampered", "network-1", "core-1"),
+        )
+        conn.commit()
+    with pytest.raises(ValueError, match="diverges"):
+        SQLiteHistoryStore(path).recover_network_capability_state(
+            "core-1", "network-1"
+        )
