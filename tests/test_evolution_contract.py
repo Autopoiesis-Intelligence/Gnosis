@@ -536,3 +536,61 @@ def test_core_creation_proposal_rejects_foreign_resolution():
             signal, foreign, "request-3",
             CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-3"
         )
+
+
+def test_core_creation_lifecycle_preserves_originating_need():
+    from core.evolution_contract import (
+        CoreCreationLifecycle, CoreCreationReason, CoreLifecycle,
+        CoreLifecycleRecord, EvolutionNeedSignal, NetworkRegistry,
+        core_creation_proposal_from_resolution, resolve_need_against_network,
+        advance_core_creation_lifecycle,
+    )
+    signal = EvolutionNeedSignal(
+        "need-lifecycle", "parent", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    resolution = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    proposal = core_creation_proposal_from_resolution(
+        signal, resolution, "request-life",
+        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth"
+    )
+    lifecycle = CoreCreationLifecycle(
+        proposal,
+        CoreLifecycleRecord(
+            "core-new", "parent", CoreLifecycle.PROPOSED, "network-1", "proposal-evidence"
+        ),
+    )
+    authorized = advance_core_creation_lifecycle(
+        lifecycle, CoreLifecycle.AUTHORIZED, "authorization-evidence"
+    )
+    assert authorized.need_digest == signal.digest()
+    assert authorized.record.state is CoreLifecycle.AUTHORIZED
+
+
+def test_core_creation_lifecycle_rejects_wrong_parent():
+    from core.evolution_contract import (
+        CoreCreationLifecycle, CoreCreationReason, CoreLifecycle,
+        CoreLifecycleRecord, EvolutionNeedSignal, NetworkRegistry,
+        core_creation_proposal_from_resolution, resolve_need_against_network,
+    )
+    signal = EvolutionNeedSignal(
+        "need-parent", "parent-a", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    resolution = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    proposal = core_creation_proposal_from_resolution(
+        signal, resolution, "request-parent",
+        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth"
+    )
+    with pytest.raises(ValueError, match="parent"):
+        CoreCreationLifecycle(
+            proposal,
+            CoreLifecycleRecord(
+                "core-new", "parent-b", CoreLifecycle.PROPOSED,
+                "network-1", "proposal-evidence"
+            ),
+        )
