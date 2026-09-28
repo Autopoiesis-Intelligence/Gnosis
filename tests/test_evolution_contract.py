@@ -37,3 +37,35 @@ def test_need_signal_requires_evidence_identity():
     with pytest.raises(ValueError, match="need signal identity"):
         EvolutionNeedSignal("signal", "core", "state", "optimization",
                             "analytics", "", "local")
+
+
+def test_need_signal_creates_scoped_core_creation_proposal():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, core_creation_proposal_from_need,
+    )
+    signal = EvolutionNeedSignal(
+        "signal-core", "core-parent", "state-parent", "specialization",
+        "analytics", "evidence", "domain-x"
+    )
+    proposal = core_creation_proposal_from_need(
+        signal, "request-1", "specialized capability",
+        CoreCreationReason.SPECIALIZATION, "domain-x", "auth-digest"
+    )
+    assert proposal.request.parent_core_id == "core-parent"
+    assert proposal.request.need_digest == signal.digest()
+    assert proposal.capability_scope == "domain-x"
+
+
+def test_core_creation_proposal_requires_authorization():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, core_creation_proposal_from_need,
+    )
+    signal = EvolutionNeedSignal(
+        "signal-core", "core-parent", "state-parent", "specialization",
+        "analytics", "evidence", "domain-x"
+    )
+    with pytest.raises(ValueError, match="authorization"):
+        core_creation_proposal_from_need(
+            signal, "request-1", "specialized capability",
+            CoreCreationReason.SPECIALIZATION, "domain-x", ""
+        )
