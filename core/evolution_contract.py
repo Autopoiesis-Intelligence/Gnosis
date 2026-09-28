@@ -263,7 +263,33 @@ class OpportunityScope:
 
 
 @dataclass(frozen=True)
+class OpportunityPlanState(str, Enum):
+    PROPOSED = "proposed"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    EXECUTED = "executed"
+
+
+@dataclass(frozen=True)
+class OpportunityPlanRecord:
+    plan: "OpportunityPlan"
+    state: OpportunityPlanState = OpportunityPlanState.PROPOSED
+
+    def advance(self, target: OpportunityPlanState) -> "OpportunityPlanRecord":
+        allowed = {
+            OpportunityPlanState.PROPOSED: {OpportunityPlanState.APPROVED, OpportunityPlanState.REJECTED},
+            OpportunityPlanState.APPROVED: {OpportunityPlanState.EXECUTED},
+            OpportunityPlanState.REJECTED: set(),
+            OpportunityPlanState.EXECUTED: set(),
+        }
+        if target not in allowed[self.state]:
+            raise ValueError(f"invalid opportunity plan transition: {self.state} -> {target}")
+        return OpportunityPlanRecord(self.plan, target)
+
+
+@dataclass(frozen=True)
 class OpportunityPlan:
+
     opportunity_id: str
     candidate_core_ids: tuple[str, ...]
     rationale: str
