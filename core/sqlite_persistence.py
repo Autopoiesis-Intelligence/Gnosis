@@ -111,6 +111,33 @@ class SQLiteHistoryStore:
             if len(matches) != 1:
                 raise ValueError("evolution outcome has no unique canonical binding")
 
+    def save_network_registry_snapshot(self, snapshot) -> None:
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS network_registry_snapshots (
+                network_id TEXT PRIMARY KEY, snapshot_digest TEXT NOT NULL,
+                payload TEXT NOT NULL)
+            """)
+            payload = repr(tuple(
+                (e.attachment.core_id, e.attachment.network_id,
+                 e.attachment.capability_scope, e.attachment.attachment_evidence_digest,
+                 e.attachment_state.value, e.lifecycle_evidence_digest)
+                for e in snapshot.entries
+            ))
+            conn.execute(
+                "INSERT OR REPLACE INTO network_registry_snapshots "
+                "(network_id, snapshot_digest, payload) VALUES (?, ?, ?)",
+                (snapshot.network_id, snapshot.snapshot_digest, payload),
+            )
+            conn.commit()
+
+    def load_network_registry_snapshot(self, network_id: str):
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                "SELECT snapshot_digest, payload FROM network_registry_snapshots "
+                "WHERE network_id = ?", (network_id,)
+            ).fetchone()
+        return row
+
     def verify_evolution_outcomes(self) -> None:
         history = self.load_evolution_outcomes()
         for i, record in enumerate(history.records):
