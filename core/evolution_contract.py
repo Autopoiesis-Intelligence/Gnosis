@@ -60,3 +60,49 @@ class EvolutionPatchCandidate:
             self.hypothesis, self.expected_effect, self.patch_digest,
         )).encode()
         return hashlib.sha256(payload).hexdigest()
+
+
+@dataclass(frozen=True)
+class EvolutionNeedSignal:
+    signal_id: str
+    core_id: str
+    core_state_hash: str
+    need_type: str
+    analytics_digest: str
+    evidence_digest: str
+    scope: str
+
+    def __post_init__(self) -> None:
+        if not all((self.signal_id, self.core_id, self.core_state_hash,
+                    self.need_type, self.analytics_digest,
+                    self.evidence_digest, self.scope)):
+            raise ValueError("evolution need signal identity is required")
+
+    def digest(self) -> str:
+        payload = "|".join((
+            self.signal_id, self.core_id, self.core_state_hash,
+            self.need_type, self.analytics_digest,
+            self.evidence_digest, self.scope,
+        )).encode()
+        return hashlib.sha256(payload).hexdigest()
+
+
+def candidate_from_need(
+    signal: EvolutionNeedSignal,
+    patch_id: str,
+    hypothesis: str,
+    expected_effect: str,
+    patch_digest: str,
+) -> EvolutionPatchCandidate:
+    if signal.need_type.strip() == "":
+        raise ValueError("need type is required")
+    return EvolutionPatchCandidate(
+        patch_id=patch_id,
+        target_core_id=signal.core_id,
+        target_core_hash=signal.core_state_hash,
+        parent_state_hash=signal.core_state_hash,
+        analytics_digest=signal.analytics_digest,
+        hypothesis=hypothesis,
+        expected_effect=expected_effect,
+        patch_digest=patch_digest,
+    )
