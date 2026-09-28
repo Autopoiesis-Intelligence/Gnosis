@@ -61,7 +61,7 @@ def test_kernel_contract_identity_is_bound_to_transition_record() -> None:
         CanonicalExecutor(history=AppendOnlyHistory(), kernel_version="test")
     )
     request = ExternalExecutionRequest(
-        operation="execute",
+        operation=ExternalOperation.REQUEST,
         information_id="info",
         content_digest="content-digest",
         purpose="test",
