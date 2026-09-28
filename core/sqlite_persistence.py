@@ -610,6 +610,65 @@ class SQLiteHistoryStore:
         )
 
 
+
+    def persist_core_admission(self, admission) -> None:
+        from .evolution_contract import validate_core_admission
+        validate_core_admission(
+            admission,
+            frozenset({admission.capability_scope}),
+            frozenset({admission.privacy_scope}),
+        )
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS core_admission (
+                core_id TEXT PRIMARY KEY,
+                origin TEXT NOT NULL,
+                network_id TEXT NOT NULL,
+                capability_scope TEXT NOT NULL,
+                privacy_scope TEXT NOT NULL,
+                authorization_digest TEXT NOT NULL,
+                verification_digest TEXT NOT NULL,
+                admission_state TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT OR REPLACE INTO core_admission
+                (core_id, origin, network_id, capability_scope, privacy_scope,
+                 authorization_digest, verification_digest, admission_state)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (admission.core_id, admission.origin.value, admission.network_id,
+                 admission.capability_scope, admission.privacy_scope,
+                 admission.authorization_digest, admission.verification_digest,
+                 "active"),
+            )
+            conn.commit()
+
+    def revoke_core_admission(self, core_id: str) -> None:
+        with sqlite3.connect(self.path) as conn:
+            conn.execute(
+                "UPDATE core_admission SET admission_state = ? WHERE core_id = ?",
+                ("revoked", core_id),
+            )
+            conn.commit()
+
+    def load_core_admission(self, core_id: str):
+        from .evolution_contract import CoreAdmission, CoreOrigin
+        with sqlite3.connect(self.path) as conn:
+            row = conn.execute(
+                """SELECT origin, network_id, capability_scope, privacy_scope,
+                          authorization_digest, verification_digest, admission_state
+                   FROM core_admission WHERE core_id = ?""",
+                (core_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        origin, network_id, capability, privacy, auth, verification, state = row
+        admission = CoreAdmission(
+            core_id, CoreOrigin(origin), network_id, capability, privacy,
+            auth, verification,
+        )
+        if state == "revoked":
+            return admission, "revoked"
+        return admission, "active"
+
     def persist_core_lifecycle(self, lifecycle) -> None:
         proposal = lifecycle.proposal
         record = lifecycle.record
