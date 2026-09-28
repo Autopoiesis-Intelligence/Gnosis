@@ -411,3 +411,27 @@ def test_commit_fails_closed_when_genesis_authorization_state_is_tampered(tmp_pa
             "s0",
             "s1",
         )
+
+
+def test_kernel_execution_provenance_survives_restart(tmp_path):
+    path = tmp_path / "kernel-provenance.db"
+    record = TransitionRecord(
+        sequence=0,
+        previous_hash="genesis",
+        state_hash="s0",
+        kernel_version="k1",
+        candidate_hash="s0",
+        admitted=True,
+        evidence_hash="e1",
+        kernel_execution_identity="exec-id-1",
+        evidence_binding_digest="binding-1",
+    )
+    provenance = Provenance("s0", "e1", "k1", ("source",))
+    SQLiteHistoryStore(path).commit_once_with_audit(record, provenance, "current", "next")
+
+    reopened = SQLiteHistoryStore(path)
+    recovered = reopened.load().records
+    assert recovered == (record,)
+    assert recovered[0].kernel_execution_identity == "exec-id-1"
+    assert recovered[0].evidence_binding_digest == "binding-1"
+    reopened.verify_cross_table_consistency()
