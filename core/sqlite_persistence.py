@@ -423,6 +423,45 @@ class SQLiteHistoryStore:
             raise ValueError("durable triple cardinality mismatch")
         return CommitResult(next_value, durable, True)
 
+
+    def persist_capability_transition(self, authorized_transition) -> None:
+        transition = authorized_transition.transition
+        binding = authorized_transition.execution_binding
+        with sqlite3.connect(self.path) as conn:
+            conn.execute("""CREATE TABLE IF NOT EXISTS capability_transition_history (
+                sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                core_id TEXT NOT NULL,
+                network_id TEXT NOT NULL,
+                previous_scope TEXT NOT NULL,
+                next_scope TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL,
+                authorization_digest TEXT NOT NULL,
+                execution_attachment_digest TEXT NOT NULL)
+            """)
+            conn.execute(
+                """INSERT INTO capability_transition_history
+                (core_id, network_id, previous_scope, next_scope,
+                 evidence_digest, authorization_digest, execution_attachment_digest)
+                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (transition.core_id, transition.network_id,
+                 transition.previous_scope, transition.next_scope,
+                 transition.evidence_digest, transition.authorization_digest,
+                 binding.attachment_digest),
+            )
+            conn.commit()
+
+    def load_capability_transitions(self, core_id: str, network_id: str):
+        with sqlite3.connect(self.path) as conn:
+            return conn.execute(
+                """SELECT core_id, network_id, previous_scope, next_scope,
+                          evidence_digest, authorization_digest,
+                          execution_attachment_digest
+                   FROM capability_transition_history
+                   WHERE core_id = ? AND network_id = ?
+                   ORDER BY sequence""",
+                (core_id, network_id),
+            ).fetchall()
+
     def commit_evolution_with_audit(
         self, record: TransitionRecord, provenance: Provenance,
         evolution_outcome: EvolutionOutcomeRecord, current, next_value,
