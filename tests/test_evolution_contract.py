@@ -53,7 +53,9 @@ def test_need_signal_creates_scoped_core_creation_proposal():
     )
     assert proposal.request.parent_core_id == "core-parent"
     assert proposal.request.need_digest == signal.digest()
-    assert proposal.capability_scope == "domain-x"
+    assert proposal.request.capability == "specialized capability"
+    assert proposal.request.scope == "domain-x"
+    assert proposal.capability_scope == "specialized capability"
 
 
 def test_core_creation_proposal_requires_authorization():
@@ -473,6 +475,27 @@ def test_need_resolution_rejects_ambiguous_existing_capability():
         resolve_need_against_network(
             signal, "network-1", "physics", registry
         )
+
+
+def test_core_creation_proposal_preserves_capability_when_scope_differs():
+    from core.evolution_contract import (
+        CoreCreationReason, EvolutionNeedSignal, NetworkRegistry,
+        core_creation_proposal_from_resolution, resolve_need_against_network,
+    )
+    signal = EvolutionNeedSignal(
+        "need-separation", "parent", "state", "chemistry",
+        "analytics", "evidence", "research",
+    )
+    resolution = resolve_need_against_network(
+        signal, "network-1", "chemistry", NetworkRegistry()
+    )
+    proposal = core_creation_proposal_from_resolution(
+        signal, resolution, "request-separation",
+        CoreCreationReason.SPECIALIZATION, "network-1", "auth",
+    )
+    assert proposal.request.capability == "chemistry"
+    assert proposal.request.scope == "network-1"
+    assert proposal.capability_scope == "chemistry"
 
 
 def test_core_creation_proposal_requires_create_resolution():
