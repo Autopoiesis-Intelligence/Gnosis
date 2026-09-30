@@ -600,12 +600,6 @@ def bind_network_execution(
     )
 
 
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
-
-
 @dataclass(frozen=True)
 class NetworkAttachmentRecord:
     attachment: NetworkAttachment
