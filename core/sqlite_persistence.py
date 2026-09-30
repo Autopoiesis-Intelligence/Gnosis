@@ -519,7 +519,8 @@ class SQLiteHistoryStore:
             conn.commit()
 
     def recover_network_capability_state(self, core_id: str, network_id: str):
-        self._ensure_network_capability_schema()\n        from .evolution_contract import (
+        self._ensure_network_capability_schema()
+        from .evolution_contract import (
             NetworkAttachment, NetworkAttachmentState, NetworkRegistryEntry
         )
         with sqlite3.connect(self.path) as conn:
@@ -551,7 +552,8 @@ class SQLiteHistoryStore:
 
 
     def rehydrate_network_registry_from_state(self, network_id: str):
-        self._ensure_network_capability_schema()\n        from .evolution_contract import NetworkRegistrySnapshot
+        self._ensure_network_capability_schema()
+        from .evolution_contract import NetworkRegistrySnapshot
         with sqlite3.connect(self.path) as conn:
             rows = conn.execute(
                 """SELECT core_id, capability_scope, attachment_state,
