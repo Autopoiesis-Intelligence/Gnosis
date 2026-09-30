@@ -491,7 +491,7 @@ def test_core_creation_proposal_preserves_capability_when_scope_differs():
     )
     proposal = core_creation_proposal_from_resolution(
         signal, resolution, "request-separation",
-        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth",
+        CoreCreationReason.SPECIALIZATION, "network-1", "auth",
     )
     assert proposal.request.capability == "chemistry"
     assert proposal.request.scope == "network-1"
