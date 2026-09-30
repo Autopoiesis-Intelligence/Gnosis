@@ -486,6 +486,12 @@ class CoreLifecycleRecord:
             raise ValueError("core lifecycle identity is required")
 
 
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 @dataclass(frozen=True)
 class NetworkAttachment:
     core_id: str
@@ -598,12 +604,6 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
-
-
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
 
 
 @dataclass(frozen=True)
