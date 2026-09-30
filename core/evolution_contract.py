@@ -160,8 +160,8 @@ def core_creation_proposal_from_resolution(
         raise ValueError("need resolution does not match signal")
     if resolution.action != "create":
         raise ValueError("core creation requires a create resolution")
-    if resolution.capability_scope != signal.required_capability:
-        raise ValueError("resolution capability does not match need")
+    if not resolution.capability_scope:
+        raise ValueError("resolution capability is required")
     if resolution.network_id == "" or scope == "":
         raise ValueError("network and scope are required")
     return core_creation_proposal_from_need(
@@ -486,6 +486,12 @@ class CoreLifecycleRecord:
             raise ValueError("core lifecycle identity is required")
 
 
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 @dataclass(frozen=True)
 class NetworkAttachment:
     core_id: str
@@ -598,12 +604,6 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
-
-
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
 
 
 @dataclass(frozen=True)

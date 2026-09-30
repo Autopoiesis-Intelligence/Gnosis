@@ -40,6 +40,7 @@ class SQLiteHistoryStore:
                 outcome_digest TEXT NOT NULL, patch_id TEXT NOT NULL,
                 parent_state_hash TEXT NOT NULL, candidate_state_hash TEXT NOT NULL,
                 decision TEXT NOT NULL, evidence_digest TEXT NOT NULL)
+            """)
             conn.execute("""CREATE TABLE IF NOT EXISTS audit_history (
                 sequence INTEGER PRIMARY KEY, transition_hash TEXT NOT NULL,
                 previous_audit_hash TEXT NOT NULL, provenance_hash TEXT NOT NULL,
