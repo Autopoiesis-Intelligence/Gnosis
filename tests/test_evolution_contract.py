@@ -489,7 +489,7 @@ def test_core_creation_proposal_requires_create_resolution():
     )
     proposal = core_creation_proposal_from_resolution(
         signal, resolution, "request-1",
-        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-1"
+        CoreCreationReason.NEW_CAPABILITY, "network-1", "auth-1"
     )
     assert proposal.request.need_digest == signal.digest()
     assert proposal.request.capability == "chemistry"
@@ -515,7 +515,7 @@ def test_core_creation_proposal_rejects_reuse_resolution():
     with pytest.raises(ValueError, match="create resolution"):
         core_creation_proposal_from_resolution(
             signal, resolution, "request-2",
-            CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-2"
+            CoreCreationReason.NEW_CAPABILITY, "network-1", "auth-2"
         )
 
 
@@ -534,7 +534,7 @@ def test_core_creation_proposal_rejects_foreign_resolution():
     with pytest.raises(ValueError, match="does not match signal"):
         core_creation_proposal_from_resolution(
             signal, foreign, "request-3",
-            CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth-3"
+            CoreCreationReason.NEW_CAPABILITY, "network-1", "auth-3"
         )
 
 
@@ -554,7 +554,7 @@ def test_core_creation_lifecycle_preserves_originating_need():
     )
     proposal = core_creation_proposal_from_resolution(
         signal, resolution, "request-life",
-        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth"
+        CoreCreationReason.NEW_CAPABILITY, "network-1", "auth"
     )
     lifecycle = CoreCreationLifecycle(
         proposal,
@@ -584,7 +584,7 @@ def test_core_creation_lifecycle_rejects_wrong_parent():
     )
     proposal = core_creation_proposal_from_resolution(
         signal, resolution, "request-parent",
-        CoreCreationReason.MISSING_CAPABILITY, "network-1", "auth"
+        CoreCreationReason.NEW_CAPABILITY, "network-1", "auth"
     )
     with pytest.raises(ValueError, match="parent"):
         CoreCreationLifecycle(
