@@ -487,6 +487,12 @@ class CoreLifecycleRecord:
 
 
 @dataclass(frozen=True)
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 class NetworkAttachment:
     core_id: str
     network_id: str
@@ -598,12 +604,6 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
-
-
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
 
 
 @dataclass(frozen=True)
