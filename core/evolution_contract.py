@@ -486,6 +486,12 @@ class CoreLifecycleRecord:
             raise ValueError("core lifecycle identity is required")
 
 
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 @dataclass(frozen=True)
 class NetworkAttachment:
     core_id: str
