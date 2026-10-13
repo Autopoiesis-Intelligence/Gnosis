@@ -1,4 +1,4 @@
-# Gnozis State Pointer
+# Gnosis State Pointer
 
 The authoritative living project state is now `PROJECT_STATE.md`.
 

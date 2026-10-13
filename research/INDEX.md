@@ -1,10 +1,10 @@
-# Gnozis Research Library — Machine-Readable Index
+# Gnosis Research Library — Machine-Readable Index
 
 ## Repository role
-This repository is the public research library for Gnozis. It preserves research, reverse-analysis, mathematical models, experiments, historical implementations and provenance. It is not the canonical production Core.
+This repository is the public research library for Gnosis. It preserves research, reverse-analysis, mathematical models, experiments, historical implementations and provenance. It is not the canonical production Core.
 
 ## Canonical lineage
-Research Library → Gnozis Core → specialized research kernels → user/commercial versions.
+Research Library → Gnosis Core → specialized research kernels → user/commercial versions.
 
 ## Admission rule
 Research does not become Core functionality merely by being documented. The engineering path is:

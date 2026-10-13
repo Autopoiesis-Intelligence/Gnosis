@@ -1,4 +1,4 @@
-# GNOZIS — ROADMAP
+# GNOSIS — ROADMAP
 
 ## Stage 0 — Project memory
 **Status: completed in this audit.**
@@ -55,7 +55,7 @@ Maintain separate research tracks for mathematical/physical hypotheses. No physi
 
 The project succeeds at this stage if a new model can open the repository and, without relying on old chat history, determine:
 
-1. what Gnozis currently is;
+1. what Gnosis currently is;
 2. what it used to be;
 3. why major changes occurred;
 4. what is actually implemented;

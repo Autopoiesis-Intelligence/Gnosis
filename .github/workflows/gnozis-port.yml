@@ -1,4 +1,4 @@
-name: Gnozis Port CI
+name: Gnosis Port CI
 
 on:
   workflow_dispatch:

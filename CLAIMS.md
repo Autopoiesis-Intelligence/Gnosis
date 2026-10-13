@@ -1,4 +1,4 @@
-# GNOZIS — CLAIM STATUS
+# GNOSIS — CLAIM STATUS
 
 This file prevents hypotheses, observations and implementation facts from being mixed.
 
@@ -37,7 +37,7 @@ This file prevents hypotheses, observations and implementation facts from being 
 
 ## D — Physics / mathematical research tracks
 
-The following must not be presented as established results of Gnozis without separate derivations and reproducible evidence:
+The following must not be presented as established results of Gnosis without separate derivations and reproducible evidence:
 
 - Born rule;
 - Bell/nonlocal correlations;

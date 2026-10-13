@@ -1,14 +1,14 @@
-# GNOZIS
+# GNOSIS
 
 ## Public registry of machine-generated opportunities, contracts and evidence
 
-**Gnozis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
+**Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
 The production factory behind this surface is **Genesis**. Genesis is intended to remain a protected engineering environment rather than the primary public interface.
 
-Gnozis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
+Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
-> **Genesis produces. Gnozis exposes, verifies and records.**
+> **Genesis produces. Gnosis exposes, verifies and records.**
 
 ---
 
@@ -28,7 +28,7 @@ Gnozis is where selected outputs become inspectable: proposals, contracts, modul
                     verification
                            │
                            ▼
-                        GNOZIS
+                        GNOSIS
                  public product surface
                            │
         ┌──────────────────┼──────────────────┐
@@ -48,7 +48,7 @@ The public repository is therefore not intended to expose the protected factory 
 
 ---
 
-## What Gnozis is building
+## What Gnosis is building
 
 The long-term product direction is a controlled machine-production cycle:
 
@@ -85,7 +85,7 @@ Creating autonomous modules does **not** automatically grant the factory permiss
 
 ## Public opportunity catalogue
 
-Gnozis is intended to expose machine-generated opportunities in a form that testers, researchers, partners and potential investors can inspect.
+Gnosis is intended to expose machine-generated opportunities in a form that testers, researchers, partners and potential investors can inspect.
 
 A proposal can progress through evidence stages such as:
 
@@ -137,7 +137,7 @@ The exact registry schema and status vocabulary are part of the evolving product
 
 ## Contracts
 
-A Gnozis contract is a machine-readable description of a proposed capability, module, partnership or other bounded commitment.
+A Gnosis contract is a machine-readable description of a proposed capability, module, partnership or other bounded commitment.
 
 A contract may include:
 
@@ -169,7 +169,7 @@ A hash identifies a specific artifact or evidence state. It does not by itself p
 
 ## Evidence before claims
 
-Gnozis separates:
+Gnosis separates:
 
 ```text
 Documentation
@@ -250,7 +250,7 @@ Unknown provenance or unknown permission is not treated as permission by default
 
 ## Research-Memory
 
-**Gnozis-Research-Memory** is the machine-readable research and context layer associated with the product.
+**Gnosis-Memory** is the machine-readable research and context layer associated with the product.
 
 Its role is to preserve and organize:
 
@@ -267,7 +267,7 @@ Research-Memory is **not itself the authority for changing Genesis**. It supplie
 The intended relationship is:
 
 ```text
-Gnozis-Research-Memory
+Gnosis-Memory
           ↓
  candidate knowledge / evidence
           ↓
@@ -277,7 +277,7 @@ Gnozis-Research-Memory
           ↓
      generated outputs
           ↓
-       Gnozis
+       Gnosis
 ```
 
 ---
@@ -286,7 +286,7 @@ Gnozis-Research-Memory
 
 The product deliberately separates public visibility from protected execution.
 
-### Public: Gnozis
+### Public: Gnosis
 
 - opportunity catalogue;
 - contracts;
@@ -296,7 +296,7 @@ The product deliberately separates public visibility from protected execution.
 - research-facing materials;
 - partnership surface.
 
-### Research: Gnozis-Research-Memory
+### Research: Gnosis-Memory
 
 - machine-readable research;
 - historical context;
@@ -370,6 +370,6 @@ For implementation status and evidence, consult the current repository artifacts
 FACTORY → produces candidates
 EVIDENCE → establishes what happened
 CONTRACT → defines what is allowed
-GNOZIS → exposes verified opportunities
+GNOSIS → exposes verified opportunities
 PARTNERS → decide what to adopt
 ```
