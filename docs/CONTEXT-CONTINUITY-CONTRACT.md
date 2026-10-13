@@ -20,4 +20,4 @@ An authorized user can continue work across sessions, devices and connected AI i
 - Restoring context does not restore trusted authority.
 - Missing or conflicting context must be represented explicitly, not silently guessed.
 - A connected AI is a consumer/orchestrator of context, not the owner of Core authority.
-- Context references may point to Research-Memory or downstream surfaces without making those surfaces trusted Core sources.
+- Context references may point to Gnosis-Memory or downstream surfaces without making those surfaces trusted Core sources.
