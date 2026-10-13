@@ -1,6 +1,7 @@
 import pytest
 
 from core.authorized_execution import AuthorizedExecution
+from core.evolution_contract import NetworkExecutionRequest
 from core.execution import CanonicalExecutor
 from core.execution_contract import ExecutionInput
 from core.external_execution_request import ExternalExecutionRequest
