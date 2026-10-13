@@ -8,6 +8,7 @@ from enum import Enum
 
 
 class CoreCreationReason(str, Enum):
+    MISSING_CAPABILITY = "missing_capability"
     NEW_CAPABILITY = "new_capability"
     NEW_OPERATION = "new_operation"
     SPECIALIZATION = "specialization"
