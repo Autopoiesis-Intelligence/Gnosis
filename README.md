@@ -250,7 +250,7 @@ Unknown provenance or unknown permission is not treated as permission by default
 
 ---
 
-## Research-Memory
+## Research and project context
 
 **Gnosis-Memory** is the machine-readable research and context layer associated with the product.
 
@@ -298,7 +298,7 @@ The product deliberately separates public visibility from protected execution.
 - research-facing materials;
 - partnership surface.
 
-### Research: Gnosis-Research-Memory
+### Research/context: Gnosis-Memory
 
 - machine-readable research;
 - historical context;
