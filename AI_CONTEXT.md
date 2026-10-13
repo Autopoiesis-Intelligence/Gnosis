@@ -1,3 +1,17 @@
+# Canonical project identity overlay — 2026-10-13
+
+This dated overlay supersedes conflicting historical repository-role statements below. The historical material is preserved for provenance; it is not a current repository pointer or proof of implementation.
+
+- **Product / public evidence surface:** `Autopoiesis-Intelligence/Gnosis`.
+- **Public engineering Core:** `Autopoiesis-Intelligence/Gnosis-Core`.
+- **Research and project-context collection:** `Autopoiesis-Intelligence/Gnosis-Memory`; its canonical source-of-truth scope is still unresolved. The copy of this file in both repositories is intentionally being kept byte-identical during reconciliation, but that does not decide which repository should own the canonical context.
+- **Private repository:** `Autopoiesis-Intelligence/Gnosis-Genesis`; its exact relationship to the public Core and its factory/authority responsibilities are not confirmed by the inspected repository contents.
+- Current product spelling is **Gnosis**. `Gnozis`, `Gnozis-V2`, and `Genezis` are historical spellings/names, not current canonical repository identities.
+- Documentation and historical audits are not proof of capability. Apply the evidence ladder: DESIGN → IMPLEMENTED → REACHABLE → RUNTIME → PERSISTED → AUDITED → CI_PROVEN. Pin claims to exact repository, commit, tests/CI run, and runtime evidence.
+- If historical text below conflicts with this overlay or live repository evidence, mark **RECONCILIATION REQUIRED**; do not silently rewrite historical claims as current fact.
+
+---
+
 
 ## RESEARCH LIBRARY ROLE — 2026-09-21
 
