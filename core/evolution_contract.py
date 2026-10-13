@@ -520,6 +520,12 @@ def attach_verified_core(
     )
 
 
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 @dataclass(frozen=True)
 class NetworkRegistryEntry:
     attachment: NetworkAttachment
@@ -598,12 +604,6 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
-
-
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
 
 
 @dataclass(frozen=True)
