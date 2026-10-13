@@ -2,16 +2,16 @@
 
 ## Allowed
 
-Genesis -> Core contracts
+Production/factory layer -> Core contracts
 Product -> Core contracts
-Product -> Genesis interfaces
-Research/Knowledge -> explicit evidence/context interfaces
+Product -> explicitly defined production/factory interfaces
+Gnosis-Memory / Research -> explicit evidence/context interfaces
 External adapters -> public interfaces
 
 ## Forbidden
 
-Core -> Genesis
-Core -> Research-Memory
+Core -> external production/factory layer
+Core -> Gnosis-Memory
 Core -> LLM/API/connector
 Core -> Product/Commercial/UI
 External repository -> direct Core database mutation
