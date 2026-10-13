@@ -3,26 +3,23 @@
 
 **Gnosis** is the canonical product identity and public repository (`Autopoiesis-Intelligence/Gnosis`).
 **Gnosis-Core** is the protected engineering foundation (`Autopoiesis-Intelligence/Gnosis-Core`); **Genesis** names its protected factory role.
-**Gnosis-Memory** is the research/context layer and never an authority for changing Core.
+**Gnosis-Memory** is the research/context layer and is not an authority for changing Core.
 
-Legacy names such as Gnosis, Gnosis-Core, and the former `Mikhail-Kucheriavyi-23` owner are retained only where needed to identify historical artifacts or repository states. New titles, README text, agent instructions, links and generated metadata must use canonical names. Public browsing, crawling, search indexing and anonymous traces are observations, not identity, consent, authorization or execution proof.
+The names Gnozis, Gnozis-V2, and repositories under the former `Mikhail-Kucheriavyi-23` owner are legacy identifiers. Use canonical names in current titles, README text, agent instructions, links and generated metadata. Preserve a legacy name only when needed to identify a historical source, immutable artifact, protocol identifier or prior repository state; label it as historical rather than current identity.
+
+Public browsing, repository traversal, search indexing and anonymous traces are observations, not identity verification, consent, authorization or execution proof.
 
 ## RESEARCH LIBRARY ROLE — 2026-09-21
 
-This repository is the Gnosis Research Library: the public research/archive line containing discovered principles, reverse-analysis, mathematical models, experimental Python implementations and research material for researchers and enthusiasts. It is not the current production Core. Gnosis-Core is the future canonical engineering Core foundation.
+This repository contains public product/evidence surfaces alongside research and historical artifacts. It is not the protected production Core. Historical research and code become current engineering requirements only after source verification, formalization, architecture mapping, implementation and evidence.
 
-Research findings may become V2 requirements only after pattern extraction, definition/formalization, engineering mapping and evidence. Historical code in this repository is not automatically canonical V2 implementation.
-
-Intended lineage: Research Library → Gnosis-Core → specialized research kernels → user/commercial versions.
+Intended lineage: Gnosis public opportunities/evidence → Gnosis-Memory research context → Gnosis-Core/Genesis engineering → verified outputs exposed through Gnosis.
 
 # AI_CONTEXT.md — Gnosis Strategic Mathematical Context
-## 2026-09-18 consolidation
-
-This file records the strategic and mathematical conclusions established during the current analytical phase. It is not a claim that every statement below is proven. Distinguish: definition, candidate derivation, implementation fact, empirical result, and hypothesis.
 
 ## 1. Strategic foundation
 
-Gnosis is not to be designed by accumulating software modules and then fitting mathematics afterward. The direction is reversed:
+Gnozis is not to be designed by accumulating software modules and then fitting mathematics afterward. The direction is reversed:
 
 Natural mathematical structure
 -> laws/constraints
@@ -247,7 +244,7 @@ Trust(a,b) = f(consistency, evidence, history, context)
 
 The exact form must be derived/tested later.
 
-Gnosis interacting with users and Gnosis creating capabilities for user copies should use the same underlying relational/agent model rather than separate special-purpose ontologies.
+Gnozis interacting with users and Gnozis creating capabilities for user copies should use the same underlying relational/agent model rather than separate special-purpose ontologies.
 
 ## 12. Time and causality
 
@@ -377,7 +374,7 @@ DEFINITION / DERIVATION / THEOREM-CANDIDATE / IMPLEMENTATION REQUIREMENT / EMPIR
 
 ## 19. Strategic principle
 
-Gnosis should aim to reproduce the organization of natural mathematical systems rather than imitate their surface complexity.
+Gnozis should aim to reproduce the organization of natural mathematical systems rather than imitate their surface complexity.
 
 The central engineering question is:
 What is the smallest lawful recursive structure from which the observed higher-level capabilities can naturally emerge?
@@ -678,7 +675,7 @@ id_Psi: Psi -> Psi.
 
 Therefore the family of structures and admissible transformations has category-like closure.
 
-Do not yet assert that Gnosis "is a category"; the useful result is that objects, admissible transformations, identity and composition form a natural mathematical vocabulary for evolution.
+Do not yet assert that Gnozis "is a category"; the useful result is that objects, admissible transformations, identity and composition form a natural mathematical vocabulary for evolution.
 
 ### 27.4 Evolution is directional and need not be reversible
 
@@ -997,9 +994,9 @@ Existing code is implementation history, not proof of mathematical optimality.
 
 This section explicitly preserves the analytical work that must not be lost between AI sessions. It is research context, not a claim that every item is implemented or mathematically proven.
 
-### 28.1 Inter-Gnosis network: connected but independently authoritative
+### 28.1 Inter-Gnozis network: connected but independently authoritative
 
-A Gnosis instance is modeled as:
+A Gnozis instance is modeled as:
 
 G_i = (Psi_i, K_i, M_i)
 
@@ -1032,7 +1029,7 @@ G_2 checks structural properties;
 G_3 checks a mathematical invariant;
 G_4 checks an external source.
 
-But the receiving/local Gnosis retains commit authority.
+But the receiving/local Gnozis retains commit authority.
 
 Distributed verification != distributed authority.
 
@@ -1142,7 +1139,7 @@ Silence at a mandatory verification gate is not consent:
 
 Silence = HardStop.
 
-### 28.8 User <-> Gnosis and multi-agent symmetry
+### 28.8 User <-> Gnozis and multi-agent symmetry
 
 A user may act as:
 Observer;
@@ -1150,11 +1147,11 @@ Generator;
 EvidenceProvider;
 Evaluator.
 
-A Gnosis may use multiple users as distributed agents, while users may use multiple Gnosis as agents.
+A Gnozis may use multiple users as distributed agents, while users may use multiple Gnozis as agents.
 
 The same underlying relation/agent model should be preferred over separate special-purpose ontologies.
 
-User input, another Gnosis, an AI model, Internet evidence, or an agent may generate candidates or evidence, but none automatically receives Core commit authority.
+User input, another Gnozis, an AI model, Internet evidence, or an agent may generate candidates or evidence, but none automatically receives Core commit authority.
 
 UserPreference != KernelAuthority.
 
@@ -1461,7 +1458,7 @@ World / external structure
 -> Persistent history
 -> Recomputed transformation space.
 
-Across Gnosis instances:
+Across Gnozis instances:
 
 Network communication
 -> evidence/candidate/proposal exchange
@@ -1499,7 +1496,7 @@ They must distinguish:
 The next analytical problem remains:
 
 Invariant Evolution and Proof-Preserving Relaxation:
-how Gnosis can discover that an existing invariant/law is insufficient and propose a lawful extension without being able to simply delete the constraint that blocks a desired transition.
+how Gnozis can discover that an existing invariant/law is insufficient and propose a lawful extension without being able to simply delete the constraint that blocks a desired transition.
 
 After that, the accumulated theory should be converted into the operational Task Registry and mapped against the actual repository state before implementation changes.
 
@@ -1716,7 +1713,7 @@ Exact status must be established from repository evidence and tests, not inferre
 
 ### 29.8 Next operational task
 
-The next step is a specification audit against the actual Gnosis-Core repository.
+The next step is a specification audit against the actual Gnozis-V2 repository.
 
 Required order:
 
@@ -2191,7 +2188,7 @@ This strengthens the local static invariant: semantic commit APIs are not import
 
 Updated `formal/MinimalCore.lean` successfully. The formal target now models `Psi = (X,R)`, defines a kernel invariant predicate `K0`, makes `Transition` carry an explicit preservation proof `K0 P -> K0 next`, and defines composition of two invariant-preserving transitions. The attempted additional theorem write was blocked by a missing SHA on the second update and is not counted as implemented.
 
-Important limitation: `K0 := True` is still a placeholder. The next mathematical step is to replace it with the actual protected Gnosis kernel invariant and prove preservation from the real admission/refinement semantics.
+Important limitation: `K0 := True` is still a placeholder. The next mathematical step is to replace it with the actual protected Gnozis kernel invariant and prove preservation from the real admission/refinement semantics.
 
 ## 65. K0 Source Reconciliation — 2026-09-18
 
@@ -2215,7 +2212,7 @@ Remaining: replace the intermediate K0 predicate with the concrete protected-ker
 
 Inspected the exact executable `core/root_invariant.py`: `preserve_root(root,before,after)` is precisely `root.holds(before) and root.holds(after)`. Updated `formal/RootInvariant.lean` to expose the corresponding logical relation `preserves K before after := K before ∧ K after`, while retaining proof-carrying transition preservation and composition.
 
-This closes the semantic-shape gap between the Python preservation helper and the formal layer. It still does not prove that a particular concrete Gnosis kernel predicate is the intended K0; that requires selecting the actual protected-kernel predicate and proving its correspondence.
+This closes the semantic-shape gap between the Python preservation helper and the formal layer. It still does not prove that a particular concrete Gnozis kernel predicate is the intended K0; that requires selecting the actual protected-kernel predicate and proving its correspondence.
 
 ## 69. Sigma-Level Protected Invariant — 2026-09-18
 
@@ -2551,7 +2548,7 @@ Added `docs/PSI_CONTEXT_SUPERPOSITION_ANALYSIS_2026-09-18.md`. No new component 
 
 ## 117. Concrete Ψ Context Classification — 2026-09-18
 
-Added `docs/PSI_CONTEXT_CLASSIFICATION_2026-09-18.md` to classify concrete Gnosis context before changing the mathematical model. The working classes are: intrinsic X/R state; semantically relevant history; evaluation policy; generation policy; runtime resources; safety/provenance; persistence/transport infrastructure; hidden mutable closure; and external/user/world observations.
+Added `docs/PSI_CONTEXT_CLASSIFICATION_2026-09-18.md` to classify concrete Gnozis context before changing the mathematical model. The working classes are: intrinsic X/R state; semantically relevant history; evaluation policy; generation policy; runtime resources; safety/provenance; persistence/transport infrastructure; hidden mutable closure; and external/user/world observations.
 
 The key distinction is now explicit: information may influence execution without being part of Ψ. For a strict `F: Ψ → Ψ` claim, context that changes F must either be explicit transition context with a qualified contract or have its semantically relevant portion represented in Ψ. Infrastructure and execution controls must not be silently promoted into Ψ.
 
@@ -2559,7 +2556,7 @@ The key distinction is now explicit: information may influence execution without
 
 Added `docs/PSI_STATE_VS_CONTEXT_DECISION_RULES_2026-09-18.md`. Eight working rules now guide architecture reviews: state identity, explicit transition context, state-relevant observation, hidden-dependence detection, no state inflation, no hidden semantic state, preservation of optionality, and evidence-before-axiom.
 
-Current consequence: the closure finding alone does not justify changing Ψ. The canonical state remains exactly Ψ=(X,R). These rules should next be tested against concrete Gnosis flows including world observation, memory/learning, multi-agent interaction, and autonomous evolution before becoming core invariants.
+Current consequence: the closure finding alone does not justify changing Ψ. The canonical state remains exactly Ψ=(X,R). These rules should next be tested against concrete Gnozis flows including world observation, memory/learning, multi-agent interaction, and autonomous evolution before becoming core invariants.
 
 ## 119. Ψ Context Case Study — Memory — 2026-09-18
 
@@ -2698,7 +2695,7 @@ Their intersection is confirmed alignment. Differences are treated as architectu
 5. World Bridge — 4–7 days.
 6. Multi-Agent semantics — 5–10 days.
 7. Different realities / tension / superposition — 5–10 days.
-8. Connected Gnosis network — 7–14 days.
+8. Connected Gnozis network — 7–14 days.
 9. Autonomous evolution — 7–14 days.
 10. Controlled self-modification — 7–14 days.
 11. Security / recovery / audit — 5–10 days.
@@ -2811,7 +2808,7 @@ Inspection of `core/meta_admission.py` resolves part of the previous ambiguity. 
 
 Therefore, for META/kernel evolution, the repository intentionally uses a two-state root-validity contract plus closure/refinement. This should not automatically be imposed on ordinary `PsiTransition` evolution. RME now distinguishes: ordinary semantic admission (candidate invariant + transition binding), meta admission (before root validity + after root validity + closure + refinement), and evolutionary viability (candidate pool continuation). These are three separate proof regimes.
 
-This is a strong architectural simplification: do not generalize MetaAdmission into ordinary Proof. Instead, use it as evidence that Gnosis already has a pattern for explicit, fail-closed, proof-carrying admission. The next P0 task is to compare ordinary Admission with MetaAdmission and identify the minimum common algebraic interface without collapsing their semantics.
+This is a strong architectural simplification: do not generalize MetaAdmission into ordinary Proof. Instead, use it as evidence that Gnozis already has a pattern for explicit, fail-closed, proof-carrying admission. The next P0 task is to compare ordinary Admission with MetaAdmission and identify the minimum common algebraic interface without collapsing their semantics.
 
 
 ## 130. RME Result — Ordinary Admission Is Weaker Than Formal Admission — 2026-09-19
@@ -2966,7 +2963,7 @@ Current precise working definition: Autonomy = internal generation + proof-const
 The minimal candidate RC1=Psi=(X,R), RC2=proof-required transition, RC3=trusted-kernel proof acceptance establishes a formal acceptance boundary only. It does not by itself prove semantic safety, preservation of arbitrary invariants, absence of semantic drift, or universal correctness.
 
 ### 140.14 Refinement/conservative extension
-Next candidate: model F_{t+1} as a proof-preserving refinement or conservative extension of F_t. This is not yet the final rule. It requires a Gnosis-specific definition and adversarial counterexample search.
+Next candidate: model F_{t+1} as a proof-preserving refinement or conservative extension of F_t. This is not yet the final rule. It requires a Gnozis-specific definition and adversarial counterexample search.
 
 ### 140.15 Bottom-up implementation discipline
 Use: concrete evidence -> smallest affected layer -> tests -> contract reconciliation -> higher layer. Do not jump to architecture-wide rewrites when a lower-level contradiction is found.
