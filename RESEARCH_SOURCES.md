@@ -12,7 +12,7 @@ These are public GitHub repositories verified as reachable through the connected
 - https://github.com/modelcontextprotocol/servers — MCP server implementations and external-tool integration patterns.
 
 ## Infrastructure / contracts
-- https://github.com/fastapi/fastapi — API and async transport patterns used by Gnozis-Proxy.
+- https://github.com/fastapi/fastapi — API and async transport patterns used by Gnosis Terminal Bridge.
 - https://github.com/pydantic/pydantic — typed validation and state/data contracts.
 - https://github.com/open-telemetry/opentelemetry-specification — tracing and observability standards.
 
@@ -22,7 +22,7 @@ These are public GitHub repositories verified as reachable through the connected
 - https://github.com/deepset-ai/haystack — modular retrieval, pipelines and evaluation patterns.
 
 ## Persistence
-- https://github.com/sqlite/sqlite — SQLite source and persistence behavior; relevant to the current Gnozis-Proxy SQLite/WAL design.
+- https://github.com/sqlite/sqlite — SQLite source and persistence behavior; relevant to the current Gnosis Terminal Bridge SQLite/WAL design.
 
 ## Research rule
-Use these repositories as comparative architectural evidence. Prefer extracting minimal patterns over importing frameworks. For every proposed adoption record: problem solved, assumptions, complexity cost, minimal equivalent, failure mode that justifies adoption, and effect on Ψ/UROBOROS invariants.
+Use these repositories as comparative architectural evidence. Prefer extracting minimal patterns over importing frameworks. For every proposed adoption record: problem solved, assumptions, complexity cost, minimal equivalent, failure mode that justifies adoption, and effect on Core invariants.

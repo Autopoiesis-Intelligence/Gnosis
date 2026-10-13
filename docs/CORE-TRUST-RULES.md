@@ -1,8 +1,8 @@
 # Core Trust Rules
 
 1. Trusted state changes only through the explicit verification/commit path.
-2. Research-Memory is evidence/context material, never Core authority.
-3. Genesis is a producer/orchestrator, never a hidden authority inside Core.
+2. Research and context material is evidence/context, never Core authority.
+3. A separate production or orchestration layer is never hidden authority inside Core; its current role must be established from implementation and deployment evidence.
 4. External connectors are adapters, never trusted state writers.
 5. LLM/AI output is untrusted input until explicitly tested and verified.
 6. Persistence, retrieval, consumption and influence are separate operations.
@@ -11,6 +11,10 @@
 9. Downstream repository updates cannot mutate trusted Core state implicitly.
 10. Missing evidence blocks a maturity claim; implementation alone is insufficient.
 
+
+## Historical repository labels
+
+`Research-Memory` and `Genesis` are retained in older tests, audit records and migration history. They are compatibility labels, not assertions about current repository names, production deployments, or authority boundaries. Current roles require current implementation/deployment evidence.
 
 ## Evolution influence gate
 
