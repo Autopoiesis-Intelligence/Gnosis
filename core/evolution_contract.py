@@ -73,6 +73,11 @@ class EvolutionNeedSignal:
     evidence_digest: str
     scope: str
 
+    @property
+    def required_capability(self) -> str:
+        """Capability requested by this need signal."""
+        return self.need_type
+
     def __post_init__(self) -> None:
         if not all((self.signal_id, self.core_id, self.core_state_hash,
                     self.need_type, self.analytics_digest,
