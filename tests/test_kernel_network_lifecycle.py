@@ -1,4 +1,5 @@
 from core.execution_contract import ExecutionInput
+from core.capacity_snapshot import CapacitySnapshot
 from core.kernel_network_lifecycle import expand_and_route
 from core.kernel_provisioning_contract import KernelProvisionRequest
 from core.kernel_registry import KernelRegistry
@@ -6,13 +7,17 @@ from core.network_expansion_contract import ExpansionRequest
 
 
 def test_full_kernel_network_lifecycle():
-    expansion = ExpansionRequest("e1", "math", "work", 8, 0, "snapshot")
+    registry = KernelRegistry(())
+    snapshot = CapacitySnapshot.from_registry(registry, "math")
+    expansion = ExpansionRequest(
+        "e1", "math", "work", 8, snapshot.available_units, snapshot.digest
+    )
     provisioning = KernelProvisionRequest(
         "p1", expansion.digest(), "math", 8,
         "core.main", "parent-hash", "gnozis", "product-hash",
     )
     lifecycle = expand_and_route(
-        registry=KernelRegistry(()),
+        registry=registry,
         expansion_request=expansion,
         provisioning_request=provisioning,
         kernel_id="kernel.math.2",
