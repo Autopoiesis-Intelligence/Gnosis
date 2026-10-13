@@ -372,6 +372,13 @@ This repository is the public product and evidence surface, not a packaged hoste
 
 No universal installation or production deployment command is promised here: the available entry point depends on the specific component and its implementation status.
 
+## Machine-readable repository context
+
+AI agents, search systems, and public crawlers can start from the versioned [Gnosis context manifest](.well-known/gnosis-context.json) and its [JSON Schema](schemas/gnosis-context.schema.json). The manifest describes repository roles, public entry points, provenance requirements, bounded unauthenticated actions, and the separation between public proposals and authorized execution.
+
+The manifest is descriptive metadata, not an authorization token or proof of capability. Resolve the exact commit SHA before relying on evidence; never infer identity, consent, or execution authority from a public link or browsing trace. Its structural invariants are checked by `tools/validate_repository_context.py` and covered by tests.
+
+
 ## Current capabilities and limitations
 
 This repository contains product documentation and engineering artifacts for an evolving system. The complete end-to-end factory, registry, partner, and commercial workflow is **not asserted to be fully operational** merely because it is described here.

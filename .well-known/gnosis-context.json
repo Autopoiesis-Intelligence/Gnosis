@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "identity": {
+    "product": "Gnosis",
+    "repository": "Autopoiesis-Intelligence/Gnosis",
+    "canonical_url": "https://github.com/Autopoiesis-Intelligence/Gnosis",
+    "role": "public-product-and-evidence-surface"
+  },
+  "purpose": "Expose selected public opportunities, contracts, research-facing material, provenance and evidence without granting authority over protected execution.",
+  "repository_revision": {
+    "value": null,
+    "resolution": "Use the exact Git commit SHA of the inspected checkout or CI run; never treat this manifest's own contents as proof of a revision.",
+    "required_for_evidence": true
+  },
+  "related_repositories": [
+    {
+      "repository": "Autopoiesis-Intelligence/Gnosis-Core",
+      "url": "https://github.com/Autopoiesis-Intelligence/Gnosis-Core",
+      "relationship": "engineering-foundation",
+      "trust_note": "Repository visibility does not establish authorization or commercial confidentiality. Verify current access controls and runtime gates independently."
+    }
+  ],
+  "unauthenticated_profile": {
+    "name": "A0-public-observer",
+    "allowed": [
+      "read public repository files and public documentation",
+      "follow explicitly public repository links",
+      "run deterministic, bounded, non-mutating checks on public materials",
+      "report gaps and prepare proposed patches for human review"
+    ],
+    "denied": [
+      "access secrets or private partner data",
+      "issue owner approval or execution authorization",
+      "write authoritative Core state or mutate protected runtime state",
+      "commit, merge, release, or deploy on the strength of observation alone",
+      "infer identity, consent, permission, or authority from browsing, links, repetition, or context continuation"
+    ],
+    "output_label": "untrusted-observation-or-proposal-unless-independently-verified"
+  },
+  "authority_boundary": {
+    "rule": "Public discovery and evidence can inform a proposal but cannot grant execution authority.",
+    "authorization_source": "An independently verified, explicitly scoped authorization checked by the existing trusted execution gate.",
+    "fail_closed_on": [
+      "missing provenance",
+      "stale revision",
+      "unknown permission",
+      "scope mismatch",
+      "unverified identity",
+      "conflicting evidence"
+    ]
+  },
+  "evidence_contract": {
+    "required_fields": [
+      "source_repository",
+      "source_commit_sha",
+      "source_path_or_url",
+      "claim",
+      "evidence_class",
+      "authorization_status"
+    ],
+    "evidence_classes": [
+      "documentation",
+      "source",
+      "test",
+      "ci",
+      "runtime",
+      "audit"
+    ],
+    "claim_statuses": [
+      "documented",
+      "implemented",
+      "tested",
+      "ci-proven",
+      "runtime-proven",
+      "audited",
+      "unresolved"
+    ],
+    "rules": [
+      "A status must be supported by evidence for the exact inspected revision.",
+      "A link, observation, popularity signal, or repeated claim is not proof of correctness.",
+      "A test or CI pass does not grant authorization.",
+      "Unknown or partial provenance remains explicitly unknown."
+    ]
+  },
+  "improvement_loop": {
+    "stages": [
+      "public-query-or-discovery-signal",
+      "retrieve-source-context",
+      "verify-claims-against-exact-revision",
+      "prepare-candidate-documentation-or-code-change",
+      "reviewable-pull-request",
+      "CI-and-relevant-runtime-checks",
+      "measure-only-trustworthy-aggregate-outcomes"
+    ],
+    "automatic_merge": false,
+    "personal_tracking": false,
+    "public_sources_only": true,
+    "note": "Public discussions may inform candidate improvements only where permitted by source/platform rules; popularity is not correctness."
+  },
+  "entry_points": {
+    "readme": "https://github.com/Autopoiesis-Intelligence/Gnosis/blob/main/README.md",
+    "issues": "https://github.com/Autopoiesis-Intelligence/Gnosis/issues",
+    "contribution_guide": "https://github.com/Autopoiesis-Intelligence/Gnosis/blob/main/CONTRIBUTING.md",
+    "support": "https://github.com/Autopoiesis-Intelligence/Gnosis/blob/main/SUPPORT.md"
+  },
+  "status": {
+    "manifest": "implemented-in-this-change; CI and review status must be checked against the exact commit",
+    "end_to_end_autonomous_discovery": "unresolved",
+    "commercial_execution_authorization": "not-established-by-this-public-manifest"
+  }
+}
