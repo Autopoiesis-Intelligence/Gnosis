@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Autopoiesis-Intelligence/Gnosis/blob/main/schemas/gnosis-context.schema.json",
+  "title": "Gnosis machine-readable repository context",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "identity",
+    "purpose",
+    "repository_revision",
+    "related_repositories",
+    "unauthenticated_profile",
+    "authority_boundary",
+    "evidence_contract",
+    "improvement_loop",
+    "entry_points",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "product",
+        "repository",
+        "canonical_url",
+        "role"
+      ],
+      "properties": {
+        "product": {
+          "const": "Gnosis"
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "canonical_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository_revision": {
+      "type": "object",
+      "required": [
+        "value",
+        "resolution",
+        "required_for_evidence"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "resolution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_for_evidence": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "related_repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "repository",
+          "url",
+          "relationship",
+          "trust_note"
+        ],
+        "properties": {
+          "repository": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "relationship": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trust_note": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "unauthenticated_profile": {
+      "type": "object",
+      "required": [
+        "name",
+        "allowed",
+        "denied",
+        "output_label"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "denied": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "output_label": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "authority_boundary": {
+      "type": "object",
+      "required": [
+        "rule",
+        "authorization_source",
+        "fail_closed_on"
+      ],
+      "properties": {
+        "rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorization_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fail_closed_on": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "evidence_contract": {
+      "type": "object",
+      "required": [
+        "required_fields",
+        "evidence_classes",
+        "claim_statuses",
+        "rules"
+      ],
+      "properties": {
+        "required_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "claim_statuses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "improvement_loop": {
+      "type": "object",
+      "required": [
+        "stages",
+        "automatic_merge",
+        "personal_tracking",
+        "public_sources_only",
+        "note"
+      ],
+      "properties": {
+        "stages": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "automatic_merge": {
+          "const": false
+        },
+        "personal_tracking": {
+          "const": false
+        },
+        "public_sources_only": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "entry_points": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "status": {
+      "type": "object",
+      "required": [
+        "manifest",
+        "end_to_end_autonomous_discovery",
+        "commercial_execution_authorization"
+      ],
+      "properties": {
+        "manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "end_to_end_autonomous_discovery": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commercial_execution_authorization": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
