@@ -11,6 +11,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Direct script execution puts tools/ rather than the repository root on sys.path.
+# Add the repository root so the documented file-path invocation works as well as module invocation.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from tools.capability_catalogue import (
     CapabilityCatalogueError,
     evaluate_with_catalogue,
