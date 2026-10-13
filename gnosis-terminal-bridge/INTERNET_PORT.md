@@ -90,7 +90,12 @@ Every POST endpoint requires an HTTP `Authorization: Bearer <token>` header
 matched against the server-side `GNOZIS_PORT_API_TOKEN` secret. If the secret
 is not configured, POST requests fail closed with HTTP 503; missing or invalid
 tokens receive HTTP 401. The client-supplied `authorization` object inside a
-message is not transport authentication. `GET /health` remains an unauthenticated
+message is neither transport authentication nor trusted authorization evidence.
+The adapter treats its status as `UNKNOWN` regardless of a client-provided
+`ALLOWED` value or `validity_ref`. Exchange acceptance means only that a
+proposal passed the transport protocol; it does not grant authority, persist a
+trusted fact, or authorize execution. A trusted issuer/verifier and explicit
+policy binding are required before any operation can be authorized. `GET /health` remains an unauthenticated
 liveness endpoint and is not proof that the service is production-ready.
 
 This single shared bearer token is a minimum transport gate, not a complete
