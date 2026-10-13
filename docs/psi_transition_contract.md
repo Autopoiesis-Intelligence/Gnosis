@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the minimal engineering contract for one endogenous transition of the Gnozis state.
+Define the minimal engineering contract for one endogenous transition of the Gnosis state.
 
 Let the canonical state be:
 
