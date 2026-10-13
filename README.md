@@ -275,18 +275,22 @@ Gnosis-Memory
           ↓
       eligibility
           ↓
-        Genesis
+      Gnosis-Core
           ↓
-     generated outputs
+ engineering / evaluation
+          ↓
+ shareable outputs / evidence
           ↓
        Gnosis
+
+[private Gnosis-Genesis: exact boundary unresolved]
 ```
 
 ---
 
-## Public repository vs protected factory
+## Public product and repository boundaries
 
-The product deliberately separates public visibility from protected execution.
+The product deliberately separates public visibility from engineering and any private execution boundary. The exact private boundary remains unresolved.
 
 ### Public: Gnosis
 
