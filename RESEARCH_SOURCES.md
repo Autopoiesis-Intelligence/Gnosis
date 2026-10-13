@@ -12,7 +12,7 @@ These are public GitHub repositories verified as reachable through the connected
 - https://github.com/modelcontextprotocol/servers — MCP server implementations and external-tool integration patterns.
 
 ## Infrastructure / contracts
-- https://github.com/fastapi/fastapi — API and async transport patterns used by Gnozis-Proxy.
+- https://github.com/fastapi/fastapi — API and async transport patterns suitable for Gnosis adapters and services.
 - https://github.com/pydantic/pydantic — typed validation and state/data contracts.
 - https://github.com/open-telemetry/opentelemetry-specification — tracing and observability standards.
 
@@ -22,7 +22,9 @@ These are public GitHub repositories verified as reachable through the connected
 - https://github.com/deepset-ai/haystack — modular retrieval, pipelines and evaluation patterns.
 
 ## Persistence
-- https://github.com/sqlite/sqlite — SQLite source and persistence behavior; relevant to the current Gnozis-Proxy SQLite/WAL design.
+- https://github.com/sqlite/sqlite — SQLite source and persistence behavior; relevant when evaluating SQLite/WAL persistence for Gnosis components.
 
 ## Research rule
-Use these repositories as comparative architectural evidence. Prefer extracting minimal patterns over importing frameworks. For every proposed adoption record: problem solved, assumptions, complexity cost, minimal equivalent, failure mode that justifies adoption, and effect on Ψ/UROBOROS invariants.
+Use these repositories as comparative architectural references. Reachability is not an endorsement, security audit, dependency decision or proof that a Gnosis integration exists. Record exact source revision, intended use, license, data/permission boundary, maintenance status and reproducible evaluation before adopting an external component.
+
+**Naming rule:** current product/repository identity is Gnosis; the protected engineering repository is Gnosis-Core; the research/context layer is Gnosis-Memory. Legacy labels should appear only when identifying historical artifacts.
