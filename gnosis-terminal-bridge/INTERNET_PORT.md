@@ -86,6 +86,16 @@ or authorization; it does not make the endpoint safe for public deployment.
 
 The port is not considered Internet-safe merely because it speaks HTTP.
 
+Every POST endpoint requires an HTTP `Authorization: Bearer <token>` header
+matched against the server-side `GNOZIS_PORT_API_TOKEN` secret. If the secret
+is not configured, POST requests fail closed with HTTP 503; missing or invalid
+tokens receive HTTP 401. The client-supplied `authorization` object inside a
+message is not transport authentication. `GET /health` remains an unauthenticated
+liveness endpoint and is not proof that the service is production-ready.
+
+This single shared bearer token is a minimum transport gate, not a complete
+identity, per-client authorization, key rotation, or deployment-isolation system.
+
 Before public deployment it requires at minimum:
 
 - TLS termination;
