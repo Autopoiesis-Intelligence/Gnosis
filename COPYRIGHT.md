@@ -1,6 +1,6 @@
-# GNOSIS TRADEMARKS AND PROJECT IDENTITY
+# Gnosis TRADEMARKS AND PROJECT IDENTITY
 
-## GNOSIS — Universal Scientific Discovery & Intelligence Platform
+## Gnosis — Research and Engineering Platform
 
 ### Gnosis Core and Reference Architecture
 
@@ -14,7 +14,7 @@
 
 This document defines the naming and project-identity principles applicable to Gnosis and its software architecture.
 
-The purpose is to allow accurate identification of the project while reducing the risk of confusion between official GNOSIS releases and independent implementations, forks or derivative projects.
+The purpose is to allow accurate identification of the project while reducing the risk of confusion between official Gnosis releases and independent implementations, forks or derivative projects.
 
 ---
 
@@ -22,7 +22,7 @@ The purpose is to allow accurate identification of the project while reducing th
 
 The principal project identifiers are:
 
-* **GNOSIS**
+* **Gnosis**
 * **Gnosis**
 * **Gnosis Core**
 * **Gnosis reference architecture**
@@ -31,13 +31,13 @@ These names identify the Gnosis project, its computational core and its document
 
 ---
 
-## 3. GNOSIS
+## 3. Gnosis
 
-**GNOSIS** is the name of the research platform.
+**Gnosis** is the name of the research platform.
 
 It identifies:
 
-**GNOSIS — Universal Scientific Discovery & Intelligence Platform**
+**Gnosis — Universal Scientific Discovery & Intelligence Platform**
 
 Third parties may use the name descriptively to identify the official project where such use is accurate and does not imply endorsement, certification or affiliation.
 
@@ -47,7 +47,7 @@ Third parties may use the name descriptively to identify the official project wh
 
 **Gnosis Core** identifies the computational core developed as part of the Gnosis project.
 
-The name may be used descriptively when referring accurately to the GNOSIS computational core.
+The name may be used descriptively when referring accurately to the Gnosis computational core.
 
 Third-party implementations should clearly distinguish themselves from the official Gnosis Core implementation.
 
@@ -69,10 +69,10 @@ Accurate descriptive use of the project names is permitted where necessary to id
 
 Examples include:
 
-* "Research conducted using GNOSIS."
+* "Research conducted using Gnosis."
 * "This experiment uses Gnosis Core."
 * "This implementation is based on the Gnosis reference architecture v33."
-* "This paper evaluates GNOSIS."
+* "This paper evaluates Gnosis."
 
 Such references should not imply official endorsement or certification.
 
@@ -91,19 +91,19 @@ Use of the project names does not imply:
 * affiliation;
 * scientific validation.
 
-Third parties must not represent an independent project as officially approved by GNOSIS unless such approval has been expressly granted in writing.
+Third parties must not represent an independent project as officially approved by Gnosis unless such approval has been expressly granted in writing.
 
 ---
 
 ## 8. Independent Implementations
 
-Independent implementations, forks and derivative projects may accurately describe their relationship to GNOSIS.
+Independent implementations, forks and derivative projects may accurately describe their relationship to Gnosis.
 
 However, they should make the distinction between the original project and the independent implementation reasonably clear.
 
 Recommended wording:
 
-> This is an independent implementation derived from or inspired by GNOSIS and is not an official GNOSIS release.
+> This is an independent implementation derived from or inspired by Gnosis and is not an official Gnosis release.
 
 Where the implementation is materially different, the distinction should be especially clear.
 
@@ -111,12 +111,12 @@ Where the implementation is materially different, the distinction should be espe
 
 ## 9. Modified Versions
 
-Modified versions must not be represented as unchanged official GNOSIS releases.
+Modified versions must not be represented as unchanged official Gnosis releases.
 
 Where practical, modified distributions should identify:
 
 * that modifications were made;
-* the original GNOSIS version;
+* the original Gnosis version;
 * the relevant modification or fork;
 * the responsible organization or developer.
 
@@ -124,9 +124,9 @@ Where practical, modified distributions should identify:
 
 ## 10. Commercial Branding
 
-A commercial license to use GNOSIS technology does not automatically grant the right to use:
+A commercial license to use Gnosis technology does not automatically grant the right to use:
 
-* GNOSIS;
+* Gnosis;
 * Gnosis Core;
 * Gnosis reference architecture;
 * Gnosis reference architecture v33;
@@ -139,14 +139,14 @@ Commercial branding rights, if any, must be separately authorized.
 
 ## 11. Product Naming
 
-Third parties should avoid naming independent commercial products in a manner that could reasonably cause confusion with official GNOSIS products or releases.
+Third parties should avoid naming independent commercial products in a manner that could reasonably cause confusion with official Gnosis products or releases.
 
 Examples of potentially confusing presentation include statements suggesting that an independent product is:
 
-* an official GNOSIS product;
+* an official Gnosis product;
 * an official Gnosis Core release;
-* certified by GNOSIS;
-* developed by the GNOSIS project;
+* certified by Gnosis;
+* developed by the Gnosis project;
 * officially supported by the author;
 
 when no such relationship exists.
@@ -155,9 +155,9 @@ when no such relationship exists.
 
 ## 12. Attribution
 
-When GNOSIS technology is referenced in research or technical work, the following attribution is recommended:
+When Gnosis technology is referenced in research or technical work, the following attribution is recommended:
 
-> GNOSIS — Universal Scientific Discovery & Intelligence Platform
+> Gnosis — Universal Scientific Discovery & Intelligence Platform
 > Gnosis Core — Gnosis reference architecture v33
 > Mikhail Kucheriaviy
 > Public Research Release — 3 September 2026
@@ -180,7 +180,7 @@ See:
 
 ## 14. Relationship to Licensing
 
-Permission to use GNOSIS software under the Research License does not automatically grant trademark rights.
+Permission to use Gnosis software under the Research License does not automatically grant trademark rights.
 
 Permission for Commercial Use under a separate commercial agreement does not automatically grant trademark rights unless expressly stated.
 
@@ -201,7 +201,7 @@ The project names must not be used to imply that a third-party system has been:
 * commercially approved;
 * officially validated;
 
-by GNOSIS or its author unless such certification has been expressly established.
+by Gnosis or its author unless such certification has been expressly established.
 
 ---
 
@@ -229,7 +229,7 @@ Forks and derivative projects are encouraged where permitted by the applicable l
 
 However, they should preserve a clear distinction between:
 
-**Official GNOSIS**
+**Official Gnosis**
 
 and
 
@@ -263,7 +263,7 @@ Users should obtain appropriate legal advice regarding trademark registration, e
 
 The official project identity is:
 
-**GNOSIS**
+**Gnosis**
 
 The computational core is:
 
@@ -285,13 +285,13 @@ The public research release is:
 
 ## Final Principle
 
-GNOSIS is intended to remain identifiable as an open research project while allowing independent researchers and developers to investigate, reproduce, modify and extend the technology.
+Gnosis is intended to remain identifiable as an open research project while allowing independent researchers and developers to investigate, reproduce, modify and extend the technology.
 
 Accurate identification is encouraged.
 
 False affiliation is not.
 
-**GNOSIS**
+**Gnosis**
 
 **Gnosis Core — Gnosis reference architecture v33**
 
