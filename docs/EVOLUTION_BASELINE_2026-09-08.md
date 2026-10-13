@@ -1,4 +1,4 @@
-# Gnozis Evolution Baseline — 2026-09-08
+# Gnosis Evolution Baseline — 2026-09-08
 
 ## Purpose
 
