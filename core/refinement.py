@@ -1,6 +1,6 @@
 """Executable forward-simulation refinement for Psi transitions.
 
-The relation is intentionally supplied by the caller: Gnozis does not assume
+The relation is intentionally supplied by the caller: Gnosis does not assume
 that every operator change has one universal notion of behavioral equivalence.
 """
 from __future__ import annotations
