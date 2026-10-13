@@ -3,7 +3,7 @@
 ## Canonical layers
 
 - Gnosis-Core: minimal trusted runtime and authority for trusted state transitions.
-- Gnosis-Genesis: private Module Factory and governed evolution/production layer.
+- Gnosis-Genesis: separate private repository; its production, deployment, and authority responsibilities are unresolved until verified against current implementation and deployment evidence.
 - Gnosis-Memory: machine-readable research, evidence, provenance and context-transfer material.
 - Public Gnosis surfaces: user/product/research/opportunity interfaces.
 
@@ -17,4 +17,4 @@ Authorized user/project context may move across sessions, devices and connected 
 
 ## Dependency rule
 
-Core MUST NOT depend on Genesis, Research-Memory, LLMs, connectors, UI, or commercial services. Genesis and product layers may consume Core contracts. Research and external surfaces are downstream evidence/work surfaces.
+Core MUST NOT depend on external factories, research/context repositories, LLMs, connectors, UI, or commercial services. Any production layer may consume Core contracts only through explicit interfaces; its repository role must be verified rather than assumed. Gnosis-Memory and external surfaces are downstream evidence/work surfaces.

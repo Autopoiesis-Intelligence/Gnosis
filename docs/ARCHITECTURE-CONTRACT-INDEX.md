@@ -33,4 +33,4 @@ If another document conflicts with this contract set, the conflict must be resol
 
 ## Current architecture in one sentence
 
-Core owns trusted state and verification; Genesis produces/governs modules; Research-Memory carries machine-readable research/evidence/context; public surfaces expose authorized results; external systems interact only through explicit contracts.
+Core owns trusted state and verification; Gnosis-Memory carries research/evidence/context; public surfaces expose authorized results; external systems interact only through explicit contracts. The current production and authority role of any separate private repository must be established from implementation and deployment evidence, not inferred from its name.
