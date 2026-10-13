@@ -1,8 +1,8 @@
 cff-version: 1.2.0
-message: "If you use GNOSIS, UROBOROS or Ψ-Core v33 in research, please cite this project."
+message: "If you use Gnosis in research or engineering, please cite this project."
 type: software
 
-title: "GNOSIS — Universal Scientific Discovery & Intelligence Platform"
+title: "Gnosis — Research and Engineering Platform"
 
 abstract: >
 GNOSIS is an open research platform for scientific discovery,
@@ -52,5 +52,5 @@ authors:
 - family-names: "Kucheriavyi"
 given-names: "Mikhail"
 year: 2026
-version: "Ψ-Core v33"
+version: "33"
 url: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
