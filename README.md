@@ -1,22 +1,24 @@
-# GNOZIS
+# GNOSIS
+
+> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research/context material, but its canonical source-of-truth scope is still being reconciled. `Autopoiesis-Intelligence/Gnosis-Genesis` is a separate private repository; its exact factory/authority boundary is not yet confirmed. This README supersedes older wording that treats Genesis as an already-confirmed production authority.
 
 ## Public registry of machine-generated opportunities, contracts and evidence
 
-**Gnozis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
+**Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
-The production factory behind this surface is **Genesis**. Genesis is intended to remain a protected engineering environment rather than the primary public interface.
+The engineering Core is maintained in **Gnosis-Core**. The separate private **Gnosis-Genesis** repository may have a related role, but its exact production and authority boundary has not yet been confirmed. This public repository must expose only shareable product outputs and evidence.
 
-Gnozis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
+Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
-> **Genesis produces. Gnozis exposes, verifies and records.**
+> **Gnosis-Core engineers. Gnosis exposes, verifies and records.**
 
 ---
 
 ## Product model
 
 ```text
-                         GENESIS
-                    protected factory
+                       GNOSIS-CORE
+                  public engineering Core
                            │
               ┌────────────┴────────────┐
               │                         │
@@ -28,7 +30,7 @@ Gnozis is where selected outputs become inspectable: proposals, contracts, modul
                     verification
                            │
                            ▼
-                        GNOZIS
+                        GNOSIS
                  public product surface
                            │
         ┌──────────────────┼──────────────────┐
@@ -44,11 +46,11 @@ Gnozis is where selected outputs become inspectable: proposals, contracts, modul
                        partners
 ```
 
-The public repository is therefore not intended to expose the protected factory itself. It exposes the **results and evidence that are appropriate to share**.
+The public repository is not the private factory or authority boundary. It exposes the **results and evidence that are appropriate to share**. The exact boundary between `Gnosis-Core` and private `Gnosis-Genesis` remains an explicit unresolved architecture decision.
 
 ---
 
-## What Gnozis is building
+## What Gnosis is building
 
 The long-term product direction is a controlled machine-production cycle:
 
@@ -85,7 +87,7 @@ Creating autonomous modules does **not** automatically grant the factory permiss
 
 ## Public opportunity catalogue
 
-Gnozis is intended to expose machine-generated opportunities in a form that testers, researchers, partners and potential investors can inspect.
+Gnosis is intended to expose machine-generated opportunities in a form that testers, researchers, partners and potential investors can inspect.
 
 A proposal can progress through evidence stages such as:
 
@@ -250,7 +252,7 @@ Unknown provenance or unknown permission is not treated as permission by default
 
 ## Research-Memory
 
-**Gnozis-Research-Memory** is the machine-readable research and context layer associated with the product.
+**Gnosis-Memory** is the machine-readable research and context layer associated with the product.
 
 Its role is to preserve and organize:
 
@@ -267,7 +269,7 @@ Research-Memory is **not itself the authority for changing Genesis**. It supplie
 The intended relationship is:
 
 ```text
-Gnozis-Research-Memory
+Gnosis-Memory
           ↓
  candidate knowledge / evidence
           ↓
@@ -296,7 +298,7 @@ The product deliberately separates public visibility from protected execution.
 - research-facing materials;
 - partnership surface.
 
-### Research: Gnozis-Research-Memory
+### Research: Gnosis-Research-Memory
 
 - machine-readable research;
 - historical context;
@@ -370,6 +372,6 @@ For implementation status and evidence, consult the current repository artifacts
 FACTORY → produces candidates
 EVIDENCE → establishes what happened
 CONTRACT → defines what is allowed
-GNOZIS → exposes verified opportunities
+GNOSIS → exposes verified opportunities
 PARTNERS → decide what to adopt
 ```
