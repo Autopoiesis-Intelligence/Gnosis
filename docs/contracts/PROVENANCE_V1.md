@@ -1,4 +1,4 @@
-# Gnozis Provenance Contract v1
+# Gnosis Provenance Contract v1
 
 ## Purpose
 Every material information transformation must remain traceable to authorized inputs and the operation that produced it.
