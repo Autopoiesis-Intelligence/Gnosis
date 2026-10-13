@@ -97,7 +97,7 @@ def test_client_cannot_grant_itself_authorization():
         "authorization": {
             "source": "untrusted-client",
             "purpose": "test",
-            "operation": "execute",
+            "operation": "propose",
             "destination": "core",
             "status": "ALLOWED",
             "validity_ref": "client-invented-reference",
@@ -121,7 +121,7 @@ def test_transport_acceptance_is_not_authority_grant():
         "authorization": {
             "source": "untrusted-client",
             "purpose": "research",
-            "operation": "submit",
+            "operation": "propose",
             "destination": "core",
             "status": "ALLOWED",
         },
