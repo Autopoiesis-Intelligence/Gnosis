@@ -2,7 +2,7 @@
 ## CANONICAL IDENTITY AND REPOSITORY ROLES
 
 **Gnosis** is the canonical product identity and public repository (`Autopoiesis-Intelligence/Gnosis`).
-**Gnosis-Core** is the protected engineering foundation (`Autopoiesis-Intelligence/Gnosis-Core`); **Genesis** names its protected factory role.
+**Gnosis-Core** is the public engineering repository (`Autopoiesis-Intelligence/Gnosis-Core`). `Gnosis-Genesis` is a separate private repository; its factory, production, deployment, and authority responsibilities remain unconfirmed from the inspected repository contents.
 **Gnosis-Memory** is the research/context layer and is not an authority for changing Core.
 
 The names Gnozis, Gnozis-V2, and repositories under the former `Mikhail-Kucheriavyi-23` owner are legacy identifiers. Use canonical names in current titles, README text, agent instructions, links and generated metadata. Preserve a legacy name only when needed to identify a historical source, immutable artifact, protocol identifier or prior repository state; label it as historical rather than current identity.
@@ -13,7 +13,7 @@ Public browsing, repository traversal, search indexing and anonymous traces are 
 
 This repository contains public product/evidence surfaces alongside research and historical artifacts. It is not the protected production Core. Historical research and code become current engineering requirements only after source verification, formalization, architecture mapping, implementation and evidence.
 
-Intended lineage: Gnosis public opportunities/evidence → Gnosis-Memory research context → Gnosis-Core/Genesis engineering → verified outputs exposed through Gnosis.
+Intended flow: Gnosis public opportunities/evidence ↔ Gnosis-Memory research context → Gnosis-Core engineering → verified outputs exposed through Gnosis. The role of the separate private Gnosis-Genesis repository remains unresolved until supported by current implementation evidence and an explicit boundary decision.
 
 # AI_CONTEXT.md — Gnosis Strategic Mathematical Context
 
