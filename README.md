@@ -360,6 +360,41 @@ Do not interpret the presence of a documented workflow as proof that the complet
 
 For implementation status and evidence, consult the current repository artifacts and project contracts.
 
+
+## Getting started
+
+This repository is the public product and evidence surface, not a packaged hosted service by default.
+
+1. Browse the repository's source, contracts, tests, and current [open issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues).
+2. Before relying on a proposed capability, inspect the exact source version and the relevant test/CI evidence.
+3. If you are evaluating a module or opportunity, review its scope, limitations, provenance, and evidence rather than relying on a name or maturity label alone.
+4. If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).
+
+No universal installation or production deployment command is promised here: the available entry point depends on the specific component and its implementation status.
+
+## Current capabilities and limitations
+
+This repository contains product documentation and engineering artifacts for an evolving system. The complete end-to-end factory, registry, partner, and commercial workflow is **not asserted to be fully operational** merely because it is described here.
+
+Use these distinctions when evaluating a claim:
+
+- **Documented** means described in repository content.
+- **Implemented** means the relevant code exists at the inspected commit.
+- **Tested** means a specific test run exercised the behavior.
+- **CI-proven** means the relevant checks passed for an exact commit.
+- **Runtime-proven** means the behavior was observed in the relevant runtime and evidence was retained.
+
+A generated proposal, passing synthetic test, README statement, or open pull request does not by itself prove a production capability. See the [current implementation and issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues) for work in progress and unresolved questions.
+
+## Feedback and communication
+
+- [Report a bug](https://github.com/Autopoiesis-Intelligence/Gnosis/issues/new?template=bug_report.md)
+- [Request a feature](https://github.com/Autopoiesis-Intelligence/Gnosis/issues/new?template=feature_request.md)
+- [Browse open issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues)
+- Read [support and feedback guidance](SUPPORT.md) or [contribution guidance](CONTRIBUTING.md).
+
+When possible, include reproducible steps, the affected commit, and public test/CI evidence. Do not post secrets, credentials, or private partner data. Requests are not automatically accepted, scheduled, or implemented.
+
 ---
 
 ## Development principle
