@@ -245,7 +245,7 @@ def test_existing_binding_becomes_stale_after_attachment_change():
     registry = NetworkRegistry((
         NetworkRegistryEntry(a, "life", NetworkAttachmentState.REVOKED),
     ))
-    with pytest.raises(ValueError, match="no longer the active network route"):
+    with pytest.raises(ValueError, match="exactly one core"):
         validate_network_execution_binding(registry, binding)
 
 
@@ -259,7 +259,7 @@ def test_binding_cannot_cross_active_core_route():
     request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
     binding = NetworkExecutionBinding(request, "core-1", a1.digest())
     registry = NetworkRegistry().register(NetworkRegistryEntry(a2, "life-2"))
-    with pytest.raises(ValueError, match="exactly one core"):
+    with pytest.raises(ValueError, match="no longer the active network route"):
         validate_network_execution_binding(registry, binding)
 
 
