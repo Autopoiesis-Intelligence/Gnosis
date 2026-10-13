@@ -514,6 +514,20 @@ def test_evolution_replay_integrity_after_restart(tmp_path):
     assert reopened.load_evolution_outcomes().head == outcome
 
 
+def test_network_persistence_schema_is_initialized_on_store_creation(tmp_path):
+    path = tmp_path / "network-schema.db"
+    SQLiteHistoryStore(path)
+    with sqlite3.connect(path) as conn:
+        tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+        }
+    assert "network_registry_state" in tables
+    assert "capability_transition_history" in tables
+
+
 def test_network_registry_snapshot_persists_and_excludes_no_entries_from_other_networks(tmp_path):
     from core.evolution_contract import (
         NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
