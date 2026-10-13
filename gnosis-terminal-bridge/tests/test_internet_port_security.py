@@ -133,7 +133,16 @@ def test_transport_acceptance_is_not_authority_grant():
         "authorization_status": information_from_exchange(value).authorization.status.value,
     })
     session = _handshake(port)
-    result = port.exchange(_exchange(session["session_id"], "proposal-1"))
+    result = port.exchange({
+        **_exchange(session["session_id"], "proposal-1"),
+        "authorization": {
+            "source": "untrusted-client",
+            "purpose": "research",
+            "operation": "propose",
+            "destination": "core",
+            "status": "ALLOWED",
+        },
+    })
 
     assert result["status"] == "accepted"
     assert result["result"]["effect"] == "proposal_only"
