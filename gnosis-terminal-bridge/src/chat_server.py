@@ -18,10 +18,12 @@ RATE_LIMIT = 60
 
 
 def _port_handler(envelope: dict[str, Any]) -> dict[str, Any]:
-    """Convert an exchange into authorized information before acceptance."""
+    """Accept a transport proposal without granting execution authority."""
     information = information_from_exchange(envelope)
     return {
         "accepted": True,
+        "effect": "proposal_only",
+        "authority_granted": False,
         "message_type": envelope["type"],
         "payload_sha256": envelope["payload_sha256"],
         "information_id": information.information_id,

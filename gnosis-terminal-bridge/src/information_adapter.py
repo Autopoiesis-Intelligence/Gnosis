@@ -12,16 +12,15 @@ from core.information_contract import (
 
 
 def information_from_exchange(envelope: dict[str, Any]) -> Information:
-    """Convert a validated transport envelope into an explicitly authorized input."""
+    """Convert an external envelope into untrusted information, never grant authority."""
     authorization = envelope.get("authorization")
     if not isinstance(authorization, dict):
         raise PermissionError("authorization required")
 
-    status_raw = authorization.get("status")
-    try:
-        status = AuthorizationStatus(status_raw)
-    except (TypeError, ValueError):
-        status = AuthorizationStatus.UNKNOWN
+    # Authorization fields are supplied by the remote peer and are claims only.
+    # No trusted issuer/verifier is wired into this adapter, so external input
+    # can never set AuthorizationStatus.ALLOWED.
+    status = AuthorizationStatus.UNKNOWN
 
     operation = parse_external_operation(str(authorization.get("operation", "")))
     info = Information(
@@ -44,5 +43,4 @@ def information_from_exchange(envelope: dict[str, Any]) -> Information:
         value_class=ValueClass.UNKNOWN,
         payload=envelope["payload"],
     )
-    info.require_authorized()
     return info

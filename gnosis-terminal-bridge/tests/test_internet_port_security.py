@@ -3,6 +3,8 @@ from __future__ import annotations
 import time
 import pytest
 from src.internet_port import InternetPort, PortError, MAX_BODY_BYTES
+from src.information_adapter import information_from_exchange
+from core.information_contract import AuthorizationStatus
 
 
 def _port():
@@ -82,3 +84,67 @@ def test_message_is_marked_seen_before_handler_result():
 
 def test_max_body_constant_is_positive():
     assert MAX_BODY_BYTES > 0
+
+
+
+def test_client_cannot_grant_itself_authorization():
+    envelope = {
+        "message_id": "external-message",
+        "payload_sha256": "a" * 64,
+        "provenance": {"source": "untrusted-client"},
+        "payload": {"action": "execute"},
+        "type": "request",
+        "authorization": {
+            "source": "untrusted-client",
+            "purpose": "test",
+            "operation": "propose",
+            "destination": "core",
+            "status": "ALLOWED",
+            "validity_ref": "client-invented-reference",
+        },
+    }
+
+    information = information_from_exchange(envelope)
+
+    assert information.authorization.status is AuthorizationStatus.UNKNOWN
+    with pytest.raises(PermissionError, match="status=UNKNOWN"):
+        information.require_authorized()
+
+
+def test_transport_acceptance_is_not_authority_grant():
+    envelope = {
+        "message_id": "external-message",
+        "payload_sha256": "b" * 64,
+        "provenance": {"source": "untrusted-client"},
+        "payload": {"text": "proposal"},
+        "type": "hypothesis",
+        "authorization": {
+            "source": "untrusted-client",
+            "purpose": "research",
+            "operation": "propose",
+            "destination": "core",
+            "status": "ALLOWED",
+        },
+    }
+    port = InternetPort(lambda value: {
+        "accepted": True,
+        "effect": "proposal_only",
+        "authority_granted": False,
+        "authorization_status": information_from_exchange(value).authorization.status.value,
+    })
+    session = _handshake(port)
+    result = port.exchange({
+        **_exchange(session["session_id"], "proposal-1"),
+        "authorization": {
+            "source": "untrusted-client",
+            "purpose": "research",
+            "operation": "propose",
+            "destination": "core",
+            "status": "ALLOWED",
+        },
+    })
+
+    assert result["status"] == "accepted"
+    assert result["result"]["effect"] == "proposal_only"
+    assert result["result"]["authority_granted"] is False
+    assert result["result"]["authorization_status"] == "UNKNOWN"
