@@ -8,6 +8,7 @@ from enum import Enum
 
 
 class CoreCreationReason(str, Enum):
+    MISSING_CAPABILITY = "missing_capability"
     NEW_CAPABILITY = "new_capability"
     NEW_OPERATION = "new_operation"
     SPECIALIZATION = "specialization"
@@ -71,6 +72,11 @@ class EvolutionNeedSignal:
     analytics_digest: str
     evidence_digest: str
     scope: str
+
+    @property
+    def required_capability(self) -> str:
+        """Capability requested by this need signal."""
+        return self.need_type
 
     def __post_init__(self) -> None:
         if not all((self.signal_id, self.core_id, self.core_state_hash,
@@ -520,6 +526,12 @@ def attach_verified_core(
     )
 
 
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 @dataclass(frozen=True)
 class NetworkRegistryEntry:
     attachment: NetworkAttachment
@@ -598,12 +610,6 @@ def bind_network_execution(
         core_id=entry.attachment.core_id,
         attachment_digest=entry.attachment.digest(),
     )
-
-
-class NetworkAttachmentState(str, Enum):
-    ATTACHED = "attached"
-    DETACHED = "detached"
-    REVOKED = "revoked"
 
 
 @dataclass(frozen=True)

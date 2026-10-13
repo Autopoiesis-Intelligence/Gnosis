@@ -4,11 +4,20 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 from .history import AppendOnlyHistory, TransitionRecord
 T = TypeVar("T")
+
+
 @dataclass(frozen=True)
 class CommitResult(Generic[T]):
     value: T
     history: AppendOnlyHistory
     applied: bool
+
+    @property
+    def committed(self) -> bool:
+        """Compatibility alias for whether this commit was newly applied."""
+        return self.applied
+
+
 def commit_once(history: AppendOnlyHistory, record: TransitionRecord, current: T, next_value: T) -> CommitResult[T]:
     if history.records:
         head = history.records[-1]

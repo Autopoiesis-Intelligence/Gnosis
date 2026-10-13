@@ -1,3 +1,4 @@
+import hashlib
 from core.distribution_contract import KernelCapacity
 from core.in_memory_kernel_runtime import InMemoryKernelRuntimeAdapter
 from core.kernel_registry import KernelDescriptor
@@ -7,7 +8,7 @@ def descriptor():
     return KernelDescriptor(
         "kernel.math.2", ("math",), KernelCapacity("kernel.math.2", 8, 8), True,
         "gnozis", "product-hash", "core.main", "parent-hash",
-        "identity-hash", "provision-digest",
+        hashlib.sha256("|".join(("product-hash", "parent-hash", "provision-digest")).encode()).hexdigest(), "provision-digest",
     )
 
 

@@ -514,6 +514,20 @@ def test_evolution_replay_integrity_after_restart(tmp_path):
     assert reopened.load_evolution_outcomes().head == outcome
 
 
+def test_network_persistence_schema_is_initialized_on_store_creation(tmp_path):
+    path = tmp_path / "network-schema.db"
+    SQLiteHistoryStore(path)
+    with sqlite3.connect(path) as conn:
+        tables = {
+            row[0]
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+        }
+    assert "network_registry_state" in tables
+    assert "capability_transition_history" in tables
+
+
 def test_network_registry_snapshot_persists_and_excludes_no_entries_from_other_networks(tmp_path):
     from core.evolution_contract import (
         NetworkAttachment, NetworkAttachmentState, NetworkRegistry,
@@ -733,12 +747,6 @@ def test_rehydrate_network_registry_excludes_detached_state(tmp_path):
     path = tmp_path / "network-state-detached.db"
     store = SQLiteHistoryStore(path)
     with sqlite3.connect(path) as conn:
-        conn.execute("""CREATE TABLE network_registry_state (
-            network_id TEXT NOT NULL, core_id TEXT NOT NULL,
-            capability_scope TEXT NOT NULL, attachment_state TEXT NOT NULL,
-            attachment_evidence_digest TEXT NOT NULL,
-            lifecycle_evidence_digest TEXT NOT NULL,
-            PRIMARY KEY (network_id, core_id))""")
         conn.execute(
             "INSERT INTO network_registry_state VALUES (?, ?, ?, ?, ?, ?)",
             ("network-1", "core-1", "physics", "detached", "attach", "life"),

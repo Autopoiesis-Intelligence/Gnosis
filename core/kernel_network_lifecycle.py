@@ -56,8 +56,8 @@ def expand_and_route(
         kernel_id=distribution.selected_kernel_id,
         capability=distribution.capability,
         distribution_decision_id=distribution.decision_id,
-        execution_contract_id=decision_id,
-        max_capacity=provisioning_request.required_capacity_units,
+        scope=provisioning_request.parent_core_id,
+        resource_budget=provisioning_request.required_capacity_units,
     )
     binding = bind_distribution_to_execution(distribution, contract, execution_input)
     return KernelLifecycle(expansion_request, evidence, admission, binding)

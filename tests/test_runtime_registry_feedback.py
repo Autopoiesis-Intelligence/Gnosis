@@ -1,3 +1,4 @@
+import hashlib
 from core.distribution_contract import KernelCapacity
 from core.kernel_registry import KernelDescriptor, KernelRegistry
 from core.kernel_runtime_contract import KernelRuntimeStatus
@@ -8,7 +9,7 @@ def registry():
     d = KernelDescriptor(
         "kernel.math.2", ("math",), KernelCapacity("kernel.math.2", 8, 8), True,
         "gnozis", "product-hash", "core.main", "parent-hash",
-        "identity-hash", "provision-digest",
+        hashlib.sha256("|".join(("product-hash", "parent-hash", "provision-digest")).encode()).hexdigest(), "provision-digest",
     )
     return KernelRegistry((d,))
 

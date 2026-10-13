@@ -1,3 +1,5 @@
+import pytest
+
 from core.evolution_contract import CoreCreationReason, CoreCreationRequest, EvolutionPatchCandidate
 
 
@@ -257,7 +259,7 @@ def test_binding_cannot_cross_active_core_route():
     request = NetworkExecutionRequest("network-1", "physics", "simulate", "auth")
     binding = NetworkExecutionBinding(request, "core-1", a1.digest())
     registry = NetworkRegistry().register(NetworkRegistryEntry(a2, "life-2"))
-    with pytest.raises(ValueError, match="exactly one core"):
+    with pytest.raises(ValueError, match="no longer the active network route"):
         validate_network_execution_binding(registry, binding)
 
 
