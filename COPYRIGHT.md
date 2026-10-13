@@ -2,7 +2,7 @@
 
 ## GNOSIS — Universal Scientific Discovery & Intelligence Platform
 
-### UROBOROS — Ψ-Core v33
+### Gnosis Core and Reference Architecture
 
 **Copyright © 2026 Mikhail Kucheriaviy.**
 
@@ -12,7 +12,7 @@
 
 ## 1. Purpose
 
-This document defines the naming and project-identity principles applicable to GNOSIS, UROBOROS and Ψ-Core.
+This document defines the naming and project-identity principles applicable to Gnosis and its software architecture.
 
 The purpose is to allow accurate identification of the project while reducing the risk of confusion between official GNOSIS releases and independent implementations, forks or derivative projects.
 
@@ -23,11 +23,11 @@ The purpose is to allow accurate identification of the project while reducing th
 The principal project identifiers are:
 
 * **GNOSIS**
-* **UROBOROS**
-* **Ψ-Core**
-* **Ψ-Core v33**
+* **Gnosis**
+* **Gnosis Core**
+* **Gnosis reference architecture**
 
-These names identify the GNOSIS project, its computational core and its reference architecture.
+These names identify the Gnosis project, its computational core and its documented reference architecture.
 
 ---
 
@@ -43,23 +43,23 @@ Third parties may use the name descriptively to identify the official project wh
 
 ---
 
-## 4. UROBOROS
+## 4. Gnosis Core
 
-**UROBOROS** identifies the recursive computational core developed as part of GNOSIS.
+**Gnosis Core** identifies the computational core developed as part of the Gnosis project.
 
 The name may be used descriptively when referring accurately to the GNOSIS computational core.
 
-Third-party implementations should clearly distinguish themselves from the official UROBOROS implementation.
+Third-party implementations should clearly distinguish themselves from the official Gnosis Core implementation.
 
 ---
 
-## 5. Ψ-Core
+## 5. Gnosis Reference Architecture
 
-**Ψ-Core** identifies the architectural family associated with the UROBOROS computational core.
+**Gnosis reference architecture** identifies the documented architecture associated with Gnosis Core.
 
-**Ψ-Core v33** identifies the public reference architecture designated by the author as version 33.
+**Reference architecture v33** identifies the historical public baseline designated as version 33.
 
-A modified or independently implemented architecture should not be presented as the official Ψ-Core v33 implementation unless it corresponds to the official release.
+A modified or independently implemented architecture should not be presented as the official reference architecture v33 implementation unless it corresponds to the official release.
 
 ---
 
@@ -70,8 +70,8 @@ Accurate descriptive use of the project names is permitted where necessary to id
 Examples include:
 
 * "Research conducted using GNOSIS."
-* "This experiment uses UROBOROS."
-* "This implementation is based on Ψ-Core v33."
+* "This experiment uses Gnosis Core."
+* "This implementation is based on the Gnosis reference architecture v33."
 * "This paper evaluates GNOSIS."
 
 Such references should not imply official endorsement or certification.
@@ -127,8 +127,8 @@ Where practical, modified distributions should identify:
 A commercial license to use GNOSIS technology does not automatically grant the right to use:
 
 * GNOSIS;
-* UROBOROS;
-* Ψ-Core;
+* Gnosis Core;
+* Gnosis reference architecture;
 * Ψ-Core v33;
 
 as commercial product names, trademarks or branding.
