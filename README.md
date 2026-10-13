@@ -4,19 +4,19 @@
 
 **Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
-The production factory behind this surface is **Genesis**. Genesis is intended to remain a protected engineering environment rather than the primary public interface.
+The intended production factory is a protected engineering environment, separate from this public product surface. Its exact repository and deployment boundary is still being reconciled; this README does not claim that the boundary is already enforced.
 
 Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
-> **Genesis produces. Gnosis exposes, verifies and records.**
+> **The protected factory produces. Gnosis exposes, verifies and records.**
 
 ---
 
 ## Product model
 
 ```text
-                         GENESIS
-                    protected factory
+                PROTECTED ENGINEERING
+                     ENVIRONMENT
                            │
               ┌────────────┴────────────┐
               │                         │
@@ -74,7 +74,7 @@ Commercial / partner opportunity
 
 The four levels must remain distinct:
 
-1. **Factory creation** — Genesis creates a specialized candidate.
+1. **Factory creation** — the protected engineering environment prepares a specialized candidate.
 2. **Module adaptation** — the candidate may be configured, trained, supplied with knowledge, or otherwise adapted within an authorized scope.
 3. **Module operation** — the released module performs bounded tasks.
 4. **Factory/Core evolution** — changes to the protected factory or its governing mechanisms require a separate authority and evidence chain.
@@ -262,7 +262,7 @@ Its role is to preserve and organize:
 - AI-readable context;
 - candidate knowledge for future implementation.
 
-Research-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
+Research-Memory is **not itself an authority to change the protected Core or factory**. It supplies structured context and candidate material subject to the relevant contracts and gates.
 
 The intended relationship is:
 
@@ -273,7 +273,8 @@ Gnosis-Memory
           ↓
       eligibility
           ↓
-        Genesis
+  protected engineering
+     environment
           ↓
      generated outputs
           ↓
@@ -304,7 +305,7 @@ The product deliberately separates public visibility from protected execution.
 - evidence archive;
 - development context.
 
-### Protected: Genesis
+### Protected engineering environment (boundary under verification)
 
 - module factory;
 - controlled generation;
