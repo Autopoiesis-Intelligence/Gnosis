@@ -1,8 +1,8 @@
-# Gnozis Network Architecture — Layered Workload Contract
+# Gnosis Network Architecture — Layered Workload Contract
 
 ## Purpose
 
-The public Gnozis layer must not become a computational extension of the protected main Core.
+The public Gnosis layer must not become a computational extension of the protected main Core.
 
 The public layer handles high-volume, low-trust and externally visible work such as Internet research, source collection, normalization, indexing, repository/document generation, presentation, provenance packaging and public evidence publication.
 
