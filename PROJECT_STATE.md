@@ -1,12 +1,12 @@
-# GNOZIS — PROJECT STATE
+# GNOSIS — PROJECT STATE
 
 **State version:** 2026-09-10 / Audit baseline 1.2
 **Public baseline:** Ψ-Core v33, 2026-09-03
-**Detailed audit:** `GNOZIS_MASTER_AUDIT.md`
+**Detailed audit:** `GNOSIS_MASTER_AUDIT.md`
 **Recovery ledger:** `RECOVERY_GAPS_2026-09-10.md`
 
 ## Current status
-Gnozis is a research project investigating whether a minimal endogenous computational architecture can support recursive state evolution, model construction, autonomous hypothesis generation/testing/selection, and eventually broader machine reasoning and discovery.
+Gnosis is a research project investigating whether a minimal endogenous computational architecture can support recursive state evolution, model construction, autonomous hypothesis generation/testing/selection, and eventually broader machine reasoning and discovery.
 
 The project now has two coupled tracks: the Ψ research core and a protected operational interoperability layer (memory/context, secure bridge, Internet Port, external-model adapters).
 
@@ -51,7 +51,7 @@ Selection must operate only on tested/accepted candidates. Rule evolution may re
 - `core/contract.py`: extensionality checks over the Ψ projection.
 - `core/uroboros.py`: recursive wrapper and evolutionary constructor.
 - `gnosis-terminal-bridge`: protected bridge/Internet Port and security contracts.
-- Recent regression stages through Stage 7A are recorded as GREEN in `GNOZIS_MASTER_AUDIT.md`.
+- Recent regression stages through Stage 7A are recorded as GREEN in `GNOSIS_MASTER_AUDIT.md`.
 
 ## Memory / protected context frontier
 Working semantic principle:
@@ -111,7 +111,7 @@ phenomenological intuition
 ## Model handoff order
 ```text
 PROJECT_STATE.md
-GNOZIS_MASTER_AUDIT.md
+GNOSIS_MASTER_AUDIT.md
 RECOVERY_GAPS_2026-09-10.md
 PHILOSOPHY.md
 EVOLUTION.md
