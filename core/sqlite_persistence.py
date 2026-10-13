@@ -570,6 +570,14 @@ class SQLiteHistoryStore:
                    ORDER BY core_id""",
                 (network_id,),
             ).fetchall()
+        if not rows:
+            # Older/alternate persistence paths may have saved a verified registry
+            # snapshot without materializing the mutable network_registry_state rows.
+            # Rehydrate that durable snapshot rather than treating it as an empty route.
+            registry = self.rehydrate_network_registry(network_id)
+            snapshot = NetworkRegistrySnapshot.from_registry(network_id, registry)
+            return snapshot, snapshot.active_entries()
+
         entries = []
         for core_id, scope, state, attachment_digest, lifecycle_digest in rows:
             entry = self.recover_network_capability_state(core_id, network_id)
