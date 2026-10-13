@@ -1,8 +1,8 @@
-# Gnozis Internet Interoperability Port — M1
+# Gnosis Internet Interoperability Port — M1
 
 ## Purpose
 
-The Internet Port is the protocol boundary between Gnozis and external AI/agent systems. It is an interoperability layer, not part of the mathematical core.
+The Internet Port is the protocol boundary between Gnosis and external AI/agent systems. It is an interoperability layer, not part of the mathematical core.
 
 The port must allow an external system to:
 
@@ -23,17 +23,18 @@ External AI / Agent
    Adapter / validation
         |
         v
-   Gnozis Core
+   Gnosis Core
         |
         v
    Port Response
 ```
 
-The external model is never the hidden global selector of the Gnozis core. The port may transport a proposal or request; acceptance remains governed by the core contract.
+An external model is never the hidden global selector of the Gnosis core. The port may transport a proposal or request; acceptance remains governed by the core contract.
 
 ## M1 protocol surface
 
 ### GET /health
+
 Returns liveness and protocol identity.
 
 Example:
@@ -43,12 +44,15 @@ Example:
 ```
 
 ### POST /chat
+
 Compatibility endpoint for the current experimental CoreChat adapter. It is not the normative interoperability protocol; it is retained for backwards compatibility.
 
 ### POST /v1/handshake
+
 Establishes a protocol session. A client supplies a protocol version and client identity/provenance. The server returns accepted protocol version and a session identifier.
 
 ### POST /v1/exchange
+
 Carries one structured message through the port. Required fields:
 
 ```json
@@ -74,32 +78,23 @@ Responses are structured and must contain:
 }
 ```
 
+The wire identifier `gnozis-port/1` is retained for compatibility with existing clients. It is a protocol-version identifier, not the current product name. Changing it requires a separately versioned protocol migration.
+
 ## Browser origin policy
 
-Cross-origin browser access is disabled by default. To allow specific browser
-origins, set `GNOZIS_PORT_ALLOWED_ORIGINS` to a comma-separated list of exact
-origins, for example `https://console.example,https://partner.example`.
-Wildcard entries are ignored. This is a browser policy only, not authentication
-or authorization; it does not make the endpoint safe for public deployment.
+Cross-origin browser access is disabled by default. To allow specific browser origins, set `GNOZIS_PORT_ALLOWED_ORIGINS` to a comma-separated list of exact origins, for example `https://console.example,https://partner.example`. Wildcard entries are ignored. This is a browser policy only, not authentication or authorization; it does not make the endpoint safe for public deployment.
+
+The environment variable name is retained for compatibility with existing deployment configuration. A future rename must support an explicit migration or a documented legacy alias.
 
 ## Security model
 
 The port is not considered Internet-safe merely because it speaks HTTP.
 
-Every POST endpoint requires an HTTP `Authorization: Bearer <token>` header
-matched against the server-side `GNOZIS_PORT_API_TOKEN` secret. If the secret
-is not configured, POST requests fail closed with HTTP 503; missing or invalid
-tokens receive HTTP 401. The client-supplied `authorization` object inside a
-message is neither transport authentication nor trusted authorization evidence.
-The adapter treats its status as `UNKNOWN` regardless of a client-provided
-`ALLOWED` value or `validity_ref`. Exchange acceptance means only that a
-proposal passed the transport protocol; it does not grant authority, persist a
-trusted fact, or authorize execution. A trusted issuer/verifier and explicit
-policy binding are required before any operation can be authorized. `GET /health` remains an unauthenticated
-liveness endpoint and is not proof that the service is production-ready.
+Every POST endpoint requires an HTTP `Authorization: Bearer <token>` header matched against the server-side `GNOZIS_PORT_API_TOKEN` secret. If the secret is not configured, POST requests fail closed with HTTP 503; missing or invalid tokens receive HTTP 401. The client-supplied `authorization` object inside a message is neither transport authentication nor trusted authorization evidence.
 
-This single shared bearer token is a minimum transport gate, not a complete
-identity, per-client authorization, key rotation, or deployment-isolation system.
+The adapter treats its status as `UNKNOWN` regardless of a client-provided `ALLOWED` value or `validity_ref`. Exchange acceptance means only that a proposal passed the transport protocol; it does not grant authority, persist a trusted fact, or authorize execution. A trusted issuer/verifier and explicit policy binding are required before any operation can be authorized. `GET /health` remains an unauthenticated liveness endpoint and is not proof that the service is production-ready.
+
+This single shared bearer token is a minimum transport gate, not a complete identity, per-client authorization, key rotation, or deployment-isolation system.
 
 Before public deployment it requires at minimum:
 
@@ -123,8 +118,8 @@ M1 does not claim:
 - autonomous Internet agency;
 - trust in arbitrary external AI systems;
 - public unauthenticated deployment;
-- scientific validation of Gnozis;
-- replacement of the Gnozis core with an LLM.
+- scientific validation of Gnosis;
+- replacement of the Gnosis core with an LLM.
 
 ## M1 acceptance criteria
 
@@ -136,4 +131,4 @@ M1 does not claim:
 - replayed message identifiers are rejected;
 - provenance survives the adapter boundary;
 - external input cannot directly mutate hidden core state;
-- the same protocol can be implemented by GPT, Claude, Gemini or another agent without changing the core.
+- the protocol can be implemented by compatible external agents without changing the core.
