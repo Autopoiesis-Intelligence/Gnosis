@@ -1,20 +1,20 @@
 # CHANGELOG
 
-All notable changes to GNOSIS are documented in this file.
+All notable changes to Gnosis are documented in this file.
 
-GNOSIS uses explicit versioning to preserve the public research history of the project.
+Gnosis uses explicit versioning to preserve the public research history of the project.
 
 ---
 
 # [v33.0.0] — 2026-09-03
 
-## GNOSIS Public Research Release
+## Gnosis Public Research Release
 
 ### Core
 
-* Initial public release of the GNOSIS research platform.
-* Publication of the UROBOROS core.
-* Publication of the Ψ-Core v33 reference architecture.
+* Initial public release of the Gnosis research platform.
+* Publication of the Gnosis Core implementation.
+* Publication of the v33 reference architecture.
 * Establishment of the initial public technical baseline.
 * Establishment of the public research release date: **3 September 2026**.
 
@@ -40,7 +40,7 @@ The release establishes the following research principles:
 
 ### Research Status
 
-Ψ-Core v33 is a research architecture.
+The v33 reference architecture is a research baseline.
 
 It should not be interpreted as a claim that every proposed mechanism or derived phenomenon has already been experimentally or scientifically validated.
 
@@ -50,7 +50,7 @@ The project is intended to allow independent researchers to test, reproduce, cri
 
 # Versioning Policy
 
-GNOSIS uses version numbers to distinguish stable research baselines from later development.
+Gnosis uses version numbers to distinguish stable research baselines from later development.
 
 A version change may represent:
 
@@ -66,11 +66,11 @@ Changes should be documented whenever they materially affect reproducibility.
 
 ---
 
-# Ψ-Core v33 Baseline
+# Reference Architecture v33 Baseline
 
-**Ψ-Core v33 is the reference baseline of the initial public release.**
+**Reference architecture v33 is the baseline of the initial public release.**
 
-The conceptual identity of the v33 architecture should not be silently altered under the same version identifier.
+The documented identity of the v33 architecture should not be silently altered under the same version identifier.
 
 Implementation optimization is permitted when it preserves the defined behavior and research meaning of the reference architecture.
 
@@ -182,17 +182,17 @@ These documents define the applicable research, commercial, attribution and prov
 
 # Current Status
 
-**Current baseline: Ψ-Core v33**
+**Current baseline: Gnosis reference architecture v33**
 
 **Public research release: 3 September 2026**
 
-**Project: GNOSIS**
+**Project: Gnosis**
 
-**Core: UROBOROS**
+**Core: Gnosis Core**
 
 ---
 
-# GNOSIS
+# Gnosis
 
 **Open Research.**
 
@@ -200,4 +200,4 @@ These documents define the applicable research, commercial, attribution and prov
 
 **Reproducible Science.**
 
-**UROBOROS — Ψ-Core v33**
+**Gnosis Core — Gnosis reference architecture v33**
