@@ -55,6 +55,18 @@ class SQLiteHistoryStore:
                 evidence_hash TEXT NOT NULL, kernel_version TEXT NOT NULL,
                 source_ids TEXT NOT NULL)""")
             conn.execute("""CREATE TABLE IF NOT EXISTS distribution_execution_binding (sequence INTEGER PRIMARY KEY, decision_id TEXT NOT NULL, decision_digest TEXT NOT NULL, kernel_id TEXT NOT NULL, execution_identity TEXT NOT NULL)""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS network_registry_state (
+                network_id TEXT NOT NULL, core_id TEXT NOT NULL,
+                capability_scope TEXT NOT NULL, attachment_state TEXT NOT NULL,
+                attachment_evidence_digest TEXT NOT NULL,
+                lifecycle_evidence_digest TEXT NOT NULL,
+                PRIMARY KEY (network_id, core_id))""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS capability_transition_history (
+                sequence INTEGER PRIMARY KEY AUTOINCREMENT,
+                core_id TEXT NOT NULL, network_id TEXT NOT NULL,
+                previous_scope TEXT NOT NULL, next_scope TEXT NOT NULL,
+                evidence_digest TEXT NOT NULL, authorization_digest TEXT NOT NULL,
+                execution_attachment_digest TEXT NOT NULL)""")
             conn.commit()
 
     def _fail(self, point: str) -> None:
