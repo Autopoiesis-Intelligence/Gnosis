@@ -1,8 +1,8 @@
-# Core Contracts
+# Gnosis-Core Contracts
 
 ## Purpose
 
-These contracts define the minimum boundary that every higher layer must use when interacting with Gnozis-Core.
+These contracts define the minimum boundary that every higher layer must use when interacting with Gnosis-Core.
 
 ## State
 
