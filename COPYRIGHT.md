@@ -129,7 +129,7 @@ A commercial license to use GNOSIS technology does not automatically grant the r
 * GNOSIS;
 * Gnosis Core;
 * Gnosis reference architecture;
-* Ψ-Core v33;
+* Gnosis reference architecture v33;
 
 as commercial product names, trademarks or branding.
 
@@ -144,7 +144,7 @@ Third parties should avoid naming independent commercial products in a manner th
 Examples of potentially confusing presentation include statements suggesting that an independent product is:
 
 * an official GNOSIS product;
-* an official UROBOROS release;
+* an official Gnosis Core release;
 * certified by GNOSIS;
 * developed by the GNOSIS project;
 * officially supported by the author;
@@ -158,7 +158,7 @@ when no such relationship exists.
 When GNOSIS technology is referenced in research or technical work, the following attribution is recommended:
 
 > GNOSIS — Universal Scientific Discovery & Intelligence Platform
-> UROBOROS — Ψ-Core v33
+> Gnosis Core — Gnosis reference architecture v33
 > Mikhail Kucheriaviy
 > Public Research Release — 3 September 2026
 
@@ -207,7 +207,7 @@ by GNOSIS or its author unless such certification has been expressly established
 
 ## 16. Scientific Publications
 
-Researchers may identify GNOSIS, UROBOROS and Ψ-Core accurately in:
+Researchers may identify Gnosis and its documented architecture accurately in:
 
 * scientific papers;
 * preprints;
@@ -267,11 +267,11 @@ The official project identity is:
 
 The computational core is:
 
-**UROBOROS**
+**Gnosis Core**
 
 The reference architecture is:
 
-**Ψ-Core v33**
+**Gnosis reference architecture v33**
 
 The author is:
 
@@ -293,7 +293,7 @@ False affiliation is not.
 
 **GNOSIS**
 
-**UROBOROS — Ψ-Core v33**
+**Gnosis Core — Gnosis reference architecture v33**
 
 **Open for Research.**
 
