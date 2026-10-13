@@ -7,7 +7,9 @@ from threading import Thread
 from src.chat_server import GnozisChatHandler, ThreadingHTTPServer
 
 
-def test_chat_server_health_and_chat_roundtrip() -> None:
+def test_chat_server_health_and_chat_roundtrip(monkeypatch) -> None:
+    import os
+    monkeypatch.setenv("GNOZIS_PORT_API_TOKEN", "test-secret")
     server = ThreadingHTTPServer(("127.0.0.1", 0), GnozisChatHandler)
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -26,7 +28,7 @@ def test_chat_server_health_and_chat_roundtrip() -> None:
             "POST",
             "/chat",
             body=json.dumps({"message": "hello"}),
-            headers={"Content-Type": "application/json"},
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ['GNOZIS_PORT_API_TOKEN']}"},
         )
         response = connection.getresponse()
         payload = json.loads(response.read())
