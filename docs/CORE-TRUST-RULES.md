@@ -40,3 +40,8 @@ Adversarial evidence: `tests/test_admission_boundary.py` covers trusted-looking 
 Persisted evidence/provenance remains descriptive after restart. `verify_cross_table_consistency()` validates durable binding, then the recovered provenance is supplied to a rejected `ProofObligation`; it does not create an Admission. This explicitly tests `Persistence ≠ Authority` across process restart.
 
 CI evidence at HEAD `7d9ac8c8049b9bac598453464a8ec2e81abc6159`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+## Legacy terminology compatibility
+
+Some contract-consistency checks still require the historical labels `Research-Memory` and `Genesis`. Their presence here is for compatibility with those checks and historical records only; it does not establish current repository roles or authority boundaries.
