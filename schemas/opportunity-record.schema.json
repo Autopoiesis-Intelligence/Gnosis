@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Autopoiesis-Intelligence/Gnosis/blob/main/schemas/opportunity-record.schema.json",
+  "title": "Gnosis Opportunity Record",
+  "description": "Evidence-bounded candidate for research or product improvement. This record is proposal metadata, never execution authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "candidate_id", "source_url", "source_revision", "observed_at",
+    "problem", "capability_refs", "evidence_refs", "evidence_status", "uncertainty",
+    "scores", "evaluator_version"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "candidate_id": { "type": "string", "minLength": 1, "maxLength": 160, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$" },
+    "source_url": { "type": "string", "format": "uri", "minLength": 8 },
+    "source_revision": { "type": "string", "minLength": 1, "maxLength": 256, "description": "Exact source revision, commit, version, or immutable snapshot identifier; never silently substitute latest." },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "problem": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "capability_refs": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 200 }, "uniqueItems": true },
+    "evidence_refs": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 1000 }, "uniqueItems": true },
+    "evidence_status": { "enum": ["OBSERVED", "SUPPORTED", "ACCEPTED", "HYPOTHESIZED", "UNRESOLVED", "REJECTED", "SUPERSEDED"] },
+    "uncertainty": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user_value", "evidence_strength", "capability_fit", "effort", "cost", "security_risk", "privacy_risk", "maintenance_burden", "reversibility"],
+      "properties": {
+        "user_value": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "evidence_strength": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "capability_fit": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "effort": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "cost": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "security_risk": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "privacy_risk": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "maintenance_burden": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "reversibility": { "type": "integer", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "evaluator_version": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "decision": { "enum": ["PROPOSE", "DEFER", "REJECT"] },
+    "decision_reason": { "type": "string", "maxLength": 2000 }
+  }
+}
