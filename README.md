@@ -248,7 +248,7 @@ Unknown provenance or unknown permission is not treated as permission by default
 
 ---
 
-## Research-Memory
+## Gnosis-Memory
 
 **Gnosis-Memory** is the machine-readable research and context layer associated with the product.
 
@@ -262,7 +262,7 @@ Its role is to preserve and organize:
 - AI-readable context;
 - candidate knowledge for future implementation.
 
-Research-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
+Gnosis-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
 
 The intended relationship is:
 
