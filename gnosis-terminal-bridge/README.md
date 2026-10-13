@@ -4,7 +4,7 @@ Minimal experimental terminal bridge for Ψ-GNR.
 
 ## Purpose
 
-The bridge provides a controlled interface between an external terminal and Gnozis.
+The bridge provides a controlled interface between an external terminal and Gnosis.
 
 Current experimental functionality:
 
@@ -17,7 +17,7 @@ Current experimental functionality:
 
 ## Current status
 
-This repository is NOT the Gnozis core.
+This repository is NOT the Gnosis core.
 
 It is an experimental bridge for validating the terminal protocol.
 

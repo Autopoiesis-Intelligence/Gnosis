@@ -1,4 +1,4 @@
-# Gnozis Architecture Contract Index
+# Gnosis Architecture Contract Index
 
 This is the canonical entry point for the current architecture.
 

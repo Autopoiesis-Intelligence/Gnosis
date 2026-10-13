@@ -1,11 +1,11 @@
-# Gnozis Architecture Boundaries
+# Gnosis Architecture Boundaries
 
 ## Canonical layers
 
-- Gnozis-Core: minimal trusted runtime and authority for trusted state transitions.
-- Gnozis-Genesis: private Module Factory and governed evolution/production layer.
-- Gnozis-Research-Memory: machine-readable research, evidence, provenance and context-transfer material.
-- Public Gnozis surfaces: user/product/research/opportunity interfaces.
+- Gnosis-Core: minimal trusted runtime and authority for trusted state transitions.
+- Gnosis-Genesis: private Module Factory and governed evolution/production layer.
+- Gnosis-Memory: machine-readable research, evidence, provenance and context-transfer material.
+- Public Gnosis surfaces: user/product/research/opportunity interfaces.
 
 ## Trust rule
 

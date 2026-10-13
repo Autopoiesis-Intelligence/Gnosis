@@ -1,4 +1,4 @@
-# Gnozis Repository Network — Canonical Role Topology
+# Gnosis Repository Network — Canonical Role Topology
 
 ## Naming rule
 
@@ -7,7 +7,7 @@ Repository names describe stable architectural roles, not implementation version
 ## Canonical topology
 
 ```
-                         Gnozis Network
+                         Gnosis Network
                               |
                     +---------+---------+
                     |                   |
@@ -27,22 +27,22 @@ Repository names describe stable architectural roles, not implementation version
 
 ## Repository roles
 
-### 1. Gnozis
+### 1. Gnosis
 Public product surface and human-facing entry point. Contains public-facing documentation, navigation, evidence views and stable product semantics. It is not the canonical authority state of the protected Core.
 
-### 2. Gnozis-Research
+### 2. Gnosis-Research
 Public research/work repository family. Handles Internet research, source collection, analysis outputs, evidence packaging and research workflows. Heavy work stays outside Main Core.
 
-### 3. Gnozis-Knowledge-<domain>
+### 3. Gnosis-Knowledge-<domain>
 Machine-readable knowledge libraries organized by stable scientific/domain role: mathematics, physics, history, psychology, maps of discoveries, and future domains. These are attachable network resources, not authority over Core state.
 
-### 4. Gnozis-Partner-<name>
+### 4. Gnosis-Partner-<name>
 Partner-facing work surfaces. A partner may operate a scoped CRM Core for its team or client work. Partner data remains tenant-scoped.
 
-### 5. Gnozis-Core-<specialization>
+### 5. Gnosis-Core-<specialization>
 Specialized Core repositories. Created because a distinct capability or sustained operational need exists, not merely because Main Core needs more compute. Each Core has explicit admission, capability, privacy and routing contracts.
 
-### 6. Gnozis-Core
+### 6. Gnosis-Core
 The protected Main Core / network authority. Coordinates the network, admission, routing, authorization, canonical state, evidence, governance and evolution. It should not perform public Internet research or bulk repository work.
 
 ### 7. Genesis

@@ -1,8 +1,8 @@
-# GNOZIS — PHILOSOPHY
+# GNOSIS — PHILOSOPHY
 
 ## 1. Starting point
 
-Gnozis grew from the Ψ project: an attempt to find a compact mathematical/computational description of systems in which state, relations, memory, modeling and evolution can be studied without making an external observer or controller fundamental.
+Gnosis grew from the Ψ project: an attempt to find a compact mathematical/computational description of systems in which state, relations, memory, modeling and evolution can be studied without making an external observer or controller fundamental.
 
 The project treats intuitions as hypotheses to be translated into explicit structures and then attacked with mathematics, code and counterexamples.
 
@@ -44,11 +44,11 @@ This is a methodological analogy, not by itself a proof that biological or physi
 
 A potentially important primitive is the ability of a system to construct and compare alternative trajectories/models under constraints, test them, and continue from internally selected results.
 
-Gnozis therefore investigates whether useful intelligence-like behavior can emerge from a compact state/relation/evolution framework without defining the core as an AI model itself.
+Gnosis therefore investigates whether useful intelligence-like behavior can emerge from a compact state/relation/evolution framework without defining the core as an AI model itself.
 
 ## 5. Gnosis
 
-The name Gnozis refers to the broader research direction: knowledge formation through internal modeling, testing and evolutionary refinement.
+The name Gnosis refers to the broader research direction: knowledge formation through internal modeling, testing and evolutionary refinement.
 
 Gnosis is not treated as a fixed fundamental constant or final object. Its form may itself be an emergent property of system organization and internal coordination.
 
