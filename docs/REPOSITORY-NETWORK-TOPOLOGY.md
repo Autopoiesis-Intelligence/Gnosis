@@ -2,7 +2,7 @@
 
 ## Naming rule
 
-Repository names describe stable architectural roles, not implementation versions. Do not use V2/V3 naming.
+Repository names describe stable architectural roles, not implementation versions. Do not use V2/V3 naming. Use canonical Gnosis naming in current product-facing documentation; do not infer a repository's production or authority role from its name.
 
 ## Canonical topology
 
@@ -22,7 +22,7 @@ Repository names describe stable architectural roles, not implementation version
                     |
              Specialized Cores
                     |
-             Protected Genesis
+       Private Production Layer
 ```
 
 ## Repository roles
@@ -30,7 +30,7 @@ Repository names describe stable architectural roles, not implementation version
 ### 1. Gnosis
 Public product surface and human-facing entry point. Contains public-facing documentation, navigation, evidence views and stable product semantics. It is not the canonical authority state of the protected Core.
 
-### 2. Gnosis-Research
+### 2. Gnosis-Memory
 Public research/work repository family. Handles Internet research, source collection, analysis outputs, evidence packaging and research workflows. Heavy work stays outside Main Core.
 
 ### 3. Gnosis-Knowledge-<domain>
@@ -45,8 +45,8 @@ Specialized Core repositories. Created because a distinct capability or sustaine
 ### 6. Gnosis-Core
 The protected Main Core / network authority. Coordinates the network, admission, routing, authorization, canonical state, evidence, governance and evolution. It should not perform public Internet research or bulk repository work.
 
-### 7. Genesis
-Private machine factory / commercial protected layer. Produces specialized modules, scoped proposals and commercial/private Core configurations. Genesis is not the public source of truth.
+### 7. Private production/factory layer
+A separate private production layer may generate specialized modules, scoped proposals and commercial configurations. Its repository identity, implementation, deployment and authority responsibilities remain unresolved until verified from current evidence. It is not a source of Core authority merely because it is private or described as a factory.
 
 ## Trust rule
 
@@ -57,7 +57,7 @@ Knowledge library -> network resource
 Partner surface   -> tenant-scoped request/result
 Specialized Core  -> bounded execution authority
 Main Core         -> canonical authority
-Genesis           -> private module factory
+Production layer   -> proposals/modules under explicit contracts
 ```
 
 No public repository becomes trusted merely because the Main Core generated or updated it.
