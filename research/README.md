@@ -1,9 +1,9 @@
 # GNOSIS Research
 
-## UROBOROS — Ψ-Core v33
+## Research and Core versioning
 
 This directory contains experimental research conducted with GNOSIS and
-the UROBOROS Ψ-Core.
+the Gnosis core implementation.
 
 The purpose of this directory is to separate experimental investigation
 from the stable core implementation.
@@ -61,7 +61,7 @@ investigation whenever practical.
 Where applicable, record:
 
 * GNOSIS version;
-* UROBOROS version;
+* Core implementation version;
 * Ψ-Core version;
 * Git commit;
 * experiment configuration;
@@ -133,8 +133,8 @@ encouraged to cite the project according to `CITATION.cff`.
 
 Recommended citation:
 
-> GNOSIS — Universal Scientific Discovery & Intelligence Platform,
-> UROBOROS Ψ-Core v33, Mikhail Kucheriavyi, 2026.
+> GNOSIS — Universal Scientific Discovery & Intelligence Platform, version 33,
+> Mikhail Kucheriavyi, 2026.
 
 ---
 
@@ -170,7 +170,7 @@ applicable law, agreements and the actual contributions of the parties.
 
 # GNOSIS
 
-## UROBOROS — Ψ-Core v33
+## Research and Core versioning
 
 **Open Research.**
 
