@@ -1,3 +1,5 @@
+import pytest
+
 from core.evolution_contract import CoreCreationReason, CoreCreationRequest, EvolutionPatchCandidate
 
 
