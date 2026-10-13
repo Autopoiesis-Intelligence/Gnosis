@@ -1,8 +1,8 @@
-"""Strict reader for the evidence-bound capability catalogue.
+"""Strict reader and safe adapter for the evidence-bound capability catalogue.
 
-Catalogue membership is descriptive only. This module never grants permissions,
-executes operations, fetches remote evidence, or treats an unverified entry as
-available for opportunity matching.
+Catalogue membership is descriptive only. It never grants permissions or
+execution authority. Matching uses only entries whose exact source SHA is
+bound to successful recorded CI evidence.
 """
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ _ALLOWED_STATUSES = {
     "DOCUMENTED", "IMPLEMENTED", "TESTED", "CI_PROVEN",
     "RUNTIME_PROVEN", "UNRESOLVED",
 }
+DEFAULT_CATALOGUE_PATH = Path(__file__).resolve().parents[1] / "data" / "capability-catalogue.json"
 
 
 class CapabilityCatalogueError(ValueError):
@@ -83,7 +84,7 @@ def validate_catalogue(payload: Mapping[str, Any]) -> None:
                 raise CapabilityCatalogueError(f"{prefix} CI_PROVEN requires non-empty all-success evidence")
 
 
-def load_catalogue(path: str | Path) -> dict[str, Any]:
+def load_catalogue(path: str | Path = DEFAULT_CATALOGUE_PATH) -> dict[str, Any]:
     try:
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -106,3 +107,19 @@ def verified_capability_ids(payload: Mapping[str, Any]) -> set[str]:
             for proof in item["ci_evidence"]
         )
     }
+
+
+def evaluate_with_catalogue(record: Mapping[str, Any], catalogue_path: str | Path = DEFAULT_CATALOGUE_PATH):
+    """Evaluate one record using only capability IDs backed by matching CI evidence."""
+    from tools.opportunity_evaluator import evaluate
+
+    catalogue = load_catalogue(catalogue_path)
+    return evaluate(record, verified_capability_ids(catalogue))
+
+
+def rank_with_catalogue(records, catalogue_path: str | Path = DEFAULT_CATALOGUE_PATH):
+    """Rank records against the verified catalogue; output remains proposal-only."""
+    from tools.opportunity_evaluator import rank_opportunities
+
+    catalogue = load_catalogue(catalogue_path)
+    return rank_opportunities(records, verified_capability_ids(catalogue))
