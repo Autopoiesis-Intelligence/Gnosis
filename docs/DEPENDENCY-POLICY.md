@@ -24,4 +24,4 @@ The policy must be represented by structural tests and reviewed whenever a new p
 
 ## Historical compatibility labels
 
-`Genesis` and `Research-Memory` are retained here only as historical labels used by earlier architecture records and consistency checks. Their presence does not establish a current repository, production deployment, or authority role. Confirm current roles from repository and deployment evidence.
+`Genesis` and `Research-Memory` are retained here only as historical labels used by earlier architecture records and consistency checks. The historical forbidden-edge labels `Core -> Genesis` and `Core -> Research-Memory` remain for compatibility with older consistency tests; they do not establish current repository names, production deployments, or authority roles. Confirm current roles from repository and deployment evidence.
