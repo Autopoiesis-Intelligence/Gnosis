@@ -1,6 +1,6 @@
 # Gnosis — EVOLUTION RECORD
 
-This document separates historical development from the current state. Historical formulations are not automatically current requirements. Detailed recovery material is maintained in `Gnosis_MASTER_AUDIT.md`.
+This document separates historical development from the current state. Historical formulations are not automatically current requirements. Detailed recovery material is maintained in `GNOSIS_MASTER_AUDIT.md`.
 
 ## Phase 1 — Ψ intuition
 The project began as a search for a minimal framework capable of representing processes in terms of state, relations, information transformation and evolution. Phenomenological observations were treated as prompts for formalization rather than evidence.
@@ -80,7 +80,7 @@ Memory is a transformed trace of past states unless an explicit model makes it p
 
 The living-state hierarchy is:
 
-`PROJECT_STATE.md → Gnosis_MASTER_AUDIT.md → EVOLUTION/PHILOSOPHY/ARCHITECTURE/CLAIMS/ROADMAP → CHANGELOG + code + tests`
+`PROJECT_STATE.md → GNOSIS_MASTER_AUDIT.md → EVOLUTION/PHILOSOPHY/ARCHITECTURE/CLAIMS/ROADMAP → CHANGELOG + code + tests`
 
 ## Phase 12 — Current consolidation
 The project is moving from version-driven experimentation toward a living-state architecture. The immediate objective is one authoritative project state, preservation of historical failures, and a verified baseline for every future experiment.
