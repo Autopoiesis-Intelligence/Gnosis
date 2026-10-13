@@ -1,6 +1,6 @@
 # GNOSIS
 
-> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research/context material, but its canonical source-of-truth scope is still being reconciled. `Autopoiesis-Intelligence/Gnosis-Genesis` is a separate private repository; its exact factory/authority boundary is not yet confirmed. Historical names such as `Gnozis` and `Gnozis-V2` may remain in source history or provenance, but current product branding is `Gnosis`. This README supersedes older wording that treats Genesis as an already-confirmed production authority.
+> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research and project context; its canonical source-of-truth scope is still being reconciled. The exact boundary between the public Core and any private execution environment remains unresolved. This README describes current public responsibilities without assigning unverified production or authority roles.
 
 ## Public registry of machine-generated opportunities, contracts and evidence
 
