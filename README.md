@@ -1,6 +1,6 @@
 # GNOSIS
 
-> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research/context material, but its canonical source-of-truth scope is still being reconciled. `Autopoiesis-Intelligence/Gnosis-Genesis` is a separate private repository; its exact factory/authority boundary is not yet confirmed. This README supersedes older wording that treats Genesis as an already-confirmed production authority.
+> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research/context material, but its canonical source-of-truth scope is still being reconciled. `Autopoiesis-Intelligence/Gnosis-Genesis` is a separate private repository; its exact factory/authority boundary is not yet confirmed. Historical names such as `Gnozis` and `Gnozis-V2` may remain in source history or provenance, but current product branding is `Gnosis`. This README supersedes older wording that treats Genesis as an already-confirmed production authority.
 
 ## Public registry of machine-generated opportunities, contracts and evidence
 
@@ -76,7 +76,7 @@ Commercial / partner opportunity
 
 The four levels must remain distinct:
 
-1. **Factory creation** — Genesis creates a specialized candidate.
+1. **Candidate creation** — a candidate is produced by the currently authorized engineering/factory path. The private `Gnosis-Genesis` repository's exact role is not yet confirmed.
 2. **Module adaptation** — the candidate may be configured, trained, supplied with knowledge, or otherwise adapted within an authorized scope.
 3. **Module operation** — the released module performs bounded tasks.
 4. **Factory/Core evolution** — changes to the protected factory or its governing mechanisms require a separate authority and evidence chain.
@@ -139,7 +139,7 @@ The exact registry schema and status vocabulary are part of the evolving product
 
 ## Contracts
 
-A Gnozis contract is a machine-readable description of a proposed capability, module, partnership or other bounded commitment.
+A Gnosis contract is a machine-readable description of a proposed capability, module, partnership or other bounded commitment.
 
 A contract may include:
 
@@ -171,7 +171,7 @@ A hash identifies a specific artifact or evidence state. It does not by itself p
 
 ## Evidence before claims
 
-Gnozis separates:
+Gnosis separates:
 
 ```text
 Documentation
@@ -264,7 +264,7 @@ Its role is to preserve and organize:
 - AI-readable context;
 - candidate knowledge for future implementation.
 
-Research-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
+`Gnosis-Memory` is a research/context repository, not an execution authority. Its canonical source-of-truth scope and relationship to `Gnosis` are still being reconciled. Research material supplies candidate context only; it does not authorize changes to Core or any private factory.
 
 The intended relationship is:
 
@@ -279,7 +279,7 @@ Gnosis-Memory
           ↓
      generated outputs
           ↓
-       Gnozis
+       Gnosis
 ```
 
 ---
@@ -288,7 +288,7 @@ Gnosis-Memory
 
 The product deliberately separates public visibility from protected execution.
 
-### Public: Gnozis
+### Public: Gnosis
 
 - opportunity catalogue;
 - contracts;
@@ -306,15 +306,9 @@ The product deliberately separates public visibility from protected execution.
 - evidence archive;
 - development context.
 
-### Protected: Genesis
+### Private repository: Gnosis-Genesis
 
-- module factory;
-- controlled generation;
-- learning/adaptation pipeline;
-- internal orchestration;
-- protected evolution mechanisms.
-
-The protected factory should not be treated as the public product interface.
+Its repository is private, but its exact responsibilities and authority relationship to `Gnosis-Core` have not yet been confirmed by current repository contents. Do not assume that it owns module generation, orchestration, or protected evolution until that boundary is explicitly documented and accepted.
 
 ---
 
