@@ -74,6 +74,14 @@ Responses are structured and must contain:
 }
 ```
 
+## Browser origin policy
+
+Cross-origin browser access is disabled by default. To allow specific browser
+origins, set `GNOZIS_PORT_ALLOWED_ORIGINS` to a comma-separated list of exact
+origins, for example `https://console.example,https://partner.example`.
+Wildcard entries are ignored. This is a browser policy only, not authentication
+or authorization; it does not make the endpoint safe for public deployment.
+
 ## Security model
 
 The port is not considered Internet-safe merely because it speaks HTTP.

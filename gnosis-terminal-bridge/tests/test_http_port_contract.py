@@ -27,6 +27,14 @@ def _server():
     return server
 
 
+def _request_with_origin(server, path, origin):
+    url = f"http://127.0.0.1:{server.server_port}{path}"
+    req = urllib.request.Request(url, method="GET")
+    req.add_header("Origin", origin)
+    with urllib.request.urlopen(req, timeout=2) as response:
+        return response.status, response.headers
+
+
 def _handshake(server):
     return _request(server, "/v1/handshake", {
         "protocol": "gnozis-port/1",
@@ -87,3 +95,37 @@ def test_replay_is_rejected():
         assert _request(server, "/v1/exchange", payload)[0] == 401
     finally:
         server.shutdown(); server.server_close()
+
+
+
+def test_cors_is_disabled_by_default(monkeypatch):
+    monkeypatch.delenv("GNOZIS_PORT_ALLOWED_ORIGINS", raising=False)
+    server = _server()
+    try:
+        status, headers = _request_with_origin(server, "/health", "https://untrusted.example")
+        assert status == 200
+        assert headers.get("Access-Control-Allow-Origin") is None
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_cors_allows_only_exact_configured_origins(monkeypatch):
+    monkeypatch.setenv("GNOZIS_PORT_ALLOWED_ORIGINS", "https://trusted.example")
+    server = _server()
+    try:
+        status, trusted_headers = _request_with_origin(
+            server, "/health", "https://trusted.example"
+        )
+        assert status == 200
+        assert trusted_headers.get("Access-Control-Allow-Origin") == "https://trusted.example"
+        assert trusted_headers.get("Vary") == "Origin"
+
+        status, untrusted_headers = _request_with_origin(
+            server, "/health", "https://untrusted.example"
+        )
+        assert status == 200
+        assert untrusted_headers.get("Access-Control-Allow-Origin") is None
+    finally:
+        server.shutdown()
+        server.server_close()

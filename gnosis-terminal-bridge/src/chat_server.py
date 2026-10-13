@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 from collections import defaultdict, deque
@@ -57,9 +58,17 @@ class GnozisChatHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "content-type")
-        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+        origin = self.headers.get("Origin")
+        allowed_origins = {
+            item.strip()
+            for item in os.environ.get("GNOZIS_PORT_ALLOWED_ORIGINS", "").split(",")
+            if item.strip() and item.strip() != "*"
+        }
+        if origin and origin in allowed_origins:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            self.send_header("Access-Control-Allow-Headers", "content-type, authorization")
+            self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
         self.end_headers()
         self.wfile.write(body)
 
