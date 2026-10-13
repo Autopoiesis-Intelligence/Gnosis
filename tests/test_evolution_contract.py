@@ -245,7 +245,7 @@ def test_existing_binding_becomes_stale_after_attachment_change():
     registry = NetworkRegistry((
         NetworkRegistryEntry(a, "life", NetworkAttachmentState.REVOKED),
     ))
-    with pytest.raises(ValueError, match="exactly one core"):
+    with pytest.raises(ValueError, match="no longer the active network route"):
         validate_network_execution_binding(registry, binding)
 
 
