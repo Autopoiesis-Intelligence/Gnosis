@@ -6,7 +6,7 @@
 
 **Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
-The engineering Core is maintained in **Gnosis-Core**. The separate private **Gnosis-Genesis** repository may have a related role, but its exact production and authority boundary has not yet been confirmed. This public repository must expose only shareable product outputs and evidence.
+The engineering Core is maintained in **Gnosis-Core**. Any separate private engineering environment is outside this repository's public contract; its production and authority role is not established here. This public repository exposes only shareable product outputs and evidence.
 
 Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
@@ -46,7 +46,7 @@ Gnosis is where selected outputs become inspectable: proposals, contracts, modul
                        partners
 ```
 
-The public repository is not the private factory or authority boundary. It exposes the **results and evidence that are appropriate to share**. The exact boundary between `Gnosis-Core` and private `Gnosis-Genesis` remains an explicit unresolved architecture decision.
+The public repository is not the private factory or authority boundary. It exposes the **results and evidence that are appropriate to share**. The exact boundary between the public engineering Core and any private execution environment remains an explicit unresolved architecture decision.
 
 ---
 
@@ -76,7 +76,7 @@ Commercial / partner opportunity
 
 The four levels must remain distinct:
 
-1. **Candidate creation** — a candidate is produced by the currently authorized engineering/factory path. The private `Gnosis-Genesis` repository's exact role is not yet confirmed.
+1. **Candidate creation** — a candidate is produced by the currently authorized engineering/factory path. The role of any separate private engineering environment is not yet confirmed.
 2. **Module adaptation** — the candidate may be configured, trained, supplied with knowledge, or otherwise adapted within an authorized scope.
 3. **Module operation** — the released module performs bounded tasks.
 4. **Factory/Core evolution** — changes to the protected factory or its governing mechanisms require a separate authority and evidence chain.
@@ -283,7 +283,7 @@ Gnosis-Memory
           ↓
        Gnosis
 
-[private Gnosis-Genesis: exact boundary unresolved]
+[private execution boundary: unresolved]
 ```
 
 ---
@@ -310,9 +310,9 @@ The product deliberately separates public visibility from engineering and any pr
 - evidence archive;
 - development context.
 
-### Private repository: Gnosis-Genesis
+### Private execution boundary
 
-Its repository is private, but its exact responsibilities and authority relationship to `Gnosis-Core` have not yet been confirmed by current repository contents. Do not assume that it owns module generation, orchestration, or protected evolution until that boundary is explicitly documented and accepted.
+The exact responsibilities and authority relationship of any private environment to `Gnosis-Core` have not been confirmed by current repository evidence. Do not assume that a private environment owns module generation, orchestration, or protected evolution until that boundary is explicitly documented and accepted.
 
 ---
 
