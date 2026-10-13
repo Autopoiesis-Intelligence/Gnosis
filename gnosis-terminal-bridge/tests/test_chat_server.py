@@ -52,4 +52,4 @@ def test_chat_handler_creates_isolated_chat_per_handler_instance() -> None:
     assert first.chat is not second.chat
     first.chat.send("one")
     assert second.chat.state.values["turn"] == 0
-    assert second.chat.state.values["history"] == []
+    assert second.chat.state.values["history"] == ()
