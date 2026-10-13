@@ -22,7 +22,7 @@ MODELS_CHAIN = [
 
 @app.route("/", methods=["GET"])
 def index():
-    return "Gnozis AI Engineering Agent is running!", 200
+    return "Gnosis AI Engineering Agent is running!", 200
 
 @app.route(f"/{TELEGRAM_TOKEN}", methods=["POST"])
 def webhook():
@@ -59,8 +59,8 @@ def query_openrouter(prompt: str) -> str:
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://github.com/Mikhail-Kucheriavyi-23/Gnozis",
-        "X-Title": "Gnozis AI Bot"
+        "HTTP-Referer": "https://github.com/Autopoiesis-Intelligence/Gnosis",
+        "X-Title": "Gnosis AI Bot"
     }
 
     last_error = ""
@@ -68,7 +68,7 @@ def query_openrouter(prompt: str) -> str:
         payload = {
             "model": model,
             "messages": [
-                {"role": "system", "content": "You are Gnozis, an advanced AI engineering agent."},
+                {"role": "system", "content": "You are Gnosis, an advanced AI engineering agent."},
                 {"role": "user", "content": prompt}
             ]
         }
