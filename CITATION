@@ -16,9 +16,9 @@ authors:
 * family-names: "Kucheriavyi"
   given-names: "Mikhail"
 
-repository-code: "https://github.com/Mikhail-Kucheriavyi-23/Gnozis/"
+repository-code: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 
-url: "https://github.com/Mikhail-Kucheriavyi-23/Gnozis/"
+url: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 
 keywords:
 
@@ -43,7 +43,7 @@ version: "33"
 
 date-released: "2026-09-03"
 
-repository-artifact: "https://github.com/Mikhail-Kucheriavyi-23/Gnozis/"
+repository-artifact: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 
 preferred-citation:
 type: software
@@ -53,4 +53,4 @@ authors:
 given-names: "Mikhail"
 year: 2026
 version: "Ψ-Core v33"
-url: "https://github.com/Mikhail-Kucheriavyi-23/Gnozis/"
+url: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
