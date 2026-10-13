@@ -168,12 +168,32 @@
         },
         "ci_evidence": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "$ref": "#/$defs/ciEvidence"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_status": {
+                "const": "CI_PROVEN"
+              }
+            },
+            "required": [
+              "evidence_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ci_evidence": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }
