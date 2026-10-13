@@ -1,10 +1,10 @@
-# Gnozis Research Machine
+# Gnosis Research Machine
 
 ## Role
 
-Gnozis Research Machine is the machine-readable development memory and evidence base for Gnozis.
+Gnosis Research Machine is the machine-readable development memory and evidence base for Gnosis.
 
-It is not the current Gnozis Core, not an alternative implementation, and not an authority source for Core mutation.
+It is not the current Gnosis Core, not an alternative implementation, and not an authority source for Core mutation.
 
 ## Authority boundary
 
@@ -13,7 +13,7 @@ Research Machine → retrieve / inform / provide provenance
 Research Machine -X→ direct Core mutation or authorization
 ```
 
-Any influence on Gnozis Core must pass through the explicit engineering admission path:
+Any influence on Gnosis Core must pass through the explicit engineering admission path:
 
 ```
 Research Machine record
@@ -51,7 +51,7 @@ Historical source files, implementations, commits and other artifacts may be ret
 
 ## Current Core
 
-The current executable and verified system is maintained separately in the Gnozis Core repository.
+The current executable and verified system is maintained separately in the Gnosis Core repository.
 
 ## Integrity rule
 
