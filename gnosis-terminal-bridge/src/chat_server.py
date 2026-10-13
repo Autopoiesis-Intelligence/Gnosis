@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hmac
 import json
 import os
 import threading
@@ -52,6 +53,24 @@ class GnozisChatHandler(BaseHTTPRequestHandler):
             events.append(now)
             return False
 
+    def _require_api_auth(self) -> bool:
+        expected = os.environ.get("GNOZIS_PORT_API_TOKEN", "")
+        if not expected:
+            self._json(503, {"error": "port authentication is not configured"})
+            return False
+
+        authorization = self.headers.get("Authorization", "")
+        scheme, separator, supplied = authorization.partition(" ")
+        if (
+            not separator
+            or scheme.lower() != "bearer"
+            or not supplied
+            or not hmac.compare_digest(supplied.encode("utf-8"), expected.encode("utf-8"))
+        ):
+            self._json(401, {"error": "missing or invalid bearer token"})
+            return False
+        return True
+
     def _json(self, status: int, payload: dict[str, Any]) -> None:
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
@@ -96,6 +115,8 @@ class GnozisChatHandler(BaseHTTPRequestHandler):
             length = int(length_header) if length_header is not None else 0
             if length < 0 or length > MAX_BODY_BYTES:
                 self._json(413, {"error": "request body too large"})
+                return
+            if not self._require_api_auth():
                 return
             payload = json.loads(self.rfile.read(length) or b"{}")
             if not isinstance(payload, dict):
