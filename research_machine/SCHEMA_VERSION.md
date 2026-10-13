@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Schema v1 defines the minimum machine-readable identity and provenance contract for Gnozis Research Machine records.
+Schema v1 defines the minimum machine-readable identity and provenance contract for Gnosis Research Machine records.
 
 ## Required fields
 
