@@ -1,15 +1,15 @@
 cff-version: 1.2.0
-message: "If you use GNOSIS, UROBOROS or Ψ-Core v33 in research, please cite this project."
+message: "If you use Gnosis in research or engineering, please cite this project."
 type: software
 
-title: "GNOSIS — Universal Scientific Discovery & Intelligence Platform"
+title: "Gnosis — Research and Engineering Platform"
 
 abstract: >
-GNOSIS is an open research platform for scientific discovery,
-computational experimentation, modeling and intelligence research.
-Its core architecture, UROBOROS Ψ-Core v33, is designed as a
-recursive, self-organizing computational framework for investigating
-complex systems, adaptive processes and autonomous model evolution.
+Gnosis is a research and engineering project for computational
+experimentation, modeling and intelligence research. Its public
+architecture documents methods for investigating complex systems,
+adaptive processes and model evolution. Research status and validation
+claims must be established from the relevant evidence.
 
 authors:
 
@@ -33,9 +33,7 @@ keywords:
 * machine reasoning
 * model evolution
 * complex systems
-* UROBOROS
-* Ψ-Core
-* GNOSIS
+* Gnosis
 
 license: "Research License"
 
@@ -47,10 +45,10 @@ repository-artifact: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 
 preferred-citation:
 type: software
-title: "GNOSIS — Universal Scientific Discovery & Intelligence Platform"
+title: "Gnosis — Research and Engineering Platform"
 authors:
 - family-names: "Kucheriavyi"
 given-names: "Mikhail"
 year: 2026
-version: "Ψ-Core v33"
+version: "33"
 url: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
