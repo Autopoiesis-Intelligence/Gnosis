@@ -747,12 +747,6 @@ def test_rehydrate_network_registry_excludes_detached_state(tmp_path):
     path = tmp_path / "network-state-detached.db"
     store = SQLiteHistoryStore(path)
     with sqlite3.connect(path) as conn:
-        conn.execute("""CREATE TABLE network_registry_state (
-            network_id TEXT NOT NULL, core_id TEXT NOT NULL,
-            capability_scope TEXT NOT NULL, attachment_state TEXT NOT NULL,
-            attachment_evidence_digest TEXT NOT NULL,
-            lifecycle_evidence_digest TEXT NOT NULL,
-            PRIMARY KEY (network_id, core_id))""")
         conn.execute(
             "INSERT INTO network_registry_state VALUES (?, ?, ?, ?, ?, ?)",
             ("network-1", "core-1", "physics", "detached", "attach", "life"),
