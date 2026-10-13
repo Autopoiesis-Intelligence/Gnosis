@@ -106,7 +106,7 @@ Cross-tenant reuse, learning or publication requires an explicit policy and prov
 The repository network should eventually reflect operational roles rather than arbitrary historical accumulation:
 
 ```
-Gnozis
+Gnosis
   public product / catalogue / evidence
         |
         +-- Research libraries
