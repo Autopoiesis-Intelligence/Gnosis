@@ -4,19 +4,20 @@
 
 **Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
-The production factory behind this surface is **Genesis**. Genesis is intended to remain a protected engineering environment rather than the primary public interface.
+A separate private repository, **Gnosis-Genesis**, exists. Its factory, production, deployment, and authority responsibilities are not confirmed by the inspected repository contents.
 
 Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
-> **Genesis produces. Gnosis exposes, verifies and records.**
+> **Gnosis exposes selected public outputs and evidence. Private production and authority boundaries remain under reconciliation.**
 
 ---
 
 ## Product model
 
 ```text
-                         GENESIS
-                    protected factory
+                    GNOSIS-GENESIS
+                private repository
+                  role unresolved
                            │
               ┌────────────┴────────────┐
               │                         │
@@ -74,7 +75,7 @@ Commercial / partner opportunity
 
 The four levels must remain distinct:
 
-1. **Factory creation** — Genesis creates a specialized candidate.
+1. **Factory creation** — a future factory workflow may create specialized candidates; the responsibility of `Gnosis-Genesis` is not yet confirmed.
 2. **Module adaptation** — the candidate may be configured, trained, supplied with knowledge, or otherwise adapted within an authorized scope.
 3. **Module operation** — the released module performs bounded tasks.
 4. **Factory/Core evolution** — changes to the protected factory or its governing mechanisms require a separate authority and evidence chain.
@@ -262,7 +263,7 @@ Its role is to preserve and organize:
 - AI-readable context;
 - candidate knowledge for future implementation.
 
-Gnosis-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
+Gnosis-Memory is **not itself an authority for changing protected code**. It supplies structured context and candidate material subject to the relevant contracts and gates.
 
 The intended relationship is:
 
@@ -273,11 +274,7 @@ Gnosis-Memory
           ↓
       eligibility
           ↓
-        Genesis
-          ↓
-     generated outputs
-          ↓
-       Gnosis
+Gnosis-Core / Gnosis-Genesis boundaries remain subject to explicit implementation and authority evidence. Selected, verified outputs may be exposed through Gnosis.
 ```
 
 ---
@@ -304,15 +301,9 @@ The product deliberately separates public visibility from protected execution.
 - evidence archive;
 - development context.
 
-### Protected: Genesis
+### Private: Gnosis-Genesis
 
-- module factory;
-- controlled generation;
-- learning/adaptation pipeline;
-- internal orchestration;
-- protected evolution mechanisms.
-
-The protected factory should not be treated as the public product interface.
+The repository exists and is private, but its exact factory, production, deployment, and authority responsibilities are not established by the inspected root contents. Do not infer a working factory or privileged execution path from the repository name or this product target document.
 
 ---
 
