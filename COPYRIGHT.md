@@ -23,7 +23,6 @@ The purpose is to allow accurate identification of the project while reducing th
 The principal project identifiers are:
 
 * **Gnosis**
-* **Gnosis**
 * **Gnosis Core**
 * **Gnosis reference architecture**
 
@@ -37,7 +36,7 @@ These names identify the Gnosis project, its computational core and its document
 
 It identifies:
 
-**Gnosis — Universal Scientific Discovery & Intelligence Platform**
+**Gnosis — Research and Engineering Platform**
 
 Third parties may use the name descriptively to identify the official project where such use is accurate and does not imply endorsement, certification or affiliation.
 
@@ -157,7 +156,7 @@ when no such relationship exists.
 
 When Gnosis technology is referenced in research or technical work, the following attribution is recommended:
 
-> Gnosis — Universal Scientific Discovery & Intelligence Platform
+> Gnosis — Research and Engineering Platform
 > Gnosis Core — Gnosis reference architecture v33
 > Mikhail Kucheriaviy
 > Public Research Release — 3 September 2026
