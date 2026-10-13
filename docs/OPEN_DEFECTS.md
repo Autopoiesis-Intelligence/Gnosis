@@ -1,4 +1,4 @@
-# Gnozis Open Defects
+# Gnosis Open Defects
 
 Updated: 2026-09-12
 
