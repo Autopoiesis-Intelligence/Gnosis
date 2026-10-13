@@ -52,7 +52,8 @@ def validate_catalogue(payload: Mapping[str, Any]) -> None:
         seen.add(capability_id)
         if not isinstance(capability["source_revision"], str) or not _SHA_RE.fullmatch(capability["source_revision"]):
             raise CapabilityCatalogueError(f"{prefix}.source_revision must be a full lowercase SHA")
-        if capability["evidence_status"] not in _ALLOWED_STATUSES:
+        status = capability["evidence_status"]
+        if not isinstance(status, str) or status not in _ALLOWED_STATUSES:
             raise CapabilityCatalogueError(f"{prefix}.evidence_status is unknown")
         for field in ("operations", "permissions", "data_classes", "dependencies",
                       "limits", "failure_modes", "maintenance", "rollback"):
@@ -70,7 +71,8 @@ def validate_catalogue(payload: Mapping[str, Any]) -> None:
                 raise CapabilityCatalogueError(f"{item_prefix}.workflow must be non-empty")
             if isinstance(item["run_id"], bool) or not isinstance(item["run_id"], int) or item["run_id"] < 1:
                 raise CapabilityCatalogueError(f"{item_prefix}.run_id must be a positive integer")
-            if item["conclusion"] not in {"success", "failure", "cancelled", "skipped", "unknown"}:
+            conclusion = item["conclusion"]
+            if not isinstance(conclusion, str) or conclusion not in {"success", "failure", "cancelled", "skipped", "unknown"}:
                 raise CapabilityCatalogueError(f"{item_prefix}.conclusion is invalid")
             if not isinstance(item["commit_sha"], str) or not _SHA_RE.fullmatch(item["commit_sha"]):
                 raise CapabilityCatalogueError(f"{item_prefix}.commit_sha must be a full lowercase SHA")
