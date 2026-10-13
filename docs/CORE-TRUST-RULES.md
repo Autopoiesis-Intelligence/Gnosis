@@ -1,8 +1,8 @@
 # Core Trust Rules
 
 1. Trusted state changes only through the explicit verification/commit path.
-2. Research-Memory is evidence/context material, never Core authority.
-3. Genesis is a producer/orchestrator, never a hidden authority inside Core.
+2. Gnosis-Memory is research/context material, never Core authority.
+3. No external factory or orchestrator is a hidden authority inside Core. The responsibilities of any separate production repository must be established from current implementation and deployment evidence, not inferred from its name.
 4. External connectors are adapters, never trusted state writers.
 5. LLM/AI output is untrusted input until explicitly tested and verified.
 6. Persistence, retrieval, consumption and influence are separate operations.
@@ -16,7 +16,7 @@
 
 Candidate generation is not authority. A generated candidate can affect canonical evolution only through the existing proof/admission boundary. A rejected candidate produces no transition result and leaves the input state unchanged. Selection remains endogenous and deterministic; no external candidate selector is consulted.
 
-Adversarial evidence: `tests/test_evolution_selection_boundaries.py` covers rejected-candidate non-commit and endogenous candidate selection. CI at the current test baseline is GREEN.
+Adversarial evidence: `tests/test_evolution_selection_boundaries.py` covers rejected-candidate non-commit and endogenous candidate selection. The statement below describes the historical CI evidence recorded at the time; it is not a claim about the current HEAD.
 
 
 ## Meta-admission anti-bypass gate
@@ -40,3 +40,8 @@ Adversarial evidence: `tests/test_admission_boundary.py` covers trusted-looking 
 Persisted evidence/provenance remains descriptive after restart. `verify_cross_table_consistency()` validates durable binding, then the recovered provenance is supplied to a rejected `ProofObligation`; it does not create an Admission. This explicitly tests `Persistence ≠ Authority` across process restart.
 
 CI evidence at HEAD `7d9ac8c8049b9bac598453464a8ec2e81abc6159`: Tests, Architecture Gate, and Gnozis Port CI SUCCESS.
+
+
+## Legacy terminology compatibility
+
+Some contract-consistency checks still require the historical labels `Research-Memory` and `Genesis`. Their presence here is for compatibility with those checks and historical records only; it does not establish current repository roles or authority boundaries.
