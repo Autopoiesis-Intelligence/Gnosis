@@ -33,11 +33,11 @@ Extensionality became an explicit test target: identical fundamental `(X,R)` pro
 
 A hidden-state counterexample then exposed the limitation of treating `(X,R)` as universally complete without conditions. This result is preserved as a constraint on the minimal-core claim.
 
-## Phase 6 — UROBOROS / Ψ-Core
-The ideas were translated into a small computational implementation: State, Relation, Engine, evolutionary transition and UROBOROS recursive wrapper. This became the basis for reproducible software experiments.
+## Phase 6 — Core implementation
+The ideas were translated into a small computational implementation: State, Relation, Engine, evolutionary transition and recursive Core wrapper. This became the basis for reproducible software experiments.
 
-## Phase 7 — GNOSIS public baseline
-On 2026-09-03 the repository published GNOSIS as a public research platform with UROBOROS / Ψ-Core v33 as the reference baseline. Implemented behavior is separated from unvalidated research architecture.
+## Phase 7 — Gnosis public baseline
+On 2026-09-03 the repository published Gnosis as a public research platform with the documented v33 architecture as its reference baseline. Implemented behavior is separated from unvalidated research architecture.
 
 ## Phase 8 — 2026-09-08 baseline freeze
 The repository recorded an evolution baseline requiring preservation of endogenous state evolution, Generate/Test/Select integrity, internal selection, reproducibility and separation between AI interfaces and the core.
