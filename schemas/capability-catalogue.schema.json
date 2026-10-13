@@ -41,7 +41,13 @@
           "minimum": 1
         },
         "conclusion": {
-          "const": "success"
+          "enum": [
+            "success",
+            "failure",
+            "cancelled",
+            "skipped",
+            "unknown"
+          ]
         },
         "commit_sha": {
           "type": "string",
