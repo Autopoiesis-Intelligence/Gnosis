@@ -1,19 +1,30 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 
+import pytest
+
 from src.chat_server import GnozisChatHandler
 
 
-def _request(server, path, payload=None):
+def _request(server, path, payload=None, *, authorization=None):
     url = f"http://127.0.0.1:{server.server_port}{path}"
     data = None if payload is None else json.dumps(payload).encode()
     req = urllib.request.Request(url, data=data, method="POST" if payload is not None else "GET")
     req.add_header("Content-Type", "application/json")
+    if authorization is False:
+        pass
+    elif isinstance(authorization, str):
+        req.add_header("Authorization", authorization)
+    else:
+        token = os.environ.get("GNOZIS_PORT_API_TOKEN")
+        if token:
+            req.add_header("Authorization", f"Bearer {token}")
     try:
         with urllib.request.urlopen(req, timeout=2) as response:
             return response.status, json.loads(response.read())
@@ -25,6 +36,11 @@ def _server():
     server = ThreadingHTTPServer(("127.0.0.1", 0), GnozisChatHandler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
+
+
+@pytest.fixture(autouse=True)
+def _configured_api_token(monkeypatch):
+    monkeypatch.setenv("GNOZIS_PORT_API_TOKEN", "test-secret")
 
 
 def _request_with_origin(server, path, origin):
@@ -126,6 +142,48 @@ def test_cors_allows_only_exact_configured_origins(monkeypatch):
         )
         assert status == 200
         assert untrusted_headers.get("Access-Control-Allow-Origin") is None
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+
+def test_post_fails_closed_when_authentication_is_not_configured(monkeypatch):
+    monkeypatch.delenv("GNOZIS_PORT_API_TOKEN", raising=False)
+    server = _server()
+    try:
+        status, body = _request(
+            server,
+            "/v1/handshake",
+            {
+                "protocol": "gnozis-port/1",
+                "client_id": "test-client",
+                "provenance": {"source": "test"},
+            },
+            authorization=False,
+        )
+        assert status == 503
+        assert body["error"] == "port authentication is not configured"
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_post_rejects_invalid_bearer_token():
+    server = _server()
+    try:
+        status, body = _request(
+            server,
+            "/v1/handshake",
+            {
+                "protocol": "gnozis-port/1",
+                "client_id": "test-client",
+                "provenance": {"source": "test"},
+            },
+            authorization="Bearer wrong-token",
+        )
+        assert status == 401
+        assert body["error"] == "missing or invalid bearer token"
     finally:
         server.shutdown()
         server.server_close()
