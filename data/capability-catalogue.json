@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "capabilities": [
+    {
+      "capability_id": "opportunity.evaluate-curated-records",
+      "title": "Deterministic evaluation of curated opportunity records",
+      "repository": "Autopoiesis-Intelligence/Gnosis",
+      "source_revision": "cf65a0ebd89e15a7928f8e82547336c5b310d9d1",
+      "evidence_status": "CI_PROVEN",
+      "operations": [
+        "validate_record",
+        "evaluate",
+        "rank_opportunities"
+      ],
+      "permissions": [
+        "READ_EXPLICITLY_CURATED_RECORDS"
+      ],
+      "data_classes": [
+        "curated_candidate_metadata",
+        "public_or_explicitly_provided_evidence_references"
+      ],
+      "dependencies": [
+        "Python standard library"
+      ],
+      "limits": [
+        "Input records are supplied by a caller; no source discovery or network fetch.",
+        "Scores are heuristic ranking aids, not objective truth.",
+        "Output is proposal-only and does not authorize execution."
+      ],
+      "failure_modes": [
+        "Malformed record rejected",
+        "Unknown capability deferred when a catalogue is supplied",
+        "Weak or unresolved evidence deferred",
+        "High security/privacy risk deferred"
+      ],
+      "maintenance": [
+        "Version the evaluator when score weights or decision logic change",
+        "Refresh exact source revision and CI evidence when implementation changes"
+      ],
+      "rollback": [
+        "Remove this catalogue entry or mark it UNRESOLVED if its exact-source evidence becomes invalid"
+      ],
+      "ci_evidence": [
+        {
+          "workflow": "Tests",
+          "run_id": 38415769474,
+          "conclusion": "success",
+          "commit_sha": "cf65a0ebd89e15a7928f8e82547336c5b310d9d1",
+          "url": "https://github.com/Autopoiesis-Intelligence/Gnosis/actions/runs/38415769474"
+        },
+        {
+          "workflow": "Architecture Gate",
+          "run_id": 38415769295,
+          "conclusion": "success",
+          "commit_sha": "cf65a0ebd89e15a7928f8e82547336c5b310d9d1",
+          "url": "https://github.com/Autopoiesis-Intelligence/Gnosis/actions/runs/38415769295"
+        },
+        {
+          "workflow": "Gnosis Port CI",
+          "run_id": 38415769589,
+          "conclusion": "success",
+          "commit_sha": "cf65a0ebd89e15a7928f8e82547336c5b310d9d1",
+          "url": "https://github.com/Autopoiesis-Intelligence/Gnosis/actions/runs/38415769589"
+        }
+      ]
+    }
+  ]
+}
