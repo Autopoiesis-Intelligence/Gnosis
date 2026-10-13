@@ -1,8 +1,8 @@
-# Gnozis Evolution Baseline — 2026-09-08
+# Gnosis Evolution Baseline — 2026-09-08
 
 ## Purpose
 
-This document freezes the currently evidenced Gnozis core baseline before further evolution. Evolution work must preserve the properties listed here unless a deliberate experiment explicitly falsifies and replaces one of them.
+This document freezes the currently evidenced Gnosis core baseline before further evolution. Evolution work must preserve the properties listed here unless a deliberate experiment explicitly falsifies and replaces one of them.
 
 ## Baseline invariants
 
@@ -12,7 +12,7 @@ This document freezes the currently evidenced Gnozis core baseline before furthe
 4. **Selection is internal.** The architecture contains an internal selection path rather than making the human administrator a required selector at every evolutionary step.
 5. **Autopoietic continuation is preserved.** After the required initial context/agency conditions are established, subsequent evolution can proceed through the endogenous engine without requiring a new external command for each step.
 6. **Proof status must remain traceable.** Existing tests/evidence are part of the baseline and must not be silently removed, weakened, or replaced by generated claims.
-7. **AI is not the core definition.** An AI model may be an interface/reasoning component, but it must not be represented as the complete Gnozis system or as proof of the core's endogenous properties.
+7. **AI is not the core definition.** An AI model may be an interface/reasoning component, but it must not be represented as the complete Gnosis system or as proof of the core's endogenous properties.
 8. **Repository claims require repository evidence.** No component, test, integration, capability, or result is considered present merely because an AI response says so.
 
 ## Evolution safety rule
