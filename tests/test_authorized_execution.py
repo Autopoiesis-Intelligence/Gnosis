@@ -360,12 +360,10 @@ def test_authorized_execution_rejects_partial_opportunity_binding():
             PsiTransition(lambda psi: psi),
             ExecutionInput("test", "state", "digest", "content"),
             ExternalExecutionRequest(
-                operation=ExternalOperation.REQUEST,
                 information_id="info",
+                operation=ExternalOperation.REQUEST,
                 content_digest="content",
-                capability_scope="physics",
-                privacy_scope="owner-scoped",
-                authorization="auth",
+                purpose="test",
             ),
             scoped_authorization=object(),
         )
