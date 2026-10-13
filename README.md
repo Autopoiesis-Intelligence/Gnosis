@@ -1,22 +1,24 @@
 # GNOSIS
 
+> **Canonical naming (2026-10-13):** this repository is `Autopoiesis-Intelligence/Gnosis`, the public product and evidence surface. `Autopoiesis-Intelligence/Gnosis-Core` is the public engineering Core. `Autopoiesis-Intelligence/Gnosis-Memory` contains research/context material, but its canonical source-of-truth scope is still being reconciled. `Autopoiesis-Intelligence/Gnosis-Genesis` is a separate private repository; its exact factory/authority boundary is not yet confirmed. Historical names such as `Gnozis` and `Gnozis-V2` may remain in source history or provenance, but current product branding is `Gnosis`. This README supersedes older wording that treats Genesis as an already-confirmed production authority.
+
 ## Public registry of machine-generated opportunities, contracts and evidence
 
 **Gnosis** is the public product and evidence surface of a system designed to turn technical requirements into specialized, testable modules and partner-ready opportunities.
 
-The production factory behind this surface is **Genesis**. Genesis is intended to remain a protected engineering environment rather than the primary public interface.
+The engineering Core is maintained in **Gnosis-Core**. The separate private **Gnosis-Genesis** repository may have a related role, but its exact production and authority boundary has not yet been confirmed. This public repository must expose only shareable product outputs and evidence.
 
 Gnosis is where selected outputs become inspectable: proposals, contracts, modules, evidence, provenance and partnership opportunities.
 
-> **Genesis produces. Gnosis exposes, verifies and records.**
+> **Gnosis-Core engineers. Gnosis exposes, verifies and records.**
 
 ---
 
 ## Product model
 
 ```text
-                         GENESIS
-                    protected factory
+                       GNOSIS-CORE
+                  public engineering Core
                            │
               ┌────────────┴────────────┐
               │                         │
@@ -44,7 +46,7 @@ Gnosis is where selected outputs become inspectable: proposals, contracts, modul
                        partners
 ```
 
-The public repository is therefore not intended to expose the protected factory itself. It exposes the **results and evidence that are appropriate to share**.
+The public repository is not the private factory or authority boundary. It exposes the **results and evidence that are appropriate to share**. The exact boundary between `Gnosis-Core` and private `Gnosis-Genesis` remains an explicit unresolved architecture decision.
 
 ---
 
@@ -74,7 +76,7 @@ Commercial / partner opportunity
 
 The four levels must remain distinct:
 
-1. **Factory creation** — Genesis creates a specialized candidate.
+1. **Candidate creation** — a candidate is produced by the currently authorized engineering/factory path. The private `Gnosis-Genesis` repository's exact role is not yet confirmed.
 2. **Module adaptation** — the candidate may be configured, trained, supplied with knowledge, or otherwise adapted within an authorized scope.
 3. **Module operation** — the released module performs bounded tasks.
 4. **Factory/Core evolution** — changes to the protected factory or its governing mechanisms require a separate authority and evidence chain.
@@ -248,7 +250,7 @@ Unknown provenance or unknown permission is not treated as permission by default
 
 ---
 
-## Research-Memory
+## Research and project context
 
 **Gnosis-Memory** is the machine-readable research and context layer associated with the product.
 
@@ -262,7 +264,7 @@ Its role is to preserve and organize:
 - AI-readable context;
 - candidate knowledge for future implementation.
 
-Research-Memory is **not itself the authority for changing Genesis**. It supplies structured context and candidate material subject to the relevant contracts and gates.
+`Gnosis-Memory` is a research/context repository, not an execution authority. Its canonical source-of-truth scope and relationship to `Gnosis` are still being reconciled. Research material supplies candidate context only; it does not authorize changes to Core or any private factory.
 
 The intended relationship is:
 
@@ -273,18 +275,22 @@ Gnosis-Memory
           ↓
       eligibility
           ↓
-        Genesis
+      Gnosis-Core
           ↓
-     generated outputs
+ engineering / evaluation
+          ↓
+ shareable outputs / evidence
           ↓
        Gnosis
+
+[private Gnosis-Genesis: exact boundary unresolved]
 ```
 
 ---
 
-## Public repository vs protected factory
+## Public product and repository boundaries
 
-The product deliberately separates public visibility from protected execution.
+The product deliberately separates public visibility from engineering and any private execution boundary. The exact private boundary remains unresolved.
 
 ### Public: Gnosis
 
@@ -296,7 +302,7 @@ The product deliberately separates public visibility from protected execution.
 - research-facing materials;
 - partnership surface.
 
-### Research: Gnosis-Memory
+### Research/context: Gnosis-Memory
 
 - machine-readable research;
 - historical context;
@@ -304,15 +310,9 @@ The product deliberately separates public visibility from protected execution.
 - evidence archive;
 - development context.
 
-### Protected: Genesis
+### Private repository: Gnosis-Genesis
 
-- module factory;
-- controlled generation;
-- learning/adaptation pipeline;
-- internal orchestration;
-- protected evolution mechanisms.
-
-The protected factory should not be treated as the public product interface.
+Its repository is private, but its exact responsibilities and authority relationship to `Gnosis-Core` have not yet been confirmed by current repository contents. Do not assume that it owns module generation, orchestration, or protected evolution until that boundary is explicitly documented and accepted.
 
 ---
 
@@ -359,41 +359,6 @@ This repository describes the **target public product architecture** as it is be
 Do not interpret the presence of a documented workflow as proof that the complete end-to-end workflow is already operational.
 
 For implementation status and evidence, consult the current repository artifacts and project contracts.
-
-
-## Getting started
-
-This repository is the public product and evidence surface, not a packaged hosted service by default.
-
-1. Browse the repository's source, contracts, tests, and current [open issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues).
-2. Before relying on a proposed capability, inspect the exact source version and the relevant test/CI evidence.
-3. If you are evaluating a module or opportunity, review its scope, limitations, provenance, and evidence rather than relying on a name or maturity label alone.
-4. If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).
-
-No universal installation or production deployment command is promised here: the available entry point depends on the specific component and its implementation status.
-
-## Current capabilities and limitations
-
-This repository contains product documentation and engineering artifacts for an evolving system. The complete end-to-end factory, registry, partner, and commercial workflow is **not asserted to be fully operational** merely because it is described here.
-
-Use these distinctions when evaluating a claim:
-
-- **Documented** means described in repository content.
-- **Implemented** means the relevant code exists at the inspected commit.
-- **Tested** means a specific test run exercised the behavior.
-- **CI-proven** means the relevant checks passed for an exact commit.
-- **Runtime-proven** means the behavior was observed in the relevant runtime and evidence was retained.
-
-A generated proposal, passing synthetic test, README statement, or open pull request does not by itself prove a production capability. See the [current implementation and issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues) for work in progress and unresolved questions.
-
-## Feedback and communication
-
-- [Report a bug](https://github.com/Autopoiesis-Intelligence/Gnosis/issues/new?template=bug_report.md)
-- [Request a feature](https://github.com/Autopoiesis-Intelligence/Gnosis/issues/new?template=feature_request.md)
-- [Browse open issues](https://github.com/Autopoiesis-Intelligence/Gnosis/issues)
-- Read [support and feedback guidance](SUPPORT.md) or [contribution guidance](CONTRIBUTING.md).
-
-When possible, include reproducible steps, the affected commit, and public test/CI evidence. Do not post secrets, credentials, or private partner data. Requests are not automatically accepted, scheduled, or implemented.
 
 ---
 
