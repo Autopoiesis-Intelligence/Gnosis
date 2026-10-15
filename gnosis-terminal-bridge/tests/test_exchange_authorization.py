@@ -22,7 +22,7 @@ def exchange_payload(session_id, message_id, status):
         "authorization": {
             "source": "test-client",
             "purpose": "test",
-            "operation": "read",
+            "operation": "observe",
             "destination": "core",
             "status": status,
         },
@@ -43,13 +43,16 @@ def test_exchange_does_not_trust_client_allowed_authorization():
 
 
 @pytest.mark.parametrize("status", ["UNKNOWN", "DENIED", "EXPIRED", "REVOKED"])
-def test_exchange_rejects_non_allowed_authorization(status):
+def test_exchange_treats_client_authorization_status_as_untrusted_claim(status):
     port = InternetPort(_port_handler)
     session = handshake(port)
-    with pytest.raises(PermissionError):
-        port.exchange(
-            exchange_payload(session["session_id"], "m1", status)
-        )
+    result = port.exchange(
+        exchange_payload(session["session_id"], "m1", status)
+    )
+    assert result["status"] == "accepted"
+    assert result["result"]["authorization_status"] == "UNKNOWN"
+    assert result["result"]["effect"] == "proposal_only"
+    assert result["result"]["authority_granted"] is False
 
 
 def test_exchange_rejects_missing_authorization():
