@@ -30,14 +30,16 @@ def exchange_payload(session_id, message_id, status):
     }
 
 
-def test_exchange_preserves_and_enforces_allowed_authorization():
+def test_exchange_does_not_trust_client_allowed_authorization():
     port = InternetPort(_port_handler)
     session = handshake(port)
     result = port.exchange(
         exchange_payload(session["session_id"], "m1", "ALLOWED")
     )
     assert result["status"] == "accepted"
-    assert result["result"]["authorization_status"] == "ALLOWED"
+    assert result["result"]["authorization_status"] == "UNKNOWN"
+    assert result["result"]["effect"] == "proposal_only"
+    assert result["result"]["authority_granted"] is False
 
 
 @pytest.mark.parametrize("status", ["UNKNOWN", "DENIED", "EXPIRED", "REVOKED"])
