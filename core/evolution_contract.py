@@ -493,6 +493,12 @@ class CoreLifecycleRecord:
 
 
 @dataclass(frozen=True)
+class NetworkAttachmentState(str, Enum):
+    ATTACHED = "attached"
+    DETACHED = "detached"
+    REVOKED = "revoked"
+
+
 class NetworkAttachment:
     core_id: str
     network_id: str
