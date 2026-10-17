@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from core.authorized_execution import AuthorizedExecution
 from core.execution import CanonicalExecutor
-from core.execution_contract import execution_input_from_psi, state_digest
+from core.execution_contract import execution_input_from_psi, execution_input_identity, state_digest
 from core.external_execution_request import ExternalExecutionRequest
 from core.external_operation import ExternalOperation
 from core.history import AppendOnlyHistory
@@ -49,7 +49,7 @@ def run(output: Path, database: Path) -> dict:
     if recovered.state != expected or recovered.applied != 1:
         raise RuntimeError("runtime recovery invariant failed")
     evidence = {"schema":"gnozis-runtime-evidence-v1","task_id":result.task_id,
-        "content_digest":result.content_digest,"initial_state_digest":state_digest(psi),
+        "content_digest":result.content_digest,\n        "execution_input_identity": execution_input_identity(execution_input),\n        "initial_state_digest":state_digest(psi),
         "result_state_digest":state_digest(result.execution.psi),"history_records":1,
         "provenance_records":1,"audit_records":1,
         "authorization":information.authorization.status.value,
