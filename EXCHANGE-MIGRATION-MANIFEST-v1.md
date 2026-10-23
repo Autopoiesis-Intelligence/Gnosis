@@ -46,3 +46,5 @@ gnosis-terminal-bridge/src/core_adapter.py -> Exchange-to-Core adapter.
 
 Physical transfer: BLOCKED by target write access.
 Source preservation: REQUIRED.
+
+> 2026-10-23: `bot.py`, `render.yaml` and `requirements.txt` were removed from Gnosis (old Telegram/OpenRouter bot, out of the active stack). They remain in git history at `935233c`.

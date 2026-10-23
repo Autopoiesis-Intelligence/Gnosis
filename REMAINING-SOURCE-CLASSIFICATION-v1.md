@@ -61,3 +61,5 @@ Public Gnozis must not contain Genesis-private implementation.
 4. Core/public docs split
 5. CI/workflow split
 6. final source de-duplication only after verification
+
+> 2026-10-23: `bot.py`, `render.yaml` and `requirements.txt` were removed from Gnosis (old Telegram/OpenRouter bot, out of the active stack). They remain in git history at `935233c`.
