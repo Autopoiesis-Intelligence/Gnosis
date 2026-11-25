@@ -1,6 +1,6 @@
 # Gnosis Trademark and Naming Notice
 
-Copyright © 2026 Mikhail Kucheriavyi. All rights reserved.
+Copyright © 2026 The GNOSIS Project. All rights reserved.
 
 The names Gnosis, Gnosis Core, Ψ-Core, and related project names identify the Gnosis project and its components.
 
