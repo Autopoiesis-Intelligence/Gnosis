@@ -7,7 +7,7 @@ def test_verified_challenge_can_carry_agency_identity():
     context = {"epoch": 1, "generation": 2, "height": 1}
     identity = AgencyIdentity(
         provider="github",
-        subject="Mikhail-Kucheriavyi-23",
+        subject="synthetic-test-user",
     )
 
     issued = bridge.initiate_challenge(context)
@@ -24,7 +24,7 @@ def test_verified_challenge_can_carry_agency_identity():
 
     assert result["status"] == "VERIFIED"
     assert result["agency"]["identity"]["provider"] == "github"
-    assert result["agency"]["identity"]["subject"] == "Mikhail-Kucheriavyi-23"
+    assert result["agency"]["identity"]["subject"] == "synthetic-test-user"
     assert result["agency"]["identity"]["authenticated"] is True
     assert result["agency"]["epoch"] == 1
     assert result["agency"]["generation"] == 2
@@ -36,7 +36,7 @@ def test_handle_accepts_agency_identity_without_exposing_credentials():
     context = {"epoch": 1, "generation": 2, "height": 1}
     identity = AgencyIdentity(
         provider="github",
-        subject="Mikhail-Kucheriavyi-23",
+        subject="synthetic-test-user",
     )
 
     issued = bridge.initiate_challenge(context)
