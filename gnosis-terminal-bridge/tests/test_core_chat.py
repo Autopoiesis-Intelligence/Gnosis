@@ -8,7 +8,7 @@ def make_context():
     return AgencyContext(
         identity=AgencyIdentity(
             provider="github",
-            subject="Mikhail-Kucheriavyi-23",
+            subject="synthetic-test-user",
             authenticated=True,
         ),
         epoch=1,
@@ -26,7 +26,7 @@ def test_chat_message_goes_through_core_engine_and_evolves_state():
     assert result["response"] == "Gnozis core received the message and evolved its state."
     assert result["state"]["turn"] == 1
     assert result["state"]["last_message"] == "Hello, Gnozis"
-    assert result["state"]["agency_subject"] == "Mikhail-Kucheriavyi-23"
+    assert result["state"]["agency_subject"] == "synthetic-test-user"
     assert result["state"]["height"] == 3
     assert "input_message" not in result["state"]
 
