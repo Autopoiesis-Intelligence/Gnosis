@@ -1,7 +1,7 @@
 schema_version: "1.0.0"
 assessment_id: "RM-CURRENT-AUTONOMY-EVIDENCE-R1"
 checked_at: "2026-09-25T00:06:10Z"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 
 watcher:
   workflow: ".github/workflows/autonomous-watcher.yml"
