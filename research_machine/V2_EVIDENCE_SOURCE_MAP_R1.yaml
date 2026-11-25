@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 map_id: "RM-V2-EVIDENCE-SOURCE-MAP-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 purpose: "identify authoritative V2 evidence sources for enriching Research-Memory claims"
 
 authoritative_sources:
