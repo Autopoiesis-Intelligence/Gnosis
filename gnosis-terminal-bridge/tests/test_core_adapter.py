@@ -9,7 +9,7 @@ def test_verified_agency_context_becomes_credential_free_core_state():
     context = AgencyContext(
         identity=AgencyIdentity(
             provider="github",
-            subject="Mikhail-Kucheriavyi-23",
+            subject="synthetic-test-user",
             authenticated=True,
         ),
         epoch=1,
@@ -22,7 +22,7 @@ def test_verified_agency_context_becomes_credential_free_core_state():
 
     assert isinstance(state, State)
     assert state.values["agency"]["identity"]["provider"] == "github"
-    assert state.values["agency"]["identity"]["subject"] == "Mikhail-Kucheriavyi-23"
+    assert state.values["agency"]["identity"]["subject"] == "synthetic-test-user"
     assert state.values["agency"]["identity"]["authenticated"] is True
     assert state.values["agency"]["epoch"] == 1
     assert state.values["agency"]["generation"] == 2

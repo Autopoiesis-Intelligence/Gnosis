@@ -9,7 +9,7 @@ def make_context():
     return AgencyContext(
         identity=AgencyIdentity(
             provider="github",
-            subject="Mikhail-Kucheriavyi-23",
+            subject="synthetic-test-user",
             authenticated=True,
         ),
         epoch=1,
@@ -40,13 +40,13 @@ def test_agency_context_is_available_to_transition_and_evolution_needs_no_extern
     evolved = uroboros.step()
 
     assert evolved.state.values["value"] == 10
-    assert evolved.state.values["agency_seen"] == "Mikhail-Kucheriavyi-23"
+    assert evolved.state.values["agency_seen"] == "synthetic-test-user"
     assert evolved.state.values["next_height"] == 4
-    assert calls == ["Mikhail-Kucheriavyi-23"]
+    assert calls == ["synthetic-test-user"]
 
     evolved_again = evolved.step()
-    assert evolved_again.state.values["agency_seen"] == "Mikhail-Kucheriavyi-23"
-    assert calls == ["Mikhail-Kucheriavyi-23", "Mikhail-Kucheriavyi-23"]
+    assert evolved_again.state.values["agency_seen"] == "synthetic-test-user"
+    assert calls == ["synthetic-test-user", "synthetic-test-user"]
 
 
 def test_same_state_and_same_agency_context_are_deterministic():
@@ -118,10 +118,10 @@ def test_context_is_captured_once_and_three_evolution_steps_need_no_external_inp
     third = second.step()
 
     assert third.state.values["steps"] == 3
-    assert third.state.values["subject"] == "Mikhail-Kucheriavyi-23"
+    assert third.state.values["subject"] == "synthetic-test-user"
     assert transition_calls == [
-        "Mikhail-Kucheriavyi-23",
-        "Mikhail-Kucheriavyi-23",
-        "Mikhail-Kucheriavyi-23",
+        "synthetic-test-user",
+        "synthetic-test-user",
+        "synthetic-test-user",
     ]
     assert external_calls == []

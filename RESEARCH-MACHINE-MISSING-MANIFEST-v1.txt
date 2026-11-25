@@ -1,7 +1,7 @@
 # RESEARCH-MACHINE-MISSING-MANIFEST-v1
 
-Source: Mikhail-Kucheriavyi-23/Gnozis/main
-Target: Mikhail-Kucheriavyi-23/Gnozis-Research-Memory/main
+Source: Autopoiesis-Intelligence/Gnosis/main
+Target: Autopoiesis-Intelligence/Gnosis-Memory/main
 Status: READY_FOR_EXTERNAL_BATCH
 Missing objects: 210
 

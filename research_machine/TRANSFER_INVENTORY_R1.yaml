@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 inventory_id: "RM-TRANSFER-INVENTORY-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 source_ref: "main"
 source_snapshot_basis: "current tree"
 purpose: "machine-readable inventory for migration into Gnozis-Research-Memory"

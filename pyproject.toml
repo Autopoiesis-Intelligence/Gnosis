@@ -9,9 +9,6 @@ description = "GNOSIS — Universal Scientific Discovery & Intelligence Platform
 readme = "README.md"
 requires-python = ">=3.10"
 
-authors = [
-    { name = "Mikhail Kucheriavyi" }
-]
 
 license = { file = "LICENSE-RESEARCH.md" }
 
@@ -40,9 +37,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/"
-Repository = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/"
-Issues = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/issues"
+Homepage = "https://github.com/Autopoiesis-Intelligence/Gnosis/"
+Repository = "https://github.com/Autopoiesis-Intelligence/Gnosis/"
+Issues = "https://github.com/Autopoiesis-Intelligence/Gnosis/issues"
 
 [tool.setuptools]
 packages = ["core"]

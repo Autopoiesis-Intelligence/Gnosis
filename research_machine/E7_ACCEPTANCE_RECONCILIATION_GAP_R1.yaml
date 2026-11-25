@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 assessment_id: "RM-E7-109-110-GAP-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 
 E7_109:
   status: "DESIGNED / NOT_IMPLEMENTED"
