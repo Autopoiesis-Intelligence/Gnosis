@@ -37,9 +37,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/"
-Repository = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/"
-Issues = "https://github.com/Mikhail-Kucheriaviy-23/Gnozis/issues"
+Homepage = "https://github.com/Autopoiesis-Intelligence/Gnosis/"
+Repository = "https://github.com/Autopoiesis-Intelligence/Gnosis/"
+Issues = "https://github.com/Autopoiesis-Intelligence/Gnosis/issues"
 
 [tool.setuptools]
 packages = ["core"]
