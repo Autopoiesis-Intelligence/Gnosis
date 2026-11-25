@@ -1,6 +1,6 @@
 # Gnosis Commercial Licensing
 
-Copyright © 2026 Mikhail Kucheriavyi. All rights reserved.
+Copyright © 2026 The GNOSIS Project. All rights reserved.
 
 Commercial use of Gnosis research material and derivative products is subject to an applicable written commercial agreement unless an individual component is explicitly released under another license.
 
