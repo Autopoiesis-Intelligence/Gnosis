@@ -1,6 +1,6 @@
 # Gnosis Research Use and Copyright Notice
 
-Copyright © 2026 Mikhail Kucheriavyi. All rights reserved.
+Copyright © 2026 The GNOSIS Project. All rights reserved.
 
 This repository is the Gnosis Research Library. It contains research material, experimental implementations, documentation, mathematical models and historical development work.
 
