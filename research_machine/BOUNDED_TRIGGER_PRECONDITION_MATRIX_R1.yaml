@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 matrix_id: "RM-BOUNDED-TRIGGER-PRECONDITION-MATRIX-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 status: "DESIGN_ONLY"
 
 preconditions:
