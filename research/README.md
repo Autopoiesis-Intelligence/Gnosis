@@ -134,7 +134,7 @@ encouraged to cite the project according to `CITATION.cff`.
 Recommended citation:
 
 > GNOSIS — Universal Scientific Discovery & Intelligence Platform,
-> UROBOROS Ψ-Core v33, Mikhail Kucheriavyi, 2026.
+> UROBOROS Ψ-Core v33, GNOSIS Project, 2026.
 
 ---
 
