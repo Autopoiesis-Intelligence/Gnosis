@@ -9,9 +9,6 @@ description = "GNOSIS — Universal Scientific Discovery & Intelligence Platform
 readme = "README.md"
 requires-python = ">=3.10"
 
-authors = [
-    { name = "Mikhail Kucheriavyi" }
-]
 
 license = { file = "LICENSE-RESEARCH.md" }
 
