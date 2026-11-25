@@ -11,10 +11,7 @@ Its core architecture, UROBOROS Ψ-Core v33, is designed as a
 recursive, self-organizing computational framework for investigating
 complex systems, adaptive processes and autonomous model evolution.
 
-authors:
-
-* family-names: "Kucheriavyi"
-  given-names: "Mikhail"
+authors: []
 
 repository-code: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 
@@ -48,9 +45,7 @@ repository-artifact: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
 preferred-citation:
 type: software
 title: "GNOSIS — Universal Scientific Discovery & Intelligence Platform"
-authors:
-- family-names: "Kucheriavyi"
-given-names: "Mikhail"
+authors: []
 year: 2026
 version: "Ψ-Core v33"
 url: "https://github.com/Autopoiesis-Intelligence/Gnosis/"
