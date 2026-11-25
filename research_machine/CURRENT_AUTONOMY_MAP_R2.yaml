@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 assessment_id: "RM-CURRENT-AUTONOMY-MAP-R2"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 as_of: "2026-09-25"
 
 autonomous_layers:
