@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 provenance_id: "RM-V2-XAT-PROVENANCE-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 verified_sources:
   - id: "GNV2-003"
     artifact: "logs/audit/GNV2-003_BYPASS_FINDING.md"
