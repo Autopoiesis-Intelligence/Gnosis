@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 assessment_id: "RM-E7-108-IMPLEMENTATION-GAP-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 finding:
   E7.108: "DESIGNED / NOT_IMPLEMENTED"
   existing_execution_receipt: "TrainingExecutionReceipt exists, but it is not the E7.108 authoritative first-batch execution record"
