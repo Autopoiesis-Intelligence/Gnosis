@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 assessment_id: "RM-LEARNING-RUNTIME-CALLGRAPH-R1"
-source_repository: "Mikhail-Kucheriavyi-23/Gnozis-V2"
+source_repository: "Autopoiesis-Intelligence/Gnosis"
 finding:
   learning_cycle_harness: "build_verified_cycle() composes DATABASE→FINDING→PROPOSAL→VALIDATION→GOVERNANCE→EXECUTION_PLAN→RECEIPT, applies knowledge, promotes and creates integration record"
   execution_boundary: "create_execution_plan() explicitly requires external execution authority"
