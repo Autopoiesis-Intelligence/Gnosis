@@ -4,7 +4,7 @@
 
 ### UROBOROS — Ψ-Core v33
 
-**Copyright © 2026 Mikhail Kucheriaviy.**
+**Copyright © 2026 The GNOSIS Project.**
 
 **Public Research Release: 3 September 2026**
 
@@ -159,7 +159,7 @@ When GNOSIS technology is referenced in research or technical work, the followin
 
 > GNOSIS — Universal Scientific Discovery & Intelligence Platform
 > UROBOROS — Ψ-Core v33
-> Mikhail Kucheriaviy
+> The GNOSIS Project
 > Public Research Release — 3 September 2026
 
 Where possible, the relevant version or Git commit should also be identified.
@@ -273,9 +273,9 @@ The reference architecture is:
 
 **Ψ-Core v33**
 
-The author is:
+The project attribution is:
 
-**Mikhail Kucheriaviy**
+**The GNOSIS Project**
 
 The public research release is:
 
@@ -301,4 +301,4 @@ False affiliation is not.
 
 **No Implied Endorsement.**
 
-**Copyright © 2026 Mikhail Kucheriaviy.**
+**Copyright © 2026 The GNOSIS Project.**
